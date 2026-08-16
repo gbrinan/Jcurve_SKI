@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Lv.5 통합 패키징 하네스 — 기계 판정 (L1~L3 + L4 일부).
 
-사용: python3 harness/run_harness.py <팩 경로>
+사용:
+  python3 harness/run_harness.py <팩 경로>   팀 에이전트 팩을 판정
+  python3 harness/run_harness.py --self      이 저장소 자신을 판정 (README ↔ 실제 폴더 일치)
+
 종료 코드 0 = 기계 판정 전체 통과. L4의 [사람 판정] 항목은 별도 수행 필요.
 """
 import re
@@ -144,5 +147,46 @@ def main(pack_dir):
     return 1 if fails else 0
 
 
+def self_check(repo_dir):
+    """저장소 자신을 검사: README 구조도가 실제 최상위 폴더를 전부 안내하는가.
+
+    L2("기획서가 모르는 스킬은 반영 안 된 맥락")와 같은 논리를 저장소에 적용한 것.
+    폴더를 추가하고 README를 안 고치면 여기서 실패한다.
+    """
+    repo = Path(repo_dir)
+    readme = (repo / "README.md")
+    if not readme.is_file():
+        print("❌ README.md 없음")
+        return 1
+    text = readme.read_text(encoding="utf-8")
+
+    actual = {p.name for p in repo.iterdir()
+              if p.is_dir() and not p.name.startswith((".", "__"))}
+    # 구조도 블록 안에서 `이름/` 형태로 언급된 폴더만 인정한다
+    documented = set(re.findall(r"[│├└─\s]([\w.-]+)/", text))
+
+    # 반대 방향(README에만 있고 실재하지 않는 폴더) 검사는 두지 않는다.
+    # 중첩 폴더 표기와 한국어 문장의 '/'를 최상위 폴더와 구별할 수 없어 오탐만 냈다 — 제거 우선.
+    missing = sorted(actual - documented)
+    check("SELF", "README가 모든 최상위 폴더를 안내", not missing,
+          f"구조도에 없는 폴더: {missing}" if missing else "")
+    for tool in ["prompts", "harness"]:
+        if tool in actual:
+            check("SELF", f"{tool}/ 사용법 섹션 존재", f"{tool}/" in text and text.count(tool) >= 3,
+                  f"{tool}/가 구조도에만 있고 사용법 설명이 없음")
+
+    rows = [r for r in results if r[0] == "SELF"]
+    print(f"\n[SELF] {sum(1 for r in rows if r[2])}/{len(rows)} 통과")
+    for _, name, ok, detail in rows:
+        print(f"  {'✅' if ok else '❌'} {name}" + (f" — {detail}" if detail and not ok else ""))
+    fails = [r for r in rows if not r[2]]
+    print(f"\n{'='*50}")
+    print(f"저장소 자기 판정: {'통과 ✅' if not fails else f'실패 {len(fails)}건 ❌'}")
+    return 1 if fails else 0
+
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1] if len(sys.argv) > 1 else "."))
+    arg = sys.argv[1] if len(sys.argv) > 1 else "."
+    if arg == "--self":
+        sys.exit(self_check(Path(__file__).resolve().parent.parent))
+    sys.exit(main(arg))

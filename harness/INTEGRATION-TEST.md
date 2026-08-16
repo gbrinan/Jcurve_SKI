@@ -38,12 +38,24 @@ L4의 일부는 사람(또는 AI 리뷰어)이 시나리오를 실제 실행해 
 ## 실행 방법
 
 ```
-python3 harness/run_harness.py <팩 경로>
-예: python3 harness/run_harness.py examples/sample/team-agent
+python3 harness/run_harness.py <팩 경로>      # L1~L4 기계 판정
+python3 harness/simulate_run.py <팩 경로>     # 시나리오 E2E 실행 + 오류 주입
+python3 harness/run_harness.py --self         # 저장소 자기 판정 (아래 SELF 레이어)
 ```
 
 출력: 레이어별 PASS/FAIL과 실패 사유. 종료 코드 0 = 기계 판정 전체 통과.
 기계 판정 통과 후 L4의 [사람 판정] 2개를 수동으로 수행해야 최종 성공이다.
+
+## SELF 레이어 — 저장소 자신에게 적용하는 하네스
+
+L2("기획서가 모르는 스킬 = 반영 안 된 맥락")와 같은 논리를 이 저장소에 적용한다.
+문서가 도구를 따라가지 못하는 드리프트를 기계가 잡는다.
+
+- [ ] README 구조도가 실재하는 최상위 폴더를 전부 안내하는가
+- [ ] prompts/·harness/가 구조도에만 있지 않고 사용법 설명이 있는가
+
+> 반대 방향(README에만 있고 실재하지 않는 폴더) 검사는 의도적으로 두지 않았다.
+> 중첩 폴더 표기와 한국어 문장의 '/'를 최상위 폴더와 구별하지 못해 오탐만 냈다 — 제거 우선.
 
 ## 판정 철학 (paperthin)
 
