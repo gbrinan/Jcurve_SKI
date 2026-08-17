@@ -146,9 +146,35 @@ def main(pack_dir):
             check("L3", f"흐름 정합: {a}→{b}", bool(out & inp),
                   f"outputs {sorted(out)} ↛ inputs {sorted(inp)}" if not out & inp else "")
 
+    # ── 산출물 유형 분기 ──
+    # 두 가지를 본다: AI에 맡길 태스크가 몇 개인가(ATF ③다단계성), 갈림길이 있는가(ATF ④순서 가변성).
+    # 어느 쪽도 탈락 사유가 아니다. 이름을 정확히 붙이고 다음 걸음을 알려줄 뿐이다.
     branching = any(len(v) > 1 for v in nexts.values())
-    pack_kind = "팀 에이전트 (갈림길 있음)" if branching else "팀 스킬팩 (순차 실행)"
+    humans = {n: (m.get("human") or "").strip() for n, (m, _, _) in skills.items()}
+    ai_tasks = [n for n, h in humans.items() if h in ("자동", "증강")]
+    human_only = [n for n, h in humans.items() if h == "사람고유"]
+    known_human = any(humans.values())          # human 필드가 하나라도 적혀 있는가
+    too_few = known_human and len(ai_tasks) < 3  # ATF ③다단계성 기준선
+
+    if too_few:
+        pack_kind = f"팀 스킬팩 (AI 태스크 {len(ai_tasks)}개 — ATF ③다단계성 미충족)"
+        kind_note = [
+            f"  · AI에 맡길 태스크(자동·증강)가 {len(ai_tasks)}개입니다. 에이전트가 대신할 일 자체가 적습니다.",
+            "    다음 중 하나를 고르십시오 — 태스크를 더 쪼개 3개 이상으로 만들거나, 이대로 스킬 묶음으로 씁니다.",
+        ]
+    elif branching:
+        pack_kind = "팀 에이전트 (갈림길 있음)"
+        kind_note = []
+    else:
+        pack_kind = "팀 스킬팩 (순차 실행)"
+        kind_note = [
+            "  · 순서가 매번 같은 흐름입니다. 지금 만든 것은 스킬 묶음이고,",
+            "    갈림길이 생기는 순간 그대로 에이전트가 됩니다 — 부품은 이미 다 만들었습니다.",
+        ]
+
+    # 체인 중간의 사람고유 지점은 L4가 보지 못한다(끝점만 검사). 여기서 알려준다.
     terminals = [n for n in skills if not nexts.get(n)]
+    mid_human = [n for n in human_only if n not in terminals]
     chain = [n for n in _topo(skills, nexts)] if reached == set(skills) else []
 
     # 용어 일관: 표 이름 근사 중복(공백/언더스코어 차이) 탐지
@@ -200,9 +226,13 @@ def main(pack_dir):
     print(f"\n{'='*50}")
     print(f"기계 판정: {'전체 통과 ✅' if not fails else f'실패 {len(fails)}건 ❌'}")
     print(f"산출물 유형: {pack_kind}")
-    if not branching:
-        print("  · 순서가 매번 같은 흐름입니다. 지금 만든 것은 스킬 묶음이고,")
-        print("    갈림길이 생기는 순간 그대로 에이전트가 됩니다 — 부품은 이미 다 만들었습니다.")
+    for line in kind_note:
+        print(line)
+    if not known_human:
+        print("  · 스킬에 human 필드(자동·증강·사람고유)가 없어 태스크 수 판정을 건너뛰었습니다.")
+    if mid_human:
+        print(f"  ⚠️ 사람고유 지점이 체인 중간에 있습니다: {mid_human}")
+        print("     L4는 끝점만 검사하므로, CONTRACT.md의 halt_at에 이 이름을 반드시 넣으십시오.")
     print("주의: L4의 [사람 판정] 2개(실제 실행, 오류 주입)는 별도 수행 필요")
     return 1 if fails else 0
 
