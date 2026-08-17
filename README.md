@@ -18,16 +18,24 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 ## 🧭 전체 흐름 — 세션 6에서 7까지
 
 ```
-개인 Lv.6 스킬 3개
+개인 Lv.6 스킬 3개 (각자 자유롭게 작성)
       │
       ├─① prompts/  인터뷰 6문항에 답한다      →  agent-plan.md (기획서 = 원본/SSOT)
-      │                                            + 스킬팩 폴더 트리
-      ├─② harness/  제대로 묶였는지 검증한다    →  통과/실패 리포트
-      │                                            (+ 시나리오 실제 실행)
+      │                                            + CONTRACT.md (이름 계약)
+      │
+      ├─② harness/  계약 준수 게이트 →  🟢 통과 → 하네스 → E2E 실행
+      │             (check_contract)   🟡 표기 어긋남 → 교정안 → 재검사
+      │                                🔴 충돌 → 팀이 결정 → 재검사
+      │
       └─③ slide-pack  발표 자료로 만든다        →  ...-deck.html (발표용 SK CI 테마)
 ```
 
 각 단계는 앞 단계의 산출물을 그대로 입력으로 받습니다. 기획서 하나가 끝까지 따라갑니다.
+
+> **왜 게이트가 먼저인가**: 각자 만든 스킬은 표 이름·페이로드 이름이 서로 다릅니다.
+> 그 상태로 하네스를 돌리면 실패가 쏟아질 뿐 아니라, 이름이 어긋난 탓에 **진짜 충돌이 가려집니다**
+> (두 사람이 같은 표에 쓰는데 철자가 달라 다른 표로 보이는 등). 게이트가 이름을 정본으로 맞춘 뒤에
+> 하네스가 구조를 봅니다.
 
 ---
 
@@ -45,12 +53,20 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 
 ## ② 통합 하네스 — 잘 묶였는지 검증하기
 
-패키징한 폴더를 넣고 실행하면 통과/실패가 나옵니다.
+패키징한 폴더를 넣고 실행하면 통과/실패가 나옵니다. **계약 게이트부터 시작하세요.**
 
 ```bash
-python3 harness/run_harness.py examples/sample/team-agent    # 구조·일관성 자동 판정
-python3 harness/simulate_run.py examples/sample/team-agent   # 시나리오를 처음부터 끝까지 실행
+python3 harness/check_contract.py examples/sample/team-agent --run-harness  # 게이트 → 통과 시 하네스
+python3 harness/simulate_run.py examples/sample/team-agent                  # 시나리오 처음부터 끝까지 실행
 ```
+
+게이트는 팀원들이 각자 만들어 온 스킬을 `CONTRACT.md`(표·기록자·체인·페이로드·임계값)와 대조해 세 갈래로 나눕니다:
+
+| 판정 | 뜻 | 팀이 할 일 |
+|---|---|---|
+| 🟢 GREEN | 위반 없음 | 없음 — 하네스가 이어서 돕니다 |
+| 🟡 YELLOW | 표기만 어긋남 (`견적_비교표` vs `견적비교표`) | `REMEDIATION.md`의 치환 제안을 확인·반영 후 재검사 |
+| 🔴 RED | 팀 결정 필요 (기록자 중복, 임계값 상충 등) | 누가 쓸지·어느 값이 맞는지 정한 뒤 재검사 |
 
 **무엇을 보는가** (상세는 [`harness/INTEGRATION-TEST.md`](harness/INTEGRATION-TEST.md)):
 
