@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>계열사 AX전략 팀장에게 공유 에이전트</title>
+<style>
+  :root {
+    --bg: #0f1420;
+    --surface: #1a2233;
+    --line: #2c3a55;
+    --text: #e8edf7;
+    --muted: #93a1bd;
+    --accent: #ffb454;
+    --accent2: #5ec8f8;
+    --ok: #7dd486;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--bg); color: var(--text);
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif; }
+  .deck { height: 100%; display: flex; align-items: center; justify-content: center; }
+  .slide {
+    display: none; width: min(96vw, 177.6vh); aspect-ratio: 16/9;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: clamp(24px, 5vh, 56px) clamp(28px, 6vw, 72px);
+    flex-direction: column; justify-content: center; gap: clamp(12px, 2.5vh, 26px);
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+  .kicker { color: var(--accent); font-size: clamp(12px, 1.6vh, 17px); font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase; }
+  h1 { font-size: clamp(28px, 6vh, 56px); line-height: 1.2; }
+  h2 { font-size: clamp(20px, 4.2vh, 38px); line-height: 1.25; }
+  .sub { color: var(--muted); font-size: clamp(14px, 2.2vh, 21px); line-height: 1.5; }
+  ul { list-style: none; display: flex; flex-direction: column; gap: clamp(8px, 1.8vh, 16px); }
+  ul li { padding-left: 1.2em; position: relative; font-size: clamp(14px, 2.4vh, 22px); line-height: 1.45; }
+  ul li::before { content: "▸"; position: absolute; left: 0; color: var(--accent2); }
+  strong { color: var(--accent); font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: clamp(12px, 2vh, 18px); }
+  th { text-align: left; color: var(--accent2); border-bottom: 2px solid var(--line);
+    padding: .45em .6em; font-weight: 700; }
+  td { border-bottom: 1px solid var(--line); padding: .45em .6em; line-height: 1.4; }
+  .pill { display: inline-block; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 999px; padding: .2em .8em; color: var(--accent2);
+    font-size: clamp(11px, 1.7vh, 15px); }
+  .pill.ok { color: var(--ok); border-color: var(--ok); }
+  pre { background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: clamp(10px, 2vh, 20px); font-size: clamp(11px, 1.9vh, 17px); line-height: 1.5;
+    overflow-x: auto; font-family: "D2Coding", Consolas, monospace; color: var(--text); }
+  .pager { position: fixed; right: 22px; bottom: 16px; color: var(--muted);
+    font-size: 14px; font-variant-numeric: tabular-nums; }
+  .hint { position: fixed; left: 22px; bottom: 16px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="deck">
+
+<section class="slide">
+  <div class="kicker">팀 스킬팩 · AX전략 공유하기</div>
+  <h1>계열사 AX전략 팀장에게<br>공유 에이전트</h1>
+  <p class="sub">4개 Lv6 태스크를 하나로 묶어 매달 반복되는 공유 메일 준비를 자동화</p>
+  <div><span class="pill ok">✓ 통합 점검기 44/44 통과</span> <span class="pill">팀 스킬팩(순차 실행)</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">1 · 팀과 목적</div>
+  <h2>Lv4 「AX전략 공유하기」 → Lv5 「계열사 AX전략 팀장에게 공유」</h2>
+  <ul>
+    <li>매월 반복되는 <strong>공유 대상자 확인 → 회의록 첨부 → 메일 작성 → 발송</strong> 흐름</li>
+    <li>4개 Lv6 태스크를 하나로 묶어 매번 손으로 하던 조립 작업을 자동화</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">2 · 태스크 구성</div>
+  <h2>4단계 중 마지막만 사람고유</h2>
+  <table>
+    <tr><th>#</th><th>Lv6</th><th>Human 여부</th><th>Skill화</th></tr>
+    <tr><td>1</td><td>공유 대상자 목록정리</td><td>증강</td><td>중간</td></tr>
+    <tr><td>2</td><td>관련 회의록 첨부</td><td>증강</td><td>높음</td></tr>
+    <tr><td>3</td><td>메일 본문 작성</td><td>증강</td><td>높음</td></tr>
+    <tr><td>4</td><td>메일 발송</td><td><strong>사람고유</strong></td><td>높음</td></tr>
+  </table>
+</section>
+
+<section class="slide">
+  <div class="kicker">3 · 데이터 명세</div>
+  <h2>원본 2개를 읽어 결과 2개를 남긴다</h2>
+  <table>
+    <tr><th>표</th><th>칸</th><th>읽기/쓰기</th></tr>
+    <tr><td>공유대상자후보.csv</td><td>이름·소속·직책·대상여부</td><td>읽기</td></tr>
+    <tr><td>회의록목록.csv</td><td>파일명·주제·일자</td><td>읽기</td></tr>
+    <tr><td>공유대상자목록.csv</td><td>이름·소속·직책</td><td>쓰기(1단계)</td></tr>
+    <tr><td>첨부파일목록.md</td><td>파일명·일자</td><td>쓰기(2단계)</td></tr>
+  </table>
+</section>
+
+<section class="slide">
+  <div class="kicker">4 · 실제 실행 — python3 run.py</div>
+  <h2>후보 5명 → 대상 3명, 회의록 4건 → 첨부 2건</h2>
+  <ul>
+    <li><strong>1단계</strong>: 대상여부="대상"인 3명만 선정 (경영전략팀장 등 2명 제외)</li>
+    <li><strong>2단계</strong>: 주제="AX전략"인 회의록 2건만 첨부 (예산·인사 회의록 제외)</li>
+    <li><strong>3단계</strong>: 1·2단계 결과만 인용해 메일 초안 조립 — 새 판단 추가 없음</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">5 · 4단계 · 휴먼인더루프</div>
+  <h2>메일은 여기서 멈춘다</h2>
+  <pre># 발송 대기 — 사람 확인 필요
+수신자 3명: 박성준(SK온); 김도희(SK하이닉스); 최윤아(SK엔무브)
+첨부 2건 · 본문: out/메일초안.md 참조
+
+승인 후 담당자가 직접 발송합니다.
+에이전트는 여기서 멈춥니다.</pre>
+  <p class="sub">run.py에는 실제 발송 코드가 없다 — 산출물은 out/에 초안 4개뿐</p>
+</section>
+
+<section class="slide">
+  <div class="kicker">6 · 검증</div>
+  <h2>계약 게이트 → 통합 점검기 → 실행까지 전 구간 통과</h2>
+  <ul>
+    <li>🟢 GREEN — CONTRACT.md 위반 없음</li>
+    <li>L1~L4 <strong>44/44</strong> 통과 · 산출물 유형: 팀 스킬팩(순차 실행)</li>
+    <li>4단계 자동 발송 없음 · 확인 요청 문구 명시 확인됨</li>
+  </ul>
+  <p class="sub">python3 check/check_contract.py . --run-check</p>
+</section>
+
+<section class="slide">
+  <div class="kicker">알아둘 점</div>
+  <h2>1·2단계는 순서만 있고 데이터 의존은 없다</h2>
+  <ul>
+    <li>두 태스크가 각자 다른 CSV를 독립적으로 읽는다 — 서로 결과를 주고받지 않음</li>
+    <li>통합 점검기의 흐름 검사가 "출력=입력" 겹침을 요구해, 실행 순서 표시용 더미 입력으로 표현</li>
+    <li>skill.md 본문에 그대로 밝혀 두었다 — 지어내지 않고 한계로 남김</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">원문 · SSOT</div>
+  <h2>이 슬라이드는 요약본입니다</h2>
+  <ul>
+    <li>원본 문서: <strong>examples/sample/ax-share-agent/agent-plan.md</strong></li>
+    <li>실행: <strong>run.py</strong> · 검증: <strong>check/check_contract.py . --run-check</strong></li>
+    <li>원문이 바뀌면 이 덱은 <strong>다시 생성</strong>합니다</li>
+  </ul>
+  <p class="sub">생성: slide-pack 스킬 · Codex 슬라이드 포맷 · 기본 다크 테마</p>
+</section>
+
+</div>
+<div class="pager"><span id="cur">1</span> / <span id="total">1</span></div>
+<div class="hint">← → · 스페이스 · 클릭으로 이동</div>
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  let i = 0;
+  document.getElementById('total').textContent = slides.length;
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    document.getElementById('cur').textContent = i + 1;
+  }
+  addEventListener('keydown', e => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+  });
+  addEventListener('click', e => show(e.clientX < innerWidth / 3 ? i - 1 : i + 1));
+  show(0);
+</script>
+</body>
+</html>
