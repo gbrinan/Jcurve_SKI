@@ -199,15 +199,18 @@ def main(pack_dir, run_harness=False):
             elif nums and not re.search(r"±\s*" + want, body):
                 finding(YELLOW, name, f"임계값 표기가 계약 형식(±{want}%)과 다름")
 
-    # ── 6. 정지 지점 ──
-    if c["halt_at"]:
-        h = c["halt_at"]
+    # ── 6. 정지 지점 (체인 끝뿐 아니라 중간 지점도 선언 가능) ──
+    # 실측으로 확인된 문제: 사람고유 판단이 체인 중간에 있으면 통합 점검기의 L4는
+    # 끝점만 보므로 그 지점의 정지 문구가 통째로 사라져도 통과했다.
+    # halt_at에 여러 스킬을 콤마로 적으면 전부 검사한다.
+    for h in [x.strip() for x in re.split(r"[,;]", c["halt_at"] or "") if x.strip()]:
         if h in skills:
             meta, body, _ = skills[h]
             if meta.get("writes"):
                 finding(RED, h, f"정지 지점인데 표에 기록함: {meta['writes']} — 자동 발송 위험")
             if not ("확인" in body and "멈" in body):
-                finding(YELLOW, h, "정지 지점인데 본문에 확인 요청·정지 문구가 없음")
+                finding(RED, h, "정지 지점인데 본문에 확인 요청·정지 문구가 없음 — "
+                                "체인 중간 지점이면 통합 점검기 L4가 못 보는 자리이므로 여기서 반드시 잡는다")
 
     # ── 리포트 + 분기 ──
     reds = [f for f in findings if f[0] == RED]
