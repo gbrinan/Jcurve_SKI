@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """계약 준수 검사 + 분기처리 — 사용자가 자유롭게 만들어 온 스킬을 통합 전에 거른다.
 
-사용: python3 harness/check_contract.py <팩 경로> [--run-harness]
+사용: python3 check/check_contract.py <팩 경로> [--run-check]
 
 종료 코드로 분기한다:
-  0 = 🟢 GREEN  계약 준수. --run-harness를 주면 곧바로 하네스를 실행한다.
+  0 = 🟢 GREEN  계약 준수. --run-check를 주면 곧바로 점검기를 실행한다.
   1 = 🟡 YELLOW 이름 표기 어긋남. 교정안을 REMEDIATION.md로 출력한다 (기계가 제안, 사람이 반영).
   2 = 🔴 RED    팀 결정이 필요한 충돌. 결정 요청 목록을 출력한다. 자동 교정하지 않는다.
 
@@ -89,7 +89,20 @@ def main(pack_dir, run_harness=False):
     pack = Path(pack_dir)
     contract_path = pack / "CONTRACT.md"
     if not contract_path.is_file():
-        print(f"🔴 CONTRACT.md 없음 — 계약 없이는 준수 검사를 할 수 없다: {pack}")
+        # 교안 폴더 트리에는 CONTRACT.md가 없다. 막기만 하지 말고 만드는 법을 보여준다.
+        print(f"🔴 CONTRACT.md 없음: {pack}\n")
+        print("   이름을 대조하려면 계약이 하나 필요합니다. 아래를 CONTRACT.md로 저장하고 채우세요:\n")
+        print("   ```contract")
+        print("   tables:")
+        print("     표이름.xlsx: 칸1, 칸2")
+        print("   writers:")
+        print("     표이름.xlsx: 그 표에 기록하는 스킬 하나")
+        print("   chain: 첫스킬 -> 다음스킬 -> 끝스킬     # 갈림길이면 ';'로 경로를 나눠 적습니다")
+        print("   payloads: 주고받는 이름들")
+        print("   threshold: ±15%")
+        print("   halt_at: 사람이 확인하고 멈추는 스킬")
+        print("   ```\n")
+        print("   인터뷰 6문항의 ③데이터·④시나리오·⑥연동 답이 그대로 이 자리에 들어갑니다.")
         return RED
     c = parse_contract(contract_path)
     if not c:
@@ -97,7 +110,7 @@ def main(pack_dir, run_harness=False):
         return RED
 
     skills = {}
-    for p in sorted(pack.glob("skills/*/*/skill.md")):
+    for p in sorted(pack.glob("skills/*/*/[sS][kK][iI][lL][lL].md")):
         meta, body = parse_skill(p)
         if meta is None:
             finding(RED, p.parent.name, "frontmatter 없음 — 계약 대조 불가")
@@ -231,18 +244,18 @@ def main(pack_dir, run_harness=False):
         print(f"{verdict} — 교정안을 {rem}에 썼습니다. 반영 후 재검사하세요.")
     else:
         verdict, code = "🟢 GREEN", GREEN
-        print(f"{verdict} — 계약 준수. 하네스로 진행합니다.")
+        print(f"{verdict} — 계약 준수. 통합 점검기로 진행합니다.")
 
     if code == GREEN and run_harness:
         print("\n" + "─" * 55)
-        print("→ 하네스 실행\n")
-        r = subprocess.run([sys.executable, str(Path(__file__).parent / "run_harness.py"), str(pack)])
+        print("→ 통합 점검기 실행\n")
+        r = subprocess.run([sys.executable, str(Path(__file__).parent / "run_check.py"), str(pack)])
         return r.returncode
     if code != GREEN and run_harness:
-        print("→ 계약 미준수이므로 하네스를 실행하지 않습니다.")
+        print("→ 계약 미준수이므로 점검기를 실행하지 않습니다.")
     return code
 
 
 if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    sys.exit(main(args[0] if args else ".", "--run-harness" in sys.argv))
+    sys.exit(main(args[0] if args else ".", "--run-check" in sys.argv))

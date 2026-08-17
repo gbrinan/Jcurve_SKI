@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """상류 어댑터 — 코치 산출물을 통합 팩으로 변환한다.
 
-사용: python3 harness/adapt_upstream.py <와이어프레임 폴더> <ATF html> <출력 팩 경로>
+사용: python3 check/adapt_upstream.py <와이어프레임 폴더> <ATF html> <출력 팩 경로>
 
 입력:
   · 와이어프레임 코치 v9.1 → `WFDATA` 블록 (참가자 1인 = 파일 1개)
@@ -144,7 +144,7 @@ def main(wf_dir, atf_path, out_dir):
              "", "> 상류(와이어프레임·ATF)에는 표·칸 명세가 없다. 세션 6 인터뷰에서 확정한다.", "",
              "## 4. 대표 시나리오", "- (미정) — 상류에 스킬 간 연결 정보가 없음", ""]
     (out / "agent-plan.md").write_text("\n".join(plan), encoding="utf-8")
-    (out / "AGENT.md").write_text("# 페르소나\n- (미정) — 세션 6에서 작성\n", encoding="utf-8")
+    (out / "AGENTS.md").write_text("# 페르소나\n- (미정) — 세션 6에서 작성\n", encoding="utf-8")
     (out / "README.md").write_text(
         f"# {atf.get('process', '팀')} 에이전트\n\n상세는 [agent-plan.md](agent-plan.md) 참조.\n",
         encoding="utf-8")

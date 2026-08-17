@@ -55,7 +55,7 @@ def main(pack_dir):
     pack = Path(pack_dir)
     (pack / "CONTRACT.md").write_text(CONTRACT, encoding="utf-8")
 
-    for p in pack.glob("skills/*/*/skill.md"):
+    for p in pack.glob("skills/*/*/[sS][kK][iI][lL][lL].md"):
         t = p.read_text(encoding="utf-8")
         old = re.search(r"name: (.+)", t).group(1).strip()
         new = old.replace(" ", "")

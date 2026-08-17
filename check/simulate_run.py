@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """E2E 시뮬레이션 — 팩의 5개 skill.md 명세를 그대로 실행한다.
 
-사용: python3 harness/simulate_run.py <팩 경로>
+사용: python3 check/simulate_run.py <팩 경로>
 skill.md가 정의한 규칙(미승인 분리, ±15% 정지, 자동 발송 금지)을 코드로 재현하고,
 각 단계 산출물을 out/ 폴더에 남긴다. 마지막은 반드시 휴먼인더루프 정지로 끝나야 한다.
 """
@@ -10,7 +10,7 @@ import re
 import sys
 from pathlib import Path
 
-THRESHOLD = 0.15  # agent-plan.md 7절 · AGENT.md와 동일해야 함 (하네스가 검사)
+THRESHOLD = 0.15  # agent-plan.md 7절 · AGENTS.md와 동일해야 함 (점검기가 검사)
 
 
 def main(pack_dir):

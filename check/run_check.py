@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Lv.5 통합 패키징 하네스 — 기계 판정 (L1~L3 + L4 일부).
+"""Lv.5 통합 패키징 통합 점검기 — 기계 판정 (L1~L3 + L4 일부).
 
 사용:
-  python3 harness/run_harness.py <팩 경로>   팀 에이전트 팩을 판정
-  python3 harness/run_harness.py --self      이 저장소 자신을 판정 (README ↔ 실제 폴더 일치)
+  python3 check/run_check.py <팩 경로>   팀 에이전트 팩을 판정
+  python3 check/run_check.py --self      이 저장소 자신을 판정 (README ↔ 실제 폴더 일치)
 
 종료 코드 0 = 기계 판정 전체 통과. L4의 [사람 판정] 항목은 별도 수행 필요.
 """
@@ -56,7 +56,7 @@ def main(pack_dir):
     pack = Path(pack_dir)
 
     # ── L1 구조 ──
-    for f in ["README.md", "agent-plan.md", "AGENT.md"]:
+    for f in ["README.md", "agent-plan.md", "AGENTS.md"]:
         check("L1", f"필수 파일 {f}", (pack / f).is_file())
     check("L1", "skills/ 존재", (pack / "skills").is_dir())
     check("L1", "data/ 존재", (pack / "data").is_dir())
@@ -66,7 +66,7 @@ def main(pack_dir):
           f"{len(plan_copies)}개 발견" if len(plan_copies) != 1 else "")
 
     skills = {}
-    for p in sorted(pack.glob("skills/*/*/skill.md")):
+    for p in sorted(pack.glob("skills/*/*/[sS][kK][iI][lL][lL].md")):
         meta, body = parse_skill(p)
         check("L1", f"{p.parent.name}: frontmatter", meta is not None)
         if meta:
@@ -77,13 +77,13 @@ def main(pack_dir):
     check("L1", "스킬 1개 이상", len(skills) > 0)
 
     plan = (pack / "agent-plan.md").read_text(encoding="utf-8") if (pack / "agent-plan.md").is_file() else ""
-    agent_md = (pack / "AGENT.md").read_text(encoding="utf-8") if (pack / "AGENT.md").is_file() else ""
+    agent_md = (pack / "AGENTS.md").read_text(encoding="utf-8") if (pack / "AGENTS.md").is_file() else ""
 
     # ── L2 맥락 반영 ──
     plan_tables = set(re.findall(r"[\w가-힣]+\.(?:xlsx|docx|pptx|pdf|csv)", plan))
     for name, (meta, body, p) in skills.items():
         check("L2", f"{name}: 기획서에 언급", name in plan or name in agent_md,
-              "agent-plan.md/AGENT.md 어디에도 없음" if name not in plan + agent_md else "")
+              "agent-plan.md/AGENTS.md 어디에도 없음" if name not in plan + agent_md else "")
         used = set(meta.get("reads", []) + meta.get("writes", []))
         outside = used - plan_tables
         check("L2", f"{name}: 데이터가 명세 안", not outside,
@@ -147,7 +147,7 @@ def main(pack_dir):
                   f"outputs {sorted(out)} ↛ inputs {sorted(inp)}" if not out & inp else "")
 
     branching = any(len(v) > 1 for v in nexts.values())
-    pack_kind = "이노허브 Lv5 에이전트 (갈림길 있음)" if branching else "이노허브 Lv6 스킬 묶음 (순차 실행)"
+    pack_kind = "팀 에이전트 (갈림길 있음)" if branching else "팀 스킬팩 (순차 실행)"
     terminals = [n for n in skills if not nexts.get(n)]
     chain = [n for n in _topo(skills, nexts)] if reached == set(skills) else []
 
