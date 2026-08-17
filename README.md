@@ -67,7 +67,14 @@ v2는 판단기준·예외·환경 태그·실행 순서를 파일에서 자동�
 python3 check/check_contract.py examples/sample/team-agent --run-check  # 게이트 → 통과 시 통합 점검기
 python3 check/simulate_run.py examples/sample/team-agent                  # 시나리오 처음부터 끝까지 실행
 bash check/test_upstream_e2e.sh                                           # 상류 코치 산출물부터 전 구간
+python3 check/readchk.py examples/sample/team-agent                       # 읽은 바 기록 + 미결 갈래 하나
+python3 check/adapt_workflow.py <워크플로우.html> <출력 팩>                 # 설계도 HTML → 팩
 ```
+
+**정해지지 않은 것이 있어도 막지 않습니다.** `readchk`가 `DECISIONS.md`에 "이해한 바"와
+"아직 정해지지 않은 것"을 적고, 미결이 여럿이면 **가장 무거운 하나만** 앞세웁니다.
+검수 지점이 없는 설계도 팀이 위험으로 수용하고 기록하면 ⚠️로 통과합니다 —
+다만 그 표시는 출력에서 사라지지 않습니다.
 
 **상류 코치 산출물에서 시작하기.** 세션 3(ATF 핏 코치)·세션 4(와이어프레임 코치)의 출력을
 그대로 팩으로 변환합니다 — 참가자가 스킬을 새로 쓸 필요가 없습니다.

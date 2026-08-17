@@ -15,6 +15,7 @@ results = []
 
 
 def check(layer, name, ok, detail=""):
+    """ok=True 통과 · ok=False 실패 · ok=None 명시적으로 수용된 위험(⚠️, 실패로 세지 않음)."""
     results.append((layer, name, ok, detail))
 
 
@@ -213,18 +214,36 @@ def main(pack_dir):
                   f"기획서에 없는 출력 {t_meta.get('outputs')}")
             check("L4", f"{tag}: 자동 발송 없음", not t_meta.get("writes"),
                   f"끝점이 직접 기록: {t_meta.get('writes')}")
-            check("L4", f"{tag}: 휴먼인더루프 명시", "확인" in t_body and "멈" in t_body,
-                  "본문에 확인 요청·정지가 없음")
+            # 검수 지점이 없을 때: 팀이 그것을 알고 기록해 두었는가를 본다.
+            # 기록이 있으면 ⚠️ 수용된 위험으로 남긴다 — 실패로 세지 않되 **결코 사라지지 않는다**.
+            # 기록이 없으면 그냥 ❌다. 모르고 빠뜨린 것과 알고 감수한 것은 다르게 다뤄야 한다.
+            has_halt = "확인" in t_body and "멈" in t_body
+            if has_halt:
+                check("L4", f"{tag}: 휴먼인더루프 명시", True)
+            else:
+                decisions = (pack / "DECISIONS.md")
+                dtext = decisions.read_text(encoding="utf-8") if decisions.is_file() else ""
+                acknowledged = ("결정됨" in dtext and t in dtext
+                                and ("검수" in plan or "검수" in agent_md))
+                check("L4", f"{tag}: 휴먼인더루프 명시", None if acknowledged else False,
+                      "검수 지점 없음 — 팀이 위험으로 수용하고 DECISIONS.md에 기록함"
+                      if acknowledged else
+                      "본문에 확인 요청·정지가 없음 (수용하려면 DECISIONS.md에 결정을 기록하십시오)")
 
     # ── 리포트 ──
-    fails = [r for r in results if not r[2]]
+    fails = [r for r in results if r[2] is False]
+    accepted = [r for r in results if r[2] is None]
     for layer in ["L1", "L2", "L3", "L4"]:
         rows = [r for r in results if r[0] == layer]
         print(f"\n[{layer}] {sum(1 for r in rows if r[2])}/{len(rows)} 통과")
         for _, name, ok, detail in rows:
-            print(f"  {'✅' if ok else '❌'} {name}" + (f" — {detail}" if detail and not ok else ""))
+            mark = "✅" if ok is True else ("⚠️" if ok is None else "❌")
+            print(f"  {mark} {name}" + (f" — {detail}" if detail and ok is not True else ""))
     print(f"\n{'='*50}")
-    print(f"기계 판정: {'전체 통과 ✅' if not fails else f'실패 {len(fails)}건 ❌'}")
+    verdict = "전체 통과 ✅" if not fails else f"실패 {len(fails)}건 ❌"
+    if accepted and not fails:
+        verdict += f" (수용된 위험 {len(accepted)}건 ⚠️ — 사라지지 않습니다)"
+    print(f"기계 판정: {verdict}")
     print(f"산출물 유형: {pack_kind}")
     for line in kind_note:
         print(line)
