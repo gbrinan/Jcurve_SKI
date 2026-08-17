@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>ATF보고서_전황 업데이트</title>
+<style>body{font-family:"맑은 고딕",sans-serif;color:#222A45;max-width:900px;margin:2rem auto}
+h1{color:#222A45}.badge{background:#3346FF;color:#fff;padding:.3em .9em;border-radius:4px}
+table{border-collapse:collapse;width:100%;margin:1rem 0}
+th,td{border:1px solid #ccd;padding:.5em;text-align:left}th{background:#f2f4fb}
+.note{font-size:.85em;color:#667}</style></head>
+<body>
+<h1>Agent-Task Fit 보고서 — 전황 업데이트</h1>
+<p>과제 경로: 정세 브리핑 초안 작성 › 전황 업데이트 · 판단일 2026-08-17 · 코치 v3.0</p>
+
+<p><span class="badge">조건부 권장</span> 조건: 검증 지점을 한 곳 세우면 권장으로 올라갑니다.</p>
+
+<h2>방식 판정</h2>
+<table>
+<tr><th>Lv6 태스크</th><th>위임 구분</th><th>방식</th><th>근거</th></tr>
+<tr><td>주요 뉴스 검색</td><td>증강</td><td>스킬</td><td>매번 판정 대상 기사가 달라짐</td></tr>
+<tr><td>브리핑 초안 작성</td><td>증강</td><td>스킬</td><td>문장이 매번 달라짐</td></tr>
+<tr><td>배포 전 검토</td><td>사람고유</td><td>사람</td><td>대외 발신 책임은 팀장</td></tr>
+</table>
+
+<h2>사용 범위</h2>
+<p>여러 사람 (공유만) — 팀이 결과를 함께 보되 각자 입력하는 화면은 필요 없음</p>
+
+<h2>에이전트 적합성 6기준</h2>
+<table>
+<tr><th>기준</th><th>판정</th><th>근거</th></tr>
+<tr><td>① 반복성</td><td>✅ 충족</td><td>매일 아침 정기 반복</td></tr>
+<tr><td>② 위임 가능성</td><td>✅ 충족</td><td>증강 태스크 2개</td></tr>
+<tr><td>③ 다단계성</td><td>✅ 충족</td><td>스킬 방식 태스크 3개</td></tr>
+<tr><td>④ 순서 가변성</td><td>❌ 미충족</td><td>순서가 매번 같음</td></tr>
+<tr><td>⑤ 가치</td><td>✅ 충족</td><td>주당 5시간, 감수 확인됨</td></tr>
+<tr><td>⑥ 검증 가능성</td><td>❓ 미확인</td><td>틀렸을 때 누가 보는지 미정</td></tr>
+</table>
+<p class="note">※ 기준 출처 · Anthropic · OpenAI · Microsoft · Gartner · Design Camp</p>
+
+<h2>다음 걸음</h2>
+<p>14:00 Lv.6 와이어프레임 → 15:00 개인별 Lv.6 스킬 제작 → 16:00 팀 Lv.5 통합·패키징 → 17:00 데모</p>
+
+<p class="note">※ 이 보고서는 교육 과정의 참고용 판단입니다. 업계 공개 기준(Anthropic·OpenAI 에이전트 가이드, Gartner 전망)에 따른 권장 의견이며, 실제 구축 여부·범위의 최종 결정과 책임은 팀과 조직에 있습니다. 사내 보안·규정 관련 항목은 별도 사내 기준 확인이 필요합니다.</p>
+
+<script type="application/json" id="atf-data">
+{"verdict":"조건부 권장","process":"정세 브리핑 초안 작성 › 전황 업데이트","targetTask":{"no":1,"name":"주요 뉴스 검색"},
+ "engines":[{"no":1,"name":"주요 뉴스 검색","human":"증강","engine":"스킬"},
+            {"no":2,"name":"브리핑 초안 작성","human":"증강","engine":"스킬"},
+            {"no":3,"name":"배포 전 검토","human":"사람고유","engine":"사람"}],
+ "wrap":"여러사람_공유만",
+ "gates":{"G1":"충족","G2":"충족","G3":"충족","G4":"미충족","G5":"충족","G6":"미확인"},
+ "condition":"검증 지점을 한 곳 세우면 권장으로 올라갑니다","alternative":"","hoursPerWeek":5}
+</script>
+</body>
+</html>

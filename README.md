@@ -58,7 +58,20 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 ```bash
 python3 harness/check_contract.py examples/sample/team-agent --run-harness  # 게이트 → 통과 시 하네스
 python3 harness/simulate_run.py examples/sample/team-agent                  # 시나리오 처음부터 끝까지 실행
+bash harness/test_upstream_e2e.sh                                           # 상류 코치 산출물부터 전 구간
 ```
+
+**상류 코치 산출물에서 시작하기.** 세션 3(ATF 핏 코치)·세션 4(와이어프레임 코치)의 출력을
+그대로 팩으로 변환합니다 — 참가자가 스킬을 새로 쓸 필요가 없습니다.
+
+```bash
+python3 harness/adapt_upstream.py <와이어프레임 폴더> <ATF html> <출력 팩>
+```
+
+어댑터는 `WFDATA`의 판단기준·예외·환경태그를 skill.md로 옮기고, `atf-data`의 판정·6기준을
+기획서로 옮깁니다. **상류에 없는 것은 지어내지 않고 `(미정)`으로 남깁니다** — 스킬 사이 순서,
+표·칸 이름, 임계값이 여기 해당합니다(참가자는 각자 LV6 하나만 그리므로 연결 정보가 없습니다).
+그 자리는 세션 6 인터뷰가 채웁니다. 예시는 [`examples/upstream/`](examples/upstream/).
 
 게이트는 팀원들이 각자 만들어 온 스킬을 `CONTRACT.md`(표·기록자·체인·페이로드·임계값)와 대조해 세 갈래로 나눕니다:
 
@@ -146,7 +159,7 @@ Jcurve_SKI/
 ├── SKILL.md             ← AI가 읽는 slide-pack 스킬 정의
 ├── DESIGN.md            ← SK CI 색·폰트 규칙 (디자인의 원본)
 ├── prompts/             ← ① 인터뷰 프롬프트 (팀장이 붙여넣는 것)
-├── harness/             ← ② 통합 검증 하네스 (판정 기준 + 스크립트 2개)
+├── harness/             ← ② 통합 검증 하네스 (판정 기준 + 어댑터 + 스크립트)
 ├── personas/            ← SK 팀장·실무자 페르소나 인터뷰 (스킬 발굴 근거)
 ├── assets/              ← ③ 슬라이드 테마 뼈대 (다크 / SK CI)
 └── examples/            ← 완성 예시 모음
