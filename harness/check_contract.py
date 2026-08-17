@@ -68,7 +68,10 @@ def parse_contract(path):
                 continue
             section = None
             if key == "chain":
-                c["chain"] = [s.strip() for s in val.split("->") if s.strip()]
+                # 직선: 'a -> b -> c'
+                # 갈림길: 경로를 ';'로 여러 개 적는다 'a -> b -> d; a -> c -> d'
+                c["chain"] = [[s.strip() for s in path.split("->") if s.strip()]
+                              for path in val.split(";") if path.strip()]
             elif key == "payloads":
                 c["payloads"] = [s.strip() for s in val.split(",") if s.strip()]
             elif key in ("threshold", "halt_at"):
@@ -150,21 +153,26 @@ def main(pack_dir, run_harness=False):
                 else:
                     finding(RED, name, f"{field}에 계약에 없는 이름: {v} — 팀이 페이로드를 정의해야 함")
 
-    # ── 4. 체인 순서 ──
-    contract_chain = c["chain"]
-    unknown = [s for s in skills if s not in contract_chain]
-    for s in unknown:
-        finding(RED, s, f"계약 체인에 없는 스킬 — 체인 어디에 넣을지 팀이 결정 필요")
-    missing = [s for s in contract_chain if s not in skills]
-    for s in missing:
+    # ── 4. 흐름 (직선·갈림길 모두 허용) ──
+    # 계약의 chain은 'a -> b -> c' 또는 갈림길이면 'a -> b | c' / 여러 줄을 ';'로 잇는다.
+    edges, nodes_in_chain = set(), set()
+    for path in c["chain"]:
+        nodes_in_chain.update(path)
+        edges.update(zip(path, path[1:]))
+
+    for s in [s for s in skills if s not in nodes_in_chain]:
+        finding(RED, s, "계약 흐름에 없는 스킬 — 어디에 넣을지 팀이 결정 필요")
+    for s in [s for s in nodes_in_chain if s not in skills]:
         finding(RED, s, "계약에 있으나 제출되지 않은 스킬 — 담당자 확인 필요")
-    for a, b in zip(contract_chain, contract_chain[1:]):
+    for a, b in edges:
         if a in skills and b in skills:
-            actual = skills[a][0].get("next")
-            if actual != b:
-                lvl = YELLOW if actual and norm(actual) == norm(b) else RED
-                finding(lvl, a, f"next가 계약과 다름: {actual} (계약: {b})",
-                        (str(skills[a][2]), f"next: {actual}", f"next: {b}") if lvl == YELLOW else None)
+            actual = [x.strip() for x in re.split(r"[|,]", skills[a][0].get("next") or "") if x.strip()]
+            if b in actual:
+                continue
+            lvl = YELLOW if any(norm(x) == norm(b) for x in actual) else RED
+            finding(lvl, a, f"next가 계약과 다름: {actual or '(없음)'} (계약: {b})",
+                    (str(skills[a][2]), f"next: {skills[a][0].get('next')}",
+                     f"next: {b}") if lvl == YELLOW else None)
 
     # ── 5. 임계값 (자유 서술도 잡는다) ──
     if c["threshold"]:

@@ -36,6 +36,22 @@ def parse_skill(path):
     return meta, m.group(2)
 
 
+def _topo(skills, nexts):
+    """위상 정렬 — 분기가 있어도 실행 순서를 하나 뽑는다 (시작·끝 판정용)."""
+    order, seen = [], set()
+    def walk(n):
+        if n in seen:
+            return
+        seen.add(n)
+        for m_ in nexts.get(n, []):
+            if m_ in skills:
+                walk(m_)
+        order.append(n)
+    for n in skills:
+        walk(n)
+    return list(reversed(order))
+
+
 def main(pack_dir):
     pack = Path(pack_dir)
 
@@ -83,21 +99,57 @@ def main(pack_dir):
         check("L3", f"단일 기록자: {t}", len(ws) == 1, f"복수 기록자 {ws}" if len(ws) > 1 else "")
 
     # 체인: next 링크가 모든 스킬을 한 줄로 잇는가
-    nexts = {n: m.get("next") for n, (m, _, _) in skills.items()}
-    targets = [v for v in nexts.values() if v]
+    # 흐름은 직선일 수도, 갈림길이 있을 수도 있다. 둘 다 유효한 산출물이다 —
+    # 직선이면 '스킬 묶음', 갈림길이 있으면 '에이전트'로 분류만 하고 통과시킨다.
+    # (ATF의 ④순서 가변성이 바로 이 차이다. 거부가 아니라 이름을 정확히 붙이는 것이 우리 일이다.)
+    nexts = {n: [x.strip() for x in re.split(r"[|,]", m["next"]) if x.strip()] if m.get("next") else []
+             for n, (m, _, _) in skills.items()}
+    targets = {t for vs in nexts.values() for t in vs}
     starts = [n for n in skills if n not in targets]
-    chain, cur, seen = [], (starts[0] if len(starts) == 1 else None), set()
-    while cur and cur in skills and cur not in seen:
-        chain.append(cur)
-        seen.add(cur)
-        cur = nexts[cur]
-    check("L3", "체인: 시작점 1개", len(starts) == 1, f"시작점 {starts}")
-    check("L3", "체인: 전체 스킬 포함(고아·순환 없음)", len(chain) == len(skills),
-          f"체인 {chain} vs 스킬 {sorted(skills)}")
-    for a, b in zip(chain, chain[1:]):
-        out, inp = set(skills[a][0].get("outputs", [])), set(skills[b][0].get("inputs", []))
-        check("L3", f"체인 정합: {a}→{b}", bool(out & inp),
-              f"outputs {sorted(out)} ↛ inputs {sorted(inp)}" if not out & inp else "")
+
+    # 시작점에서 도달 가능한 스킬 (BFS — 분기 허용, 순환 감지)
+    reached, frontier = set(starts), list(starts)
+    while frontier:
+        cur = frontier.pop()
+        for nxt in nexts.get(cur, []):
+            if nxt in skills and nxt not in reached:
+                reached.add(nxt)
+                frontier.append(nxt)
+
+    def has_cycle():
+        state = {}
+        def walk(n):
+            if state.get(n) == 1:
+                return True
+            if state.get(n) == 2:
+                return False
+            state[n] = 1
+            for m_ in nexts.get(n, []):
+                if m_ in skills and walk(m_):
+                    return True
+            state[n] = 2
+            return False
+        return any(walk(n) for n in skills)
+
+    check("L3", "흐름: 시작점 1개", len(starts) == 1, f"시작점 {starts}")
+    check("L3", "흐름: 모든 스킬에 도달(고아 없음)", reached == set(skills),
+          f"도달 못 함: {sorted(set(skills) - reached)}")
+    check("L3", "흐름: 순환 없음", not has_cycle())
+    dangling = [(a, t) for a, vs in nexts.items() for t in vs if t not in skills]
+    check("L3", "흐름: next가 실재하는 스킬을 가리킴", not dangling,
+          f"없는 스킬 지목: {dangling}" if dangling else "")
+    for a, vs in nexts.items():
+        for b in vs:
+            if b not in skills:
+                continue
+            out, inp = set(skills[a][0].get("outputs", [])), set(skills[b][0].get("inputs", []))
+            check("L3", f"흐름 정합: {a}→{b}", bool(out & inp),
+                  f"outputs {sorted(out)} ↛ inputs {sorted(inp)}" if not out & inp else "")
+
+    branching = any(len(v) > 1 for v in nexts.values())
+    pack_kind = "이노허브 Lv5 에이전트 (갈림길 있음)" if branching else "이노허브 Lv6 스킬 묶음 (순차 실행)"
+    terminals = [n for n in skills if not nexts.get(n)]
+    chain = [n for n in _topo(skills, nexts)] if reached == set(skills) else []
 
     # 용어 일관: 표 이름 근사 중복(공백/언더스코어 차이) 탐지
     all_text = plan + agent_md + "".join(b for _, b, _ in skills.values())
@@ -123,16 +175,20 @@ def main(pack_dir):
     # ── L4 E2E (기계 판정 부분) ──
     if chain:
         first_in = skills[chain[0]][0].get("inputs", [])
-        last_meta, last_body, _ = skills[chain[-1]]
         plan_flat = plan.replace(" ", "")
         check("L4", "시작 입력이 시나리오와 일치", any(i.replace(" ", "") in plan_flat for i in first_in),
               f"기획서에 없는 입력 {first_in}")
-        check("L4", "끝 출력이 시나리오 산출물",
-              any(o.replace(" ", "") in plan_flat for o in last_meta.get("outputs", [])))
-        check("L4", "최종 단계: 자동 발송 없음", not last_meta.get("writes"),
-              f"최종 스킬이 직접 기록: {last_meta.get('writes')}")
-        check("L4", "최종 단계: 휴먼인더루프 명시", "확인" in last_body and "멈" in last_body,
-              "최종 스킬 본문에 확인 요청·정지가 없음")
+        # 갈림길이 있으면 끝점이 여럿이다. 모든 끝점이 조건을 지켜야 한다.
+        for t in terminals:
+            t_meta, t_body, _ = skills[t]
+            tag = f"끝점 {t}" if len(terminals) > 1 else "최종 단계"
+            check("L4", f"{tag}: 출력이 시나리오 산출물",
+                  any(o.replace(" ", "") in plan_flat for o in t_meta.get("outputs", [])),
+                  f"기획서에 없는 출력 {t_meta.get('outputs')}")
+            check("L4", f"{tag}: 자동 발송 없음", not t_meta.get("writes"),
+                  f"끝점이 직접 기록: {t_meta.get('writes')}")
+            check("L4", f"{tag}: 휴먼인더루프 명시", "확인" in t_body and "멈" in t_body,
+                  "본문에 확인 요청·정지가 없음")
 
     # ── 리포트 ──
     fails = [r for r in results if not r[2]]
@@ -143,6 +199,10 @@ def main(pack_dir):
             print(f"  {'✅' if ok else '❌'} {name}" + (f" — {detail}" if detail and not ok else ""))
     print(f"\n{'='*50}")
     print(f"기계 판정: {'전체 통과 ✅' if not fails else f'실패 {len(fails)}건 ❌'}")
+    print(f"산출물 유형: {pack_kind}")
+    if not branching:
+        print("  · 순서가 매번 같은 흐름입니다. 지금 만든 것은 스킬 묶음이고,")
+        print("    갈림길이 생기는 순간 그대로 에이전트가 됩니다 — 부품은 이미 다 만들었습니다.")
     print("주의: L4의 [사람 판정] 2개(실제 실행, 오류 주입)는 별도 수행 필요")
     return 1 if fails else 0
 
