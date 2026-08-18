@@ -75,15 +75,24 @@ def main(pack_dir):
         cur = nexts[cur][0] if nexts[cur] else None
 
     branching = any(len(v) > 1 for v in nexts.values())
-    kind = ("팀 에이전트(갈림길 있음)" if branching
-            else f"팀 스킬팩(순차 실행){' — AI 태스크 ' + str(len(ai)) + '개' if humans and len(ai) < 3 else ''}")
+    # human 필드가 하나도 없으면 태스크 수를 "0개"라고 단정하지 않는다 — 모르는 것과 없는 것은 다르다.
+    known_human = any(humans.values())
+    if branching:
+        kind = "팀 에이전트(갈림길 있음)"
+    elif known_human and len(ai) < 3:
+        kind = f"팀 스킬팩(순차 실행) — AI 태스크 {len(ai)}개"
+    else:
+        kind = "팀 스킬팩(순차 실행)"
 
     restate = [
-        f"- 출처 업무: Lv4 「{lv4}」 › Lv5 「{lv5}」",
+        (f"- 출처 업무: Lv4 「{lv4}」 › Lv5 「{lv5}」" if lv4 != "(미정)" or lv5 != "(미정)"
+         else "- 출처 업무: 기획서에 Lv4·Lv5가 적혀 있지 않다"),
         f"- 스킬 {len(skills)}개를 " + ("갈림길이 있는 흐름으로" if branching else "한 줄로") +
         " 이었다: " + (" → ".join(order) if order else "(순서 확정 안 됨)"),
-        f"- AI가 맡는 태스크 {len(ai)}개, 사람이 직접 하는 태스크 {len(human_only)}개"
-        + (f" ({', '.join(human_only)})" if human_only else ""),
+        (f"- AI가 맡는 태스크 {len(ai)}개, 사람이 직접 하는 태스크 {len(human_only)}개"
+         + (f" ({', '.join(human_only)})" if human_only else ""))
+        if known_human else
+        "- 태스크별 Human 여부(자동·증강·사람고유)가 스킬에 적혀 있지 않아 판정하지 않았다",
         f"- 산출물 유형: {kind}",
         f"- 흐름의 끝: {', '.join(terminals)}",
     ]
