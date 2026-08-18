@@ -167,7 +167,17 @@ def main(pack_dir):
 
     doc += ["---", "", "이 미결이 남아 있어도 팩은 그대로 돌아갑니다. "
             "결정이 나면 해당 파일을 고치고 이 문서를 갱신하십시오.", ""]
-    (pack / "DECISIONS.md").write_text("\n".join(doc), encoding="utf-8")
+
+    # ★ 사람이 내린 결정을 절대 덮어쓰지 않는다.
+    #   이 도구는 결정을 **남기려고** 있는데, 재실행하면서 지워버린 적이 있다(실측).
+    target = pack / "DECISIONS.md"
+    if target.is_file() and "결정됨" in target.read_text(encoding="utf-8"):
+        alt = pack / "DECISIONS.new.md"
+        alt.write_text("\n".join(doc), encoding="utf-8")
+        print(f"\n⚠️ 기존 DECISIONS.md에 이미 내려진 결정(결정됨)이 있어 덮어쓰지 않았습니다.")
+        print(f"   새로 읽은 결과는 {alt.name}에 따로 썼습니다. 직접 비교해 반영하십시오.")
+        return 0
+    target.write_text("\n".join(doc), encoding="utf-8")
 
     print()
     for line in restate:
