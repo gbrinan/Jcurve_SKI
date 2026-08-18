@@ -1,7 +1,12 @@
-# Jcurve_SKI — 팀 AI 에이전트 패키징 도구 모음
+# Activity Coach_SKI — 팀 AI 에이전트 패키징 도구 모음
 
 **개인이 만든 스킬들을 하나의 팀 에이전트로 묶고, 제대로 묶였는지 검증하고, 그 결과를 발표 자료로 만드는 것**까지를 한 저장소에서 지원합니다.
 SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어졌습니다.
+
+> **이름의 뜻** — 교육의 코치 계열을 잇는 이름입니다.
+> 세션 3 **핏 코치**(업무가 에이전트에 맞는가) → 세션 4 **Wireframe Coach**(태스크 하나를 어떻게 판단하는가)
+> → 세션 4 **Merge Coach**(팀 것을 하나로) → 세션 6 **Activity Coach**(액티비티=Lv5를 팀 에이전트로 패키징).
+> 각 코치가 한 계층을 맡고, Activity Coach가 마지막 통합 계층을 맡습니다.
 
 이 저장소는 세 가지 도구로 이루어져 있습니다.
 
@@ -174,7 +179,7 @@ DESIGN.md의 토큰만 사용하고, template-sk-ci.html 스켈레톤을 써.
 ## 📁 저장소 구조
 
 ```
-Jcurve_SKI/
+Activity Coach_SKI/
 ├── README.md            ← 지금 읽고 있는 문서
 ├── SKILL.md             ← AI가 읽는 slide-pack 스킬 정의
 ├── DESIGN.md            ← SK CI 색·폰트 규칙 (디자인의 원본)
