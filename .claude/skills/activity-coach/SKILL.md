@@ -91,6 +91,47 @@ different, and neither disappears.
 - **Inject an error** — delete a stop instruction, point two skills at the same table,
   break a threshold. Confirm the checker fails. If it still passes, the gate is fake.
 
+## Visuals — three kinds, three jobs
+
+Do not reach for the heaviest one by default. Each answers a different question.
+
+| Kind | Answers | Made by | When |
+|---|---|---|---|
+| **mermaid** in `agent-plan.md` §8/§9 | "What is the shape?" | `adapt_workflow.py`, automatically | Always. Costs nothing. |
+| **`agent-mockup.html`** | "What does it do?" | `check/make_mockup.py <pack>` | After `run.py` exists and has been run |
+| **`agent-plan-deck.html`** | "How do we present it?" | `slide-pack` skill | Only when a team is presenting |
+
+### Execution mockup
+
+```bash
+python3 run.py                          # writes out/trace.json
+python3 check/make_mockup.py <pack>     # reads it, writes agent-mockup.html
+```
+
+**Every number on that screen comes from `out/trace.json`.** Never hand-edit the HTML —
+change the data, re-run, regenerate. A mockup typed from a log drifts the moment the
+data changes, silently.
+
+`run.py` records what happened with `check/trace.py`:
+
+```python
+from trace import Trace
+TR = Trace("의료비 판독 AI", source="Talent AX실 · HR AI", lv5="...")
+TR.input("청구접수대장", 11, "2026년 7~8월 접수분")
+TR.step("1. 증빙서류판독", "자동", "11건 판독. **1건은 판독불가**입니다.")
+TR.warn("금액을 추정하지 않았습니다.")
+TR.fork("3. 지급기준대조", "증강",
+        [("기준 충족", "자동지급상신", 6), ("증빙 미비", "보완요청작성", 1)],
+        note="세 갈래로 갈랐습니다.", taken="자동지급상신")
+TR.table("지급대장", rows, cols, mark=lambda r: "diff" if ... else None)
+TR.loop("차이분석조정", "계정검증대사", exit_cond="차이가 0이 되면")
+TR.halt("7. 지급승인", "사람고유", "여기서 멈췄습니다.", actions=["6건 승인"])
+TR.done("경로 A 6건 · B 1건 · C 4건").save(OUT)
+```
+
+Colors come from `DESIGN.md` — the mockup never carries its own palette.
+Buttons on a halt step are rendered disabled on purpose: the pack has no execution code.
+
 ## Required files in a pack
 
 | File | Missing means |

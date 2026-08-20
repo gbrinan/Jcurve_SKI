@@ -13,7 +13,6 @@
 사람고유 지점은 자동으로 넘어가지 않는다. 조정 확정은 사람이 한 것으로 **표시만** 하고,
 그 사실을 화면에 그대로 적는다.
 """
-import json
 import sys
 from pathlib import Path
 
@@ -29,10 +28,14 @@ for cand in (PACK.parents[2] / "check", PACK.parent / "check", PACK / "check"):
 else:
     sys.exit("mdtable.py를 찾지 못했습니다 — 툴킷의 check/ 폴더가 있어야 합니다.")
 from mdtable import read_table, num   # noqa: E402
+from trace import Trace          # noqa: E402
 
 이상임계 = 0.30      # agent-plan.md §3 · CONTRACT.md threshold와 같아야 한다
 설명임계 = 0.20
 MAX회차 = 5          # 무한 반복 방지. 넘으면 멈추고 사람에게 넘긴다.
+
+
+TR = None   # main()에서 Trace로 채운다. 화면 목업이 읽는 기록.
 
 
 def step(skill, msg):
@@ -66,8 +69,12 @@ def 만원(n):
 # ── 1. 결산일정수립 [증강] ─────────────────────────────────────────────
 def 결산일정수립(cal):
     대기 = [c for c in cal if c["상태"] != "완료"]
-    step("결산일정수립", f"결산캘린더 {len(cal)}행 · 미완료 {len(대기)}건 "
-                        f"(마감일 {cal[-1]['마감일']} — PP-2 T+5일)")
+    msg = (f"결산캘린더 {len(cal)}행 · 미완료 {len(대기)}건 "
+           f"(마감일 {cal[-1]['마감일']} — PP-2 T+5일)")
+    step("결산일정수립", msg)
+    TR.step("1. 결산일정수립", "증강", msg)
+    TR.warn("PP-2 [WAIT/높음] 결산 마감 일정 촉박(T+5일) — 일정을 앞당기지는 못합니다. "
+            "남은 일수를 보이게 만들 뿐입니다.")
     return 대기
 
 
@@ -91,10 +98,16 @@ def 원장잔액수집(ledger, subs):
     미수신 = [s["계열사명"] for s in subs if s["수신여부"] != "수신"]
     이상건 = [r for r in rows if r["이상여부"]]
     step("원장잔액수집", f"계정 {len(rows)}개 · 이상/신규 {len(이상건)}건")
+    TR.step("2. 원장잔액수집", "자동",
+            f"계정 {len(rows)}개를 읽고 이상/신규 {len(이상건)}건을 표시했습니다 "
+            f"(전기 대비 ±{이상임계:.0%} 초과 또는 부호 반전).")
     if 미수신:
         step("원장잔액수집", f"⚠️ 계열사 미수신 {len(미수신)}곳: {', '.join(미수신)} "
                             f"— 0으로 채우지 않고 합계에서 제외 (PP-6)")
+        TR.warn(f"계열사 미수신 {len(미수신)}곳 — {', '.join(미수신)}. "
+                f"0으로 채우지 않고 합계에서 제외했습니다. (PP-6 [WAIT/높음])")
     write("잔액수집결과.md", rows, COLS_잔액, "전기 대비 ±30% 초과 또는 부호 반전을 이상으로 표시했습니다.")
+    TR.file("out/잔액수집결과.md", len(rows))
     return rows, 미수신
 
 
@@ -120,6 +133,14 @@ def 조정분개작성(잔액, 사유사전):
     step("조정분개작성", f"조정분개 초안 {len(rows)}건"
                         + (f" · 사유확인필요 {len(확인필요)}건 (사유를 지어내지 않음)" if 확인필요 else ""))
     step("조정분개작성", "검토·승인(A-A2-1-3-3)은 하지 않음 — 초안까지")
+    TR.step("3. 조정분개작성", "증강",
+            f"조정분개 초안 {len(rows)}건."
+            + (f" 그중 {len(확인필요)}건은 사유를 알 수 없어 **지어내지 않았습니다.**"
+               if 확인필요 else "")
+            + " 검토·승인(A-A2-1-3-3)은 하지 않습니다 — 초안까지입니다.")
+    TR.table("조정분개장.md", rows, COLS_분개,
+             mark=lambda r: "diff" if r["상태"] == "사유확인필요" else None)
+    TR.file("out/조정분개장.md", len(rows))
     write("조정분개장.md", rows, COLS_분개, "초안입니다. 검토·승인은 하지 않았습니다.")
     return rows
 
@@ -148,6 +169,10 @@ def 주석초안작성(전기주석, 잔액):
     설명 = [r for r in rows if r["상태"] == "설명필요"]
     step("주석초안작성", f"주석 {len(rows)}개 · 설명필요 {len(설명)}건 (전기 대비 ±{설명임계:.0%} 초과)")
     step("주석초안작성", "검토·확정(A-A2-1-4-3)은 하지 않음 — 초안까지")
+    TR.step("4. 주석초안작성", "증강",
+            f"주석 {len(rows)}개에 당기 숫자를 채웠습니다. 전기 대비 ±{설명임계:.0%}를 넘는 "
+            f"설명필요 {len(설명)}건. 전기주석에 없는 항목은 숫자를 채우지 않고 `신규항목`으로 남깁니다.")
+    TR.file("out/주석초안.md", len(rows))
     write("주석초안.md", rows, COLS_주석, "전기 항목 구조를 그대로 쓰고 당기 숫자만 채웠습니다.")
     return rows
 
@@ -188,6 +213,17 @@ def 계정검증대사(잔액, 확인서, 회차, 조정반영=None):
     미수신 = [r for r in rows if r["상태"] == "확인서미수신"]
     step("계정검증대사", f"[{회차}회차] 대사 {len(rows)}계정 · 차이 {len(차이건)}건"
                         + (f" · 확인서미수신 {len(미수신)}건 (차이로 세지 않음)" if 미수신 else ""))
+    TR.cycle(회차).fork(
+        "5. 계정검증대사", "증강",
+        [("차이 발견? → Yes", "차이분석조정", len(차이건) if 차이건 else None),
+         ("차이 발견? → No", "결산마감", None)],
+        note=f"외부확인서와 SAP 원장을 계정별로 맞췄습니다. **차이 {len(차이건)}건**입니다.",
+        taken="차이분석조정" if 차이건 else "결산마감")
+    TR.table("대사결과", rows, COLS_대사,
+             mark=lambda r: {"차이": "diff", "확인서미수신": "na"}.get(r["상태"]))
+    if 미수신:
+        TR.warn(f"확인서 미수신 {len(미수신)}건 — 차이로 세지 않습니다. "
+                f"**차이가 없는 것과 확인할 수 없는 것은 다릅니다.**")
     return rows, 차이건
 
 
@@ -200,6 +236,13 @@ def 차이분석조정(차이건, 회차):
               f"확인 {만원(d['확인잔액'])} = 차이 {만원(d['차이'])}")
     print(f"      ⏸ 결산담당 확정 대기 … (시뮬레이션에서는 확정된 것으로 표시하고 진행)")
     step("차이분석조정", f"↩ 계정검증대사로 되돌아감 (탈출 조건: 차이 0)")
+    TR.cycle(회차).halt(
+        "6. 차이분석조정", "사람고유",
+        f"차이 {len(차이건)}건의 목록과 근거만 만들었습니다. **조정 금액은 정하지 않았습니다.**",
+        checklist=[f"{d['계정코드']} {d['계정명']} — 원장 {만원(d['원장잔액'])} vs "
+                   f"확인 {만원(d['확인잔액'])} = 차이 {만원(d['차이'])}" for d in 차이건])
+    TR.warn("결산담당 확정 대기. 조정이 확정되면 계정검증대사로 되돌아가 다시 맞춰봅니다.")
+    TR.loop("차이분석조정", "계정검증대사", exit_cond="차이가 0이 되면")
     return {d["계정코드"] for d in 차이건}
 
 
@@ -228,16 +271,36 @@ def 결산마감(미수신계열사, 대사, 주석, 분개, 회차):
     (OUT / "마감점검표.md").write_text("\n".join(lines), encoding="utf-8")
     step("결산마감", f"⛔ 사람고유 — 점검표 {남은}건만 만들고 멈춤")
     print("  → out/마감점검표.md")
+    chk = ([f"계열사 미수신 — {s} (PP-6)" for s in 미수신계열사]
+           + [f"확인서 미수신 — {r['계정코드']} {r['계정명']} (차이 없음이 아니라 확인 불가)"
+              for r in 확인서미수신]
+           + [f"주석 설명 필요 — 주석{r['주석번호']} {r['주석항목']} ({r['증감률']})"
+              for r in 설명필요]
+           + [f"조정 사유 확인 — {r['분개번호']} 계정 {r['계정코드']}" for r in 사유필요])
+    TR.cycle(None).halt(
+        "7. 결산마감", "사람고유",
+        f"**여기서 멈췄습니다.** 에이전트는 원장을 잠그지 않았고, 마감 전표도 처리하지 않았습니다. "
+        f"대사는 **{회차}회차**만에 차이 0에 도달했고, 마감 전 확인할 것 **{남은}건**이 남았습니다.",
+        actions=["마감 승인 및 원장 Lock", f"점검 항목 {남은}건 확인", "결산담당에게 반려"],
+        checklist=chk)
+    TR.file("out/마감점검표.md")
 
 
 def main():
+    global TR
     print("분기/반기 결산 에이전트  (재무본부 회계관리팀 · P-A2-1)\n")
+    TR = Trace("분기/반기 결산 에이전트",
+               source="AX전략 워크샵 · 재무본부 회계관리팀 · P-A2-1",
+               lv4="별도/연결 결산관리", lv5="분기/반기 결산")
     cal = load("결산캘린더")
     ledger, subs = load("SAP원장잔액"), load("계열사연결패키지")
     확인서, 전기주석 = load("외부확인서"), load("전기주석")
     사유사전 = load("조정사유사전")
     print(f"입력: {SRC.relative_to(PACK)} — SAP원장 {len(ledger)}계정 · 계열사 {len(subs)}곳 · "
           f"외부확인서 {len(확인서)}건 · 전기주석 {len(전기주석)}개\n")
+    TR.input("SAP원장", len(ledger), "2026년 3분기 결산 · data/결산데이터.md")
+    TR.input("계열사", len(subs)).input("외부확인서", len(확인서))
+    TR.input("전기주석", len(전기주석))
 
     결산일정수립(cal)
     잔액, 미수신계열사 = 원장잔액수집(ledger, subs)
@@ -263,10 +326,12 @@ def main():
     write("대사결과.md", 누적, COLS_대사, f"{회차}회차까지의 대사 기록입니다. 회차 칸이 루프백 횟수입니다.")
     결산마감(미수신계열사, 대사, 주석, 분개, 회차)
 
-    OUT.mkdir(exist_ok=True)
-    (OUT / "trace.json").write_text(json.dumps(
-        {"회차": 회차, "대사": 누적, "미수신계열사": 미수신계열사,
-         "주석": 주석, "분개": 분개}, ensure_ascii=False, indent=1), encoding="utf-8")
+    for l in TR.d["loops"]:
+        l["cycles"] = 회차
+    TR.done(f"루프백 {회차-1}회 (차이대사 L4) · 최종 {회차}회차에 차이 0 · "
+            f"사람 확인 없이 마감된 것 없음")
+    TR.save(OUT)
+    print(f"  → out/trace.json (실행 기록 — 목업 화면이 이것을 읽습니다)")
 
     print(f"\n루프백 {회차-1}회 (차이대사 L4) · 최종 {회차}회차에 차이 0")
     print("사람 확인 없이 마감된 것: 없음")

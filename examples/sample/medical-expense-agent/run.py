@@ -7,14 +7,21 @@
 눈으로 확인하는 것이 목적이다. 지급 실행·발송 코드는 없다 — 사람고유 지점에서 멈춘다.
 """
 import csv
-import json
 import sys
 from pathlib import Path
 
 PACK = Path(__file__).resolve().parent
 DATA, OUT = PACK / "data", PACK / "out"
 
-TRACE = []          # 목업 화면(agent-mockup.html)이 읽는 실행 기록
+for cand in (PACK.parents[2] / "check", PACK.parent / "check", PACK / "check"):
+    if (cand / "trace.py").is_file():
+        sys.path.insert(0, str(cand))
+        break
+else:
+    sys.exit("trace.py를 찾지 못했습니다 — 툴킷의 check/ 폴더가 있어야 합니다.")
+from trace import Trace   # noqa: E402
+
+TR = None           # main()에서 Trace로 채운다. 목업 화면이 읽는 기록.
 
 
 def step(skill, msg):
@@ -46,6 +53,10 @@ def 증빙서류판독(claims):
                     "상태": "판독불가" if 판독불가 else "판독완료"})
     n = sum(1 for r in out if r["상태"] == "판독불가")
     step("증빙서류판독", f"{len(out)}건 판독 · 판독불가 {n}건 (금액을 추정하지 않음)")
+    TR.step("1. 증빙서류판독", "자동",
+            f"{len(out)}건 판독. 그중 **{n}건은 판독불가**입니다 — 증빙유형에 「영수증」이 없거나 "
+            f"증빙파일 칸이 비어 있습니다.")
+    TR.warn("금액을 추정하지 않았습니다. 규칙: 증빙유형에 「영수증」이 없으면 판독 불가로 표시한다.")
     return out
 
 
@@ -60,6 +71,9 @@ def 신청서생성(read):
         seen.add(r["청구번호"])
         rows.append({k: r.get(k, "") for k in COLS_신청} | {"상태": 상태})
     step("신청서생성", f"신청서초안 {len(rows)}행 (판독불가 건도 버리지 않고 상태로 남김)")
+    TR.step("2. 신청서생성", "자동",
+            f"신청서초안 **{len(rows)}행**을 만들었습니다. 판독불가 건도 버리지 않고 상태 칸에 남겼습니다.")
+    TR.file("out/신청서초안.csv", len(rows))
     write("신청서초안.csv", rows, COLS_신청)
     return rows
 
@@ -110,6 +124,13 @@ def 지급기준대조(신청, claims, rules):
             지급.append({**c, "기준항목": rule["기준항목"],
                         "자기부담률": rule["자기부담률"], "지급액": 지급액})
     step("지급기준대조", f"◆ 갈림길 — 자동지급 {len(지급)}건 / 보완요청 {len(보완)}건 / 예외심사 {len(예외)}건")
+    TR.fork("3. 지급기준대조", "증강",
+            [("기준 충족", "자동지급상신", len(지급)),
+             ("증빙 미비", "보완요청작성", len(보완)),
+             ("모호 · 한도 초과", "예외심사요청", len(예외))],
+            note="지급기준표.csv와 대조해 **세 갈래로 갈랐습니다.**")
+    TR.warn("판단이 서지 않는 건은 자동지급 쪽으로 기울이지 않고 예외심사로 보냅니다. "
+            "규칙: 기준항목을 하나로 정할 수 없으면 자동지급상신으로 보내지 않는다.")
     return 지급, 보완, 예외
 
 
@@ -125,6 +146,12 @@ def 자동지급상신(지급, 예외):
             continue
         rows.append({k: r.get(k, "") for k in COLS_지급} | {"상태": "승인대기"})
     step("자동지급상신", f"{len(rows)}건 상신 · 상태는 전부 '승인대기' (지급 실행 아님)")
+    TR.step("4. 자동지급상신", "자동",
+            f"{len(rows)}건을 지급대장에 올렸습니다. 상태는 전부 **승인대기**입니다 — "
+            f"지급이 실행된 것이 아닙니다.")
+    TR.table("지급대장", rows,
+             ["청구번호", "성명", "기준항목", "청구금액", "지급액", "상태"])
+    TR.file("out/지급대장.csv", len(rows))
     write("지급대장.csv", rows, COLS_지급)
     return rows
 
@@ -142,6 +169,11 @@ def 보완요청작성(보완):
     (OUT / "보완요청안내문.md").write_text("\n".join(lines), encoding="utf-8")
     step("보완요청작성", f"{len(보완)}건 안내문 초안 — 발송 안 함 (사람 확인 대기)")
     print("  → out/보완요청안내문.md")
+    TR.halt("5. 보완요청작성", "증강",
+            f"{len(보완)}건에 대해 안내문 초안을 만들었습니다. 재제출 기한은 접수일 +14일입니다.",
+            checklist=[f"{r['청구번호']} {r['성명']} — {r['사유']}" for r in 보완])
+    TR.warn("**발송하지 않았습니다.** 이 갈래의 끝이고, 담당자가 확인할 때까지 멈춥니다.")
+    TR.file("out/보완요청안내문.md")
     return 보완
 
 
@@ -152,6 +184,11 @@ COLS_예외 = ["청구번호", "사번", "성명", "청구금액", "예외사유
 def 예외심사요청(예외):
     rows = [{k: r.get(k, "") for k in COLS_예외} | {"상태": "심사대기"} for r in 예외]
     step("예외심사요청", f"{len(rows)}건 심사 요청 · 지급 여부를 추천하지 않음")
+    TR.step("6. 예외심사요청", "증강",
+            f"{len(rows)}건을 심사 대기로 올렸습니다. **지급 여부를 추천하지 않았습니다** — "
+            f"판단은 심사자가 합니다.")
+    TR.table("예외심사대장", rows, ["청구번호", "성명", "예외사유", "심사근거"])
+    TR.file("out/예외심사대장.csv", len(rows))
     write("예외심사대장.csv", rows, COLS_예외)
     return rows
 
@@ -173,12 +210,25 @@ def 지급승인(지급행, 예외행):
     (OUT / "승인대기목록.md").write_text("\n".join(lines), encoding="utf-8")
     step("지급승인", "⛔ 사람고유 — 승인 대기 목록만 만들고 멈춤")
     print("  → out/승인대기목록.md")
+    합계 = sum(int(r["지급액"]) for r in 지급행)
+    TR.halt("7. 지급승인", "사람고유",
+            f"**여기서 멈췄습니다.** 에이전트는 아무것도 승인하지 않았습니다. "
+            f"자동지급 상신 {len(지급행)}건(합계 {합계:,}원)과 예외심사 대기 {len(예외행)}건이 "
+            f"복리후생 팀장 확인을 기다립니다.",
+            actions=[f"{len(지급행)}건 승인", f"예외 {len(예외행)}건 검토", "전체 반려"])
+    TR.file("out/승인대기목록.md")
 
 
 def main():
+    global TR
     print("의료비 청구 건 판독·지급 판정 에이전트\n")
+    TR = Trace("의료비 판독 AI",
+               source="SKI AX 과제 · Talent AX실 · HR AI",
+               lv4="의료비 지원 운영", lv5="의료비 청구 건 판독·지급 판정")
     claims, rules = load("청구접수대장.csv"), load("지급기준표.csv")
     print(f"입력: 청구접수대장.csv {len(claims)}건 · 지급기준표.csv {len(rules)}개 기준\n")
+    TR.input("청구접수대장", len(claims), "2026년 7~8월 접수분")
+    TR.input("지급기준표", len(rules))
 
     read = 증빙서류판독(claims)
     신청 = 신청서생성(read)
@@ -193,10 +243,10 @@ def main():
     print("  └─ 합류 ───────────────")
     지급승인(지급행, 예외행)
 
-    TRACE.append({"지급": 지급행, "보완": 보완, "예외": 예외행,
-                  "판독": read, "총건수": len(claims)})
-    (OUT / "trace.json").write_text(
-        json.dumps(TRACE[0], ensure_ascii=False, indent=1), encoding="utf-8")
+    TR.done(f"경로 A(자동지급) {len(지급행)}건 · 경로 B(보완) {len(보완)}건 · "
+            f"경로 C(예외심사) {len(예외행)}건 = 총 {len(claims)}건 · 사람 확인 없이 나간 것 없음")
+    TR.save(OUT)
+    print("  → out/trace.json (실행 기록 — 목업 화면이 이것을 읽습니다)")
 
     print(f"\n경로 A(자동지급) {len(지급행)}건 · 경로 B(보완) {len(보완)}건 · "
           f"경로 C(예외심사) {len(예외행)}건 = 총 {len(claims)}건")

@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>분기/반기 결산 에이전트 — 실행 화면</title>
+<!-- 이 파일은 check/make_mockup.py 가 out/trace.json 에서 생성했습니다.
+     손으로 고치지 마십시오 — run.py를 다시 돌리고 이 스크립트를 다시 실행하십시오.
+     색 토큰의 SSOT는 DESIGN.md 입니다. -->
 <style>
-  /* 토큰의 SSOT는 ../../../DESIGN.md */
-  :root{--brand:#EA002C;--brand-sub:#F47725;--bg:#FFFFFF;--bg-soft:#F7F5F2;
-        --text:#1A1A1A;--muted:#6E6E6E;--line:#E3DFDA;--ok:#1E7A46;--loop:#5B4FCF}
+  :root { --brand:#EA002C; --brand-sub:#F47725; --bg:#FFFFFF; --bg-soft:#F7F5F2; --text:#1A1A1A; --muted:#6E6E6E; --line:#E3DFDA; --ok:#1E7A46; --warn:#B26A00; --loop:#5B4FCF; }
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg-soft);color:var(--text);
        font:15px/1.6 -apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
@@ -16,15 +17,15 @@
   .top{display:flex;align-items:center;gap:12px;padding:14px 22px;
        border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
   .mark{width:30px;height:30px;border-radius:8px;background:var(--brand);color:#fff;
-        display:grid;place-items:center;font-size:15px;flex:none}
+        display:grid;place-items:center;font-size:14px;font-weight:700;flex:none}
   .top h1{font-size:15px;letter-spacing:-.01em}
   .top .sub{font-size:12px;color:var(--muted)}
-  .pill{margin-left:auto;font-size:11px;border:1px solid var(--loop);color:var(--loop);
-        border-radius:999px;padding:3px 10px}
-  .rail{display:flex;gap:6px;padding:14px 22px;overflow-x:auto;border-bottom:1px solid var(--line);
-        background:var(--bg-soft);align-items:center}
-  .rail .n{flex:none;font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);
-           background:var(--bg);color:var(--muted);white-space:nowrap}
+  .pill{margin-left:auto;font-size:11px;border:1px solid var(--line);border-radius:999px;
+        padding:3px 10px;color:var(--muted)}
+  .rail{display:flex;gap:6px;padding:14px 22px;overflow-x:auto;align-items:center;
+        border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .rail .n{flex:none;font-size:12px;padding:5px 11px;border-radius:999px;white-space:nowrap;
+           border:1px solid var(--line);background:var(--bg);color:var(--muted)}
   .rail .n.done{border-color:var(--ok);color:var(--ok)}
   .rail .n.fork{border-color:var(--brand-sub);color:var(--brand-sub);font-weight:600}
   .rail .n.halt{border-color:var(--brand);color:var(--brand);font-weight:600}
@@ -33,39 +34,40 @@
   main{padding:20px 22px 60px}
   .log{display:flex;flex-direction:column;gap:14px}
   .card{border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .card>header{display:flex;align-items:center;gap:9px;padding:10px 14px;background:var(--bg-soft);
-               border-bottom:1px solid var(--line);font-size:13px}
-  .tag{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .card>header{display:flex;align-items:center;gap:9px;padding:10px 14px;font-size:13px;
+                background:var(--bg-soft);border-bottom:1px solid var(--line)}
+  .card.fork-card{border-color:var(--brand-sub)}
+  .card.halt{border-color:var(--brand)}
+  .card.halt>header{background:#FDF2F4;border-color:var(--brand);color:var(--brand)}
+  .tag{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);
+       color:var(--muted)}
   .tag.auto{border-color:var(--ok);color:var(--ok)}
   .tag.aug{border-color:var(--brand-sub);color:var(--brand-sub)}
   .tag.human{border-color:var(--brand);color:var(--brand)}
-  .tag.loop{border-color:var(--loop);color:var(--loop)}
-  .ms{margin-left:auto;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .tag.fork{border-color:var(--brand-sub);color:var(--brand-sub)}
+  .cycle{font-size:11px;border:1px solid var(--loop);color:var(--loop);border-radius:999px;
+         padding:1px 8px;font-weight:600}
   .body{padding:13px 14px;font-size:14px}
   .body p+p{margin-top:6px}
   .files{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
-  .file{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:3px 9px;color:var(--muted)}
+  .file{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:3px 9px;
+        color:var(--muted)}
   .file b{color:var(--text);font-weight:600}
   .warn{background:#FFF6F0;border:1px solid var(--brand-sub);border-radius:8px;
         padding:10px 12px;font-size:13px;margin-top:10px}
-  .fork-card{border-color:var(--brand-sub)}
-  .branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:11px}
+  .branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+            gap:10px;margin-top:11px}
   .br{border:1px solid var(--line);border-radius:8px;padding:11px 12px}
   .br.taken{border-color:var(--brand-sub);background:#FFF9F5}
   .br .cond{font-size:11px;color:var(--brand-sub);font-weight:600;margin-bottom:3px}
   .br .to{font-size:13px;font-weight:600}
   .br .cnt{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:5px}
+  .br .cnt.none{color:var(--muted);font-weight:400}
   .br .cnt span{font-size:12px;font-weight:400;color:var(--muted);margin-left:3px}
-  /* 루프 */
-  .loopwrap{border:1px dashed var(--loop);border-radius:10px;padding:12px;background:#F8F7FE}
-  .loopwrap>.lh{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--loop);
-                font-weight:600;margin-bottom:11px}
-  .loopwrap .log{gap:11px}
-  .cycle{font-size:11px;border:1px solid var(--loop);color:var(--loop);border-radius:999px;
-         padding:1px 8px;font-weight:600}
-  .loopback{text-align:center;font-size:12px;color:var(--loop);padding:7px;font-weight:600}
+  .loopback{text-align:center;font-size:12px;color:var(--loop);padding:7px;font-weight:600;
+            border:1px dashed var(--loop);border-radius:8px;background:#F8F7FE}
   .scroll{overflow-x:auto;margin-top:10px}
-  table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
   th{text-align:left;font-size:11px;color:var(--muted);font-weight:600;padding:6px 9px;
      border-bottom:1px solid var(--line);white-space:nowrap}
   td{padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -73,216 +75,81 @@
   tr.diff td{background:#FFF6F0}
   tr.na td{color:var(--muted)}
   tbody tr:last-child td{border-bottom:none}
-  .halt{border:1px solid var(--brand);border-radius:10px;overflow:hidden}
-  .halt>header{background:#FDF2F4;border-bottom:1px solid var(--brand);color:var(--brand);
-               display:flex;align-items:center;gap:9px;padding:10px 14px;font-size:13px}
-  .halt-note{background:#FDF2F4;border:1px solid var(--brand);border-radius:8px;
-             padding:11px 13px;font-size:13px;color:var(--brand);margin-top:11px}
   .chk{list-style:none;margin-top:10px;font-size:13px}
   .chk li{padding:5px 0;border-bottom:1px solid var(--line)}
   .chk li:last-child{border-bottom:none}
-  .chk b{font-weight:600}
   .actions{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
-  button{font:inherit;font-size:13px;padding:8px 16px;border-radius:7px;border:1px solid var(--line);
-         background:var(--bg);cursor:not-allowed;color:var(--muted)}
+  button{font:inherit;font-size:13px;padding:8px 16px;border-radius:7px;cursor:not-allowed;
+         border:1px solid var(--line);background:var(--bg);color:var(--muted)}
   button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
   .disabled-note{font-size:12px;color:var(--muted);margin-top:7px}
   .foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
         font-size:12px;color:var(--muted);line-height:1.8}
-  .foot code{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+  .foot code{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;
+             padding:1px 5px}
 </style>
 </head>
 <body>
 <div class="app">
 
 <div class="top">
-  <div class="mark">決</div>
+  <div class="mark">분</div>
   <div>
     <h1>분기/반기 결산 에이전트</h1>
-    <div class="sub">재무본부 회계관리팀 · P-A2-1 · Lv5 「분기/반기 결산」</div>
+    <div class="sub">AX전략 워크샵 · 재무본부 회계관리팀 · P-A2-1 · Lv5 「분기/반기 결산」</div>
   </div>
-  <span class="pill">팀 에이전트 · 갈림길 + 루프백</span>
+  <span class="pill">팀 에이전트 · 갈림길+루프백</span>
 </div>
 
 <div class="rail">
-  <span class="n done">결산일정수립</span><span class="arrow">›</span>
-  <span class="n done">원장잔액수집</span><span class="arrow">›</span>
-  <span class="n done">조정분개작성</span><span class="arrow">›</span>
-  <span class="n done">주석초안작성</span><span class="arrow">›</span>
-  <span class="n fork">◆ 계정검증대사 ×2</span><span class="arrow">›</span>
-  <span class="n loop">↩ 차이분석조정</span><span class="arrow">›</span>
+  <span class="n done">결산일정수립</span>
+  <span class="arrow">›</span>
+  <span class="n done">원장잔액수집</span>
+  <span class="arrow">›</span>
+  <span class="n done">조정분개작성</span>
+  <span class="arrow">›</span>
+  <span class="n done">주석초안작성</span>
+  <span class="arrow">›</span>
+  <span class="n fork">◆ 계정검증대사 ×2</span>
+  <span class="arrow">›</span>
+  <span class="n loop">↩ 차이분석조정</span>
+  <span class="arrow">›</span>
   <span class="n halt">⛔ 결산마감</span>
 </div>
 
 <main>
 <div class="log">
 
-  <div class="card">
-    <header><b>입력</b><span class="tag">2026년 3분기 결산</span><span class="ms">0.00s</span></header>
-    <div class="body">
-      <p>SAP 원장 <b>12계정</b> · 계열사 <b>5곳</b> · 외부확인서 <b>7건</b> · 전기주석 <b>5개</b></p>
-      <div class="files">
-        <span class="file">SAP원장잔액.csv <b>12행</b></span>
-        <span class="file">계열사연결패키지.csv <b>5행</b></span>
-        <span class="file">외부확인서.csv <b>7행</b></span>
-        <span class="file">전기주석.csv <b>5행</b></span>
-      </div>
-    </div>
-  </div>
+  <div class="card"><header><b>입력</b><span class="tag">2026년 3분기 결산 · data/결산데이터.md</span></header><div class="body"><p>SAP원장 <b>12건</b> · 계열사 <b>5건</b> · 외부확인서 <b>7건</b> · 전기주석 <b>5건</b></p></div></div>
 
-  <div class="card">
-    <header><b>1. 결산일정수립</b><span class="tag aug">증강</span><span class="ms">0.04s</span></header>
-    <div class="body">
-      <p>결산캘린더 6행 · 미완료 <b>6건</b>. 마감일 <b>2026-08-21</b>까지 남았습니다.</p>
-      <p style="color:var(--muted)">PP-2 [WAIT/높음] 결산 마감 일정 촉박(T+5일) —
-         이 스킬은 일정을 앞당기지 못합니다. 남은 일수를 보이게 만들 뿐입니다.</p>
-    </div>
-  </div>
+  <div class="card"><header><b>1. 결산일정수립</b><span class="tag aug">증강</span></header><div class="body"><p>결산캘린더 6행 · 미완료 6건 (마감일 2026-08-21 — PP-2 T+5일)</p><div class="warn">⚠️ PP-2 [WAIT/높음] 결산 마감 일정 촉박(T+5일) — 일정을 앞당기지는 못합니다. 남은 일수를 보이게 만들 뿐입니다.</div></div></div>
 
-  <div class="card">
-    <header><b>2. 원장잔액수집</b><span class="tag auto">자동</span><span class="ms">0.18s</span></header>
-    <div class="body">
-      <p>계정 12개를 읽고 이상/신규 <b>2건</b>을 표시했습니다 (전기 대비 ±30% 초과 또는 부호 반전).</p>
-      <div class="warn">⚠️ <b>계열사 미수신 2곳</b> — SK지오센트릭, SK엔무브.
-        <b>0으로 채우지 않고</b> 합계에서 제외했습니다. <span style="color:var(--muted)">(PP-6 [WAIT/높음]
-        연결결산 계열사 자료 수신 지연)</span></div>
-      <div class="files"><span class="file">→ out/잔액수집결과.csv <b>12행</b></span></div>
-    </div>
-  </div>
+  <div class="card"><header><b>2. 원장잔액수집</b><span class="tag auto">자동</span></header><div class="body"><p>계정 12개를 읽고 이상/신규 2건을 표시했습니다 (전기 대비 ±30% 초과 또는 부호 반전).</p><div class="warn">⚠️ 계열사 미수신 2곳 — SK지오센트릭, SK엔무브. 0으로 채우지 않고 합계에서 제외했습니다. (PP-6 [WAIT/높음])</div><div class="files"><span class="file">→ out/잔액수집결과.md <b>12건</b></span></div></div></div>
 
-  <div class="card">
-    <header><b>3. 조정분개작성</b><span class="tag aug">증강</span><span class="ms">0.06s</span></header>
-    <div class="body">
-      <p>조정분개 초안 <b>2건</b>. 그중 <b>1건은 사유확인필요</b>입니다 —
-         계정 2210(미지급비용)의 조정 사유를 알 수 없어 <b>지어내지 않았습니다.</b></p>
-      <p style="color:var(--muted)">검토·승인(A-A2-1-3-3)은 하지 않습니다. 초안까지입니다.</p>
-      <div class="files"><span class="file">→ out/조정분개장.csv <b>2행</b></span></div>
-    </div>
-  </div>
+  <div class="card"><header><b>3. 조정분개작성</b><span class="tag aug">증강</span></header><div class="body"><p>조정분개 초안 2건. 그중 1건은 사유를 알 수 없어 <b>지어내지 않았습니다.</b> 검토·승인(A-A2-1-3-3)은 하지 않습니다 — 초안까지입니다.</p><div class="scroll"><table><thead><tr><th>분개번호</th><th>계정코드</th><th>차변</th><th>대변</th><th>사유</th><th>상태</th></tr></thead><tbody><tr><td>ADJ-3Q-001</td><td class="num">1,310</td><td class="num">412,000,000</td><td class="num">0</td><td>선급금 신규 계상 — 전기 잔액 없음</td><td>초안</td></tr><tr class="diff"><td>ADJ-3Q-002</td><td class="num">2,210</td><td class="num">360,000,000</td><td class="num">0</td><td>사유확인필요</td><td>사유확인필요</td></tr></tbody></table></div><div class="files"><span class="file">→ out/조정분개장.md <b>2건</b></span></div></div></div>
 
-  <div class="card">
-    <header><b>4. 주석초안작성</b><span class="tag aug">증강</span><span class="ms">0.05s</span></header>
-    <div class="body">
-      <p>주석 5개에 당기 숫자를 채웠습니다. 전기 대비 ±20%를 넘는 항목은 없어 설명필요 <b>0건</b>입니다.</p>
-      <p style="color:var(--muted)">전기주석에 없는 항목은 숫자를 채우지 않고 `신규항목`으로 남깁니다.
-         검토·확정(A-A2-1-4-3)은 사람이 합니다.</p>
-      <div class="files"><span class="file">→ out/주석초안.csv <b>5행</b></span></div>
-    </div>
-  </div>
+  <div class="card"><header><b>4. 주석초안작성</b><span class="tag aug">증강</span></header><div class="body"><p>주석 5개에 당기 숫자를 채웠습니다. 전기 대비 ±20%를 넘는 설명필요 0건. 전기주석에 없는 항목은 숫자를 채우지 않고 <code>신규항목</code>으로 남깁니다.</p><div class="files"><span class="file">→ out/주석초안.md <b>5건</b></span></div></div></div>
 
-  <!-- ── 루프 구간 ────────────────────────────────────── -->
-  <div class="loopwrap">
-    <div class="lh">↩ 루프백 구간 — 원본 워크샵의 <b>L4(차이대사)</b>.
-      Agent 3이 결산 지연의 주요 원인으로 지목한 자리입니다.</div>
-    <div class="log">
+  <div class="card fork-card"><header><b>5. 계정검증대사</b><span class="cycle">1회차</span><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span></header><div class="body"><p>외부확인서와 SAP 원장을 계정별로 맞췄습니다. <b>차이 1건</b>입니다.</p><div class="warn">⚠️ 확인서 미수신 1건 — 차이로 세지 않습니다. <b>차이가 없는 것과 확인할 수 없는 것은 다릅니다.</b></div><div class="branches"><div class="br taken"><div class="cond">차이 발견? → Yes</div><div class="to">→ 차이분석조정</div><div class="cnt">1<span>건</span></div></div><div class="br"><div class="cond">차이 발견? → No</div><div class="to">→ 결산마감</div><div class="cnt none">—</div></div></div><div class="scroll"><table><thead><tr><th>계정코드</th><th>계정명</th><th>원장잔액</th><th>확인잔액</th><th>차이</th><th>상태</th><th>회차</th></tr></thead><tbody><tr><td class="num">1,010</td><td>현금및현금성자산</td><td class="num">4,820,000,000</td><td class="num">4,820,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr><td class="num">1,020</td><td>단기금융상품</td><td class="num">12,000,000,000</td><td class="num">12,000,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr class="diff"><td class="num">1,110</td><td>매출채권</td><td class="num">8,340,000,000</td><td class="num">8,220,000,000</td><td class="num">120,000,000</td><td>차이</td><td class="num">1</td></tr><tr><td class="num">2,010</td><td>매입채무</td><td class="num">-5,930,000,000</td><td class="num">-5,930,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr class="na"><td class="num">2,110</td><td>단기차입금</td><td class="num">-9,000,000,000</td><td></td><td></td><td>확인서미수신</td><td class="num">1</td></tr></tbody></table></div></div></div>
 
-      <div class="card fork-card">
-        <header><b>5. 계정검증대사</b><span class="tag aug">증강</span>
-          <span class="cycle">1회차</span>
-          <span class="tag" style="border-color:var(--brand-sub);color:var(--brand-sub)">◆ 갈림길</span>
-          <span class="ms">0.21s</span></header>
-        <div class="body">
-          <p>외부확인서와 SAP 원장을 계정별로 맞췄습니다. <b>차이 1건</b>이 나왔습니다.</p>
-          <div class="scroll"><table>
-            <thead><tr><th>계정</th><th>계정명</th><th>원장잔액</th><th>확인잔액</th><th>차이</th><th>상태</th></tr></thead>
-            <tbody>
-              <tr><td>1010</td><td>현금및현금성자산</td><td class="num">4,820,000,000</td><td class="num">4,820,000,000</td><td class="num">0</td><td>일치</td></tr>
-              <tr><td>1020</td><td>단기금융상품</td><td class="num">12,000,000,000</td><td class="num">12,000,000,000</td><td class="num">0</td><td>일치</td></tr>
-              <tr class="diff"><td>1110</td><td>매출채권</td><td class="num">8,340,000,000</td><td class="num">8,220,000,000</td><td class="num"><b>120,000,000</b></td><td><b>차이</b></td></tr>
-              <tr><td>2010</td><td>매입채무</td><td class="num">-5,930,000,000</td><td class="num">-5,930,000,000</td><td class="num">0</td><td>일치</td></tr>
-              <tr class="na"><td>2110</td><td>단기차입금</td><td class="num">-9,000,000,000</td><td class="num">—</td><td class="num">—</td><td>확인서미수신</td></tr>
-            </tbody></table></div>
-          <div class="warn">계정 2110은 <b>확인서 미수신</b>입니다 — 차이로 세지 않습니다.
-            <b>차이가 없는 것과 확인할 수 없는 것은 다릅니다.</b></div>
-          <div class="branches">
-            <div class="br taken">
-              <div class="cond">차이 발견? → Yes</div>
-              <div class="to">→ 차이분석조정</div>
-              <div class="cnt">1<span>건</span></div>
-            </div>
-            <div class="br">
-              <div class="cond">차이 발견? → No</div>
-              <div class="to">→ 결산마감</div>
-              <div class="cnt" style="color:var(--muted)">—</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="card halt"><header><b>6. 차이분석조정</b><span class="cycle">1회차</span><span class="tag human">사람고유</span><span class="tag human">멈춤</span></header><div class="body"><p>차이 1건의 목록과 근거만 만들었습니다. <b>조정 금액은 정하지 않았습니다.</b></p><div class="warn">⚠️ 결산담당 확정 대기. 조정이 확정되면 계정검증대사로 되돌아가 다시 맞춰봅니다.</div><ul class="chk"><li>☐ 1110 매출채권 — 원장 8,340,000,000 vs 확인 8,220,000,000 = 차이 120,000,000</li></ul></div></div>
 
-      <div class="card" style="border-color:var(--brand)">
-        <header style="background:#FDF2F4;border-color:var(--brand)">
-          <b>6. 차이분석조정</b><span class="tag human">사람고유</span>
-          <span class="tag loop">↩ 루프백</span>
-          <span class="ms" style="color:var(--brand)">멈춤</span></header>
-        <div class="body">
-          <p>차이 <b>1건</b>의 목록과 근거만 만들었습니다. <b>조정 금액은 정하지 않았습니다.</b></p>
-          <p style="color:var(--muted)">· 1110 매출채권 — 원장 8,340,000,000 vs 확인 8,220,000,000
-             = 차이 <b style="color:var(--text)">120,000,000</b></p>
-          <div class="halt-note">⏸ <b>결산담당 확정 대기.</b>
-            조정이 확정되면 계정검증대사로 되돌아가 다시 맞춰봅니다.</div>
-        </div>
-      </div>
+  <div class="loopback">↩ 계정검증대사로 되돌아감 &nbsp;·&nbsp; 탈출 조건: 차이가 0이 되면</div>
 
-      <div class="loopback">↩ 계정검증대사로 되돌아감 &nbsp;·&nbsp; 탈출 조건: 차이 0</div>
+  <div class="card fork-card"><header><b>5. 계정검증대사</b><span class="cycle">2회차</span><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span></header><div class="body"><p>외부확인서와 SAP 원장을 계정별로 맞췄습니다. <b>차이 0건</b>입니다.</p><div class="warn">⚠️ 확인서 미수신 1건 — 차이로 세지 않습니다. <b>차이가 없는 것과 확인할 수 없는 것은 다릅니다.</b></div><div class="branches"><div class="br"><div class="cond">차이 발견? → Yes</div><div class="to">→ 차이분석조정</div><div class="cnt none">—</div></div><div class="br taken"><div class="cond">차이 발견? → No</div><div class="to">→ 결산마감</div><div class="cnt none">—</div></div></div><div class="scroll"><table><thead><tr><th>계정코드</th><th>계정명</th><th>원장잔액</th><th>확인잔액</th><th>차이</th><th>상태</th><th>회차</th></tr></thead><tbody><tr><td class="num">1,010</td><td>현금및현금성자산</td><td class="num">4,820,000,000</td><td class="num">4,820,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">1,020</td><td>단기금융상품</td><td class="num">12,000,000,000</td><td class="num">12,000,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">1,110</td><td>매출채권</td><td class="num">8,340,000,000</td><td class="num">8,220,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">2,010</td><td>매입채무</td><td class="num">-5,930,000,000</td><td class="num">-5,930,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr class="na"><td class="num">2,110</td><td>단기차입금</td><td class="num">-9,000,000,000</td><td></td><td></td><td>확인서미수신</td><td class="num">2</td></tr></tbody></table></div></div></div>
 
-      <div class="card">
-        <header><b>5. 계정검증대사</b><span class="tag aug">증강</span>
-          <span class="cycle">2회차</span>
-          <span class="tag" style="border-color:var(--brand-sub);color:var(--brand-sub)">◆ 갈림길</span>
-          <span class="ms">0.19s</span></header>
-        <div class="body">
-          <p>조정을 반영해 재대사했습니다. <b>차이 0건</b> — 루프를 빠져나갑니다.</p>
-          <div class="branches">
-            <div class="br">
-              <div class="cond">차이 발견? → Yes</div>
-              <div class="to">→ 차이분석조정</div>
-              <div class="cnt" style="color:var(--muted)">—</div>
-            </div>
-            <div class="br taken">
-              <div class="cond">차이 발견? → No</div>
-              <div class="to">→ 결산마감</div>
-              <div class="cnt">0<span>건 차이</span></div>
-            </div>
-          </div>
-          <div class="files"><span class="file">→ out/대사결과.csv <b>10행</b> (회차별 누적)</span></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="halt">
-    <header><b>7. 결산마감</b><span class="tag human">사람고유</span>
-      <span class="ms" style="color:var(--brand)">멈춤</span></header>
-    <div class="body">
-      <p><b>여기서 멈췄습니다.</b> 에이전트는 원장을 잠그지 않았고, 마감 전표도 처리하지 않았습니다.</p>
-      <p style="color:var(--muted)">대사는 <b style="color:var(--text)">2회차</b>만에 차이 0에 도달했습니다.
-         마감 전 확인할 것 <b style="color:var(--text)">4건</b>이 남았습니다.</p>
-      <ul class="chk">
-        <li>☐ <b>계열사 미수신</b> — SK지오센트릭 <span style="color:var(--muted)">(PP-6)</span></li>
-        <li>☐ <b>계열사 미수신</b> — SK엔무브 <span style="color:var(--muted)">(PP-6)</span></li>
-        <li>☐ <b>확인서 미수신</b> — 2110 단기차입금 <span style="color:var(--muted)">(차이 없음이 아니라 확인 불가)</span></li>
-        <li>☐ <b>조정 사유 확인</b> — ADJ-3Q-002 계정 2210</li>
-      </ul>
-      <div class="actions">
-        <button class="primary">마감 승인 및 원장 Lock</button>
-        <button>점검 항목 4건 확인</button>
-        <button>결산담당에게 반려</button>
-      </div>
-      <p class="disabled-note">※ 목업입니다. 이 팩에는 <b>마감 전표 처리·원장 Lock 코드가 없습니다</b> —
-         버튼은 동작하지 않습니다. Lock은 팀장이 SAP에서 직접 수행합니다.</p>
-      <div class="files"><span class="file">→ out/마감점검표.md</span></div>
-    </div>
-  </div>
+  <div class="card halt"><header><b>7. 결산마감</b><span class="tag human">사람고유</span><span class="tag human">멈춤</span></header><div class="body"><p><b>여기서 멈췄습니다.</b> 에이전트는 원장을 잠그지 않았고, 마감 전표도 처리하지 않았습니다. 대사는 <b>2회차</b>만에 차이 0에 도달했고, 마감 전 확인할 것 <b>4건</b>이 남았습니다.</p><ul class="chk"><li>☐ 계열사 미수신 — SK지오센트릭 (PP-6)</li><li>☐ 계열사 미수신 — SK엔무브 (PP-6)</li><li>☐ 확인서 미수신 — 2110 단기차입금 (차이 없음이 아니라 확인 불가)</li><li>☐ 조정 사유 확인 — ADJ-3Q-002 계정 2210</li></ul><div class="actions"><button class="primary">마감 승인 및 원장 Lock</button><button>점검 항목 4건 확인</button><button>결산담당에게 반려</button></div><p class="disabled-note">※ 목업입니다. 이 팩에는 실행 코드가 없습니다 — 버튼은 동작하지 않습니다.</p><div class="files"><span class="file">→ out/마감점검표.md</span></div></div></div>
 
 </div>
 
 <div class="foot">
   루프백 1회 (차이대사 L4) · 최종 2회차에 차이 0 · 사람 확인 없이 마감된 것 없음<br>
-  이 화면은 <code>python3 run.py</code>의 실제 실행 결과입니다.
-  숫자·표는 <code>out/</code>에 떨어진 파일과 같습니다.<br>
-  출처: AX전략 워크샵 · 재무본부 회계관리팀 (2026-08-18) · P-A2-1 분기/반기 결산 ·
-  데이터는 실습용 가상 값입니다.
+  루프백: 차이분석조정 ↩ 계정검증대사 (2회차)<br>
+  이 화면은 <code>python3 run.py</code>의 실제 실행 결과입니다 —
+  숫자·표는 <code>out/trace.json</code>에서 그대로 가져왔습니다.
+  데이터를 고치고 다시 돌리면 이 화면도 다시 만들어야 합니다:
+  <code>python3 check/make_mockup.py quarterly-close-agent</code><br>
+  AX전략 워크샵 · 재무본부 회계관리팀 · P-A2-1 · 데이터는 실습용 가상 값입니다.
 </div>
 </main>
 </div>
