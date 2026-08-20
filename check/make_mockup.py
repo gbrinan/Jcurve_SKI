@@ -544,6 +544,13 @@ def css(tk):
          border:1px solid var(--line);background:var(--bg);color:var(--muted)}}
   button.primary{{background:var(--brand);border-color:var(--brand);color:#fff}}
   .disabled-note{{font-size:12px;color:var(--muted);margin-top:7px}}
+  /* 계약 흐름 기록임을 화면이 먼저 말한다 — 숫자가 없는 이유 */
+  .modebar{{max-width:1120px;margin:0 auto;padding:12px 22px;font-size:13px;
+           display:flex;gap:10px;align-items:flex-start;
+           background:#F8F7FE;border-bottom:1px solid var(--loop);color:var(--loop)}}
+  .modebar b{{color:var(--text)}}
+  .modebar .ic{{font-size:15px;line-height:1.3}}
+
   /* ── 요약·설계도 (실행 앞단) ─────────────────────────────────────── */
   .hero{{background:var(--text);color:#fff;padding:44px 0 38px}}
   .hero .wrap{{max-width:1120px;margin:0 auto;padding:0 22px}}
@@ -702,7 +709,10 @@ def main(pack_dir):
         kind.append("루프백")
     verdict = f"팀 에이전트 · {'+'.join(kind)}" if kind else "팀 스킬팩"
 
-    ins = " · ".join(f"{e(i['name'])} <b>{i['count']}건</b>" for i in tr["inputs"])
+    ins = " · ".join(
+        (f"{e(i['name'])} <b>{i['count']}건</b>" if i.get("count") is not None
+         else f"{e(i['name'])} <span style=\"color:var(--muted)\">(값 안 읽음)</span>")
+        for i in tr["inputs"])
     input_card = (
         f'<div class="card"><header><b>입력</b>'
         f'<span class="tag">{e(tr["inputs"][0].get("note", "")) if tr["inputs"] else ""}</span>'
@@ -738,7 +748,17 @@ def main(pack_dir):
         "verdict": verdict, "summary": tr.get("summary", ""),
     }, ensure_ascii=False, indent=1)
 
-    summary = f'''
+    contract_mode = tr.get("mode") == "contract"
+    modebar = ("" if not contract_mode else
+               '<div class="modebar"><span class="ic">🗺</span><div>'
+               '<b>계약이 선언한 흐름을 걸어 본 화면입니다 — 실행 기록이 아닙니다.</b><br>'
+               'CONTRACT.md와 SKILL.md에서 순서·갈림길·루프백·정지 지점만 읽었습니다. '
+               '판단기준을 계산하지 않았고 데이터를 읽지 않았으므로 <b>건수·금액이 없습니다.</b> '
+               '갈래는 고르지 않고 <b>양쪽을 다</b> 보여줍니다. '
+               '실제 숫자가 필요하면 팩에 <code>run.py</code>를 만들어 다시 돌리십시오.'
+               '</div></div>')
+
+    summary = f'''{modebar}
 <div class="hero">
   <div class="wrap">
     <div class="eyebrow">{e(tr.get("source", ""))}</div>
@@ -824,7 +844,7 @@ def main(pack_dir):
     <h1>{e(tr['title'])}</h1>
     <div class="sub">{e(tr['source'])}{' · Lv5 「' + e(tr['lv5']) + '」' if tr.get('lv5') else ''}</div>
   </div>
-  <span class="pill">{e(verdict)}</span>
+  <span class="pill">{e(verdict)}{" · 계약 흐름" if tr.get("mode") == "contract" else ""}</span>
 </div>
 
 <div class="rail">
@@ -843,8 +863,9 @@ def main(pack_dir):
 <div class="foot">
   {e(tr.get('summary', ''))}<br>
   {'루프백: ' + loops + '<br>' if loops else ''}
-  이 화면은 <code>python3 run.py</code>의 실제 실행 결과입니다 —
-  숫자·표는 <code>out/trace.json</code>에서 그대로 가져왔습니다.
+  {"이 화면은 <code>check/orchestrate.py</code>가 계약을 걸어 만든 것입니다 — 숫자는 없습니다."
+    if tr.get("mode") == "contract" else
+    "이 화면은 <code>python3 run.py</code>의 실제 실행 결과입니다 — 숫자·표는 <code>out/trace.json</code>에서 그대로 가져왔습니다."}
   데이터를 고치고 다시 돌리면 이 화면도 다시 만들어야 합니다:
   <code>python3 check/make_mockup.py {e(pack.name)}</code><br>
   {e(tr['source'])} · 데이터는 실습용 가상 값입니다.

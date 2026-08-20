@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>의료비 판독 AI — 실행 화면</title>
+<title>구매기획팀 Lv.5 에이전트 — 실행 화면</title>
 <!-- 이 파일은 check/make_mockup.py 가 out/trace.json 에서 생성했습니다.
      손으로 고치지 마십시오 — run.py를 다시 돌리고 이 스크립트를 다시 실행하십시오.
      색 토큰의 SSOT는 DESIGN.md 입니다. -->
@@ -226,25 +226,25 @@
 </style>
 </head>
 <body>
-
+<div class="modebar"><span class="ic">🗺</span><div><b>계약이 선언한 흐름을 걸어 본 화면입니다 — 실행 기록이 아닙니다.</b><br>CONTRACT.md와 SKILL.md에서 순서·갈림길·루프백·정지 지점만 읽었습니다. 판단기준을 계산하지 않았고 데이터를 읽지 않았으므로 <b>건수·금액이 없습니다.</b> 갈래는 고르지 않고 <b>양쪽을 다</b> 보여줍니다. 실제 숫자가 필요하면 팩에 <code>run.py</code>를 만들어 다시 돌리십시오.</div></div>
 <div class="hero">
   <div class="wrap">
-    <div class="eyebrow">SKI AX 과제 · Talent AX실 · HR AI</div>
-    <h1>의료비 판독 AI <small>Lv.5 팀 에이전트</small></h1>
-    <p class="one">접수된 의료비 청구 건을 판독해 <b>지급 / 보완 / 예외심사</b> 중 어디로 갈지 가르고, 각 갈래의 서류를 초안까지 만들어 사람 앞에 놓는다.</p>
+    <div class="eyebrow">team-agent</div>
+    <h1>구매기획팀 Lv.5 에이전트 <small>Lv.5 팀 에이전트</small></h1>
+    <p class="one">&quot;수신된 견적 메일을 읽어 비교표를 갱신하고 발주 품의 초안을 만든다.&quot;</p>
     <div class="lvpath">
-      <span class="lv">Lv4 핵심 업무 · <b>의료비 지원 운영</b></span> ›
-      <span class="lv on">Lv5 워크플로우 · <b>의료비 청구 건 판독·지급 판정</b></span> ›
-      <span class="lv">Lv6 태스크 <b>7개</b> = 스킬 7개</span>
+      <span class="lv">Lv4 핵심 업무 · <b>(미정)</b></span> ›
+      <span class="lv on">Lv5 워크플로우 · <b>(미정)</b></span> ›
+      <span class="lv">Lv6 태스크 <b>5개</b> = 스킬 5개</span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="n">7<em>개</em></div>
+      <div class="stat"><div class="n">5<em>개</em></div>
         <div class="l">Lv6 스킬 · 1인 1스킬</div></div>
-      <div class="stat"><div class="n">6<em>개</em></div>
+      <div class="stat"><div class="n">0<em>개</em></div>
         <div class="l">AI 태스크 (자동+증강) · ATF③</div></div>
-      <div class="stat"><div class="n">1<em>곳</em></div>
+      <div class="stat"><div class="n">0<em>곳</em></div>
         <div class="l">사람이 확인하는 자리</div></div>
-      <div class="stat"><div class="n">1<em>+</em>0</div>
+      <div class="stat"><div class="n">0<em>+</em>0</div>
         <div class="l">갈림길 + 루프백 · ATF④</div></div>
     </div>
   </div>
@@ -256,64 +256,49 @@
   <div class="sec-head"><span class="no">①</span>
     <h2>구조 — Lv4 › Lv5 › Lv6</h2>
     <span class="hint">이 Lv5 에이전트는 아래 Lv6 스킬들로 이루어집니다</span></div>
-  <div class="panel"><div class="lane-scroll"><svg viewBox="0 0 1150 300" width="1150" height="300" role="img" aria-label="Lv4 Lv5 Lv6 계층 구조도">
-<rect x="14" y="10" width="1122" height="46" rx="10" fill="#F7F5F2" stroke="#E3DFDA"/>
+  <div class="panel"><div class="lane-scroll"><svg viewBox="0 0 980 300" width="980" height="300" role="img" aria-label="Lv4 Lv5 Lv6 계층 구조도">
+<rect x="14" y="10" width="952" height="46" rx="10" fill="#F7F5F2" stroke="#E3DFDA"/>
 <text x="30" y="30" font-size="10.5" font-weight="700" fill="#6E6E6E">Lv4 · 핵심 업무</text>
-<text x="30" y="47" font-size="14" font-weight="700" fill="#1A1A1A">의료비 지원 운영</text>
-<rect x="295.0" y="72" width="560" height="62" rx="12" fill="#1A1A1A"/>
-<text x="311.0" y="92" font-size="10.5" font-weight="700" fill="#F47725">Lv5 · 워크플로우 — 이 에이전트가 묶는 단위</text>
-<text x="575.0" y="118" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">의료비 청구 건 판독·지급 판정</text>
-<path d="M575.0 134 L575.0 150 L89.0 150 L89.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
-<path d="M575.0 134 L575.0 150 L251.0 150 L251.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
-<path d="M575.0 134 L575.0 150 L413.0 150 L413.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
-<path d="M575.0 134 L575.0 150 L575.0 150 L575.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
-<path d="M575.0 134 L575.0 150 L737.0 150 L737.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
-<path d="M575.0 134 L575.0 150 L899.0 150 L899.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
-<path d="M575.0 134 L575.0 150 L1061.0 150 L1061.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
-<rect x="14" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.8"/>
-<path d="M14 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F1F8F3"/>
-<text x="25" y="188" font-size="10" font-weight="700" fill="#1E7A46">Lv6 · 자동</text>
-<text x="25" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">증빙서류판독</text>
-<text x="25" y="236" font-size="10.5" fill="#6E6E6E">Skill화 높음</text>
-<text x="25" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
-<rect x="176" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.8"/>
-<path d="M176 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F1F8F3"/>
-<text x="187" y="188" font-size="10" font-weight="700" fill="#1E7A46">Lv6 · 자동</text>
-<text x="187" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">신청서생성</text>
-<text x="187" y="236" font-size="10.5" fill="#6E6E6E">Skill화 높음</text>
-<text x="187" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
-<rect x="338" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#F47725" stroke-width="1.8"/>
-<path d="M338 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FFF6F0"/>
-<text x="349" y="188" font-size="10" font-weight="700" fill="#F47725">Lv6 · 증강</text>
-<text x="349" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">지급기준대조</text>
-<text x="349" y="236" font-size="10.5" fill="#6E6E6E">Skill화 중간</text>
-<text x="349" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
-<text x="475" y="188" text-anchor="end" font-size="10" font-weight="700" fill="#F47725">◆</text>
-<rect x="500" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.8"/>
-<path d="M500 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F1F8F3"/>
-<text x="511" y="188" font-size="10" font-weight="700" fill="#1E7A46">Lv6 · 자동</text>
-<text x="511" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">자동지급상신</text>
-<text x="511" y="236" font-size="10.5" fill="#6E6E6E">Skill화 높음</text>
-<text x="511" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
-<rect x="662" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#F47725" stroke-width="1.8"/>
-<path d="M662 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FFF6F0"/>
-<text x="673" y="188" font-size="10" font-weight="700" fill="#F47725">Lv6 · 증강</text>
-<text x="673" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">보완요청작성</text>
-<text x="673" y="236" font-size="10.5" fill="#6E6E6E">Skill화 중간</text>
-<text x="673" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
-<rect x="824" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#F47725" stroke-width="1.8"/>
-<path d="M824 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FFF6F0"/>
-<text x="835" y="188" font-size="10" font-weight="700" fill="#F47725">Lv6 · 증강</text>
-<text x="835" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">예외심사요청</text>
-<text x="835" y="236" font-size="10.5" fill="#6E6E6E">Skill화 낮음</text>
-<text x="835" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
-<rect x="986" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#EA002C" stroke-width="1.8"/>
-<path d="M986 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FDF2F4"/>
-<text x="997" y="188" font-size="10" font-weight="700" fill="#EA002C">Lv6 · 사람고유</text>
-<text x="997" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">지급승인</text>
-<text x="997" y="236" font-size="10.5" fill="#6E6E6E">Skill화 낮음</text>
-<text x="997" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 팀장</text>
-<text x="575.0" y="290" text-anchor="middle" font-size="10.5" fill="#6E6E6E">한 사람이 만든 Lv6 스킬 하나가 카드 하나 · 테두리 색 = Human 여부 · ◆ 갈림길 · ↩ 루프백</text>
+<text x="30" y="47" font-size="14" font-weight="700" fill="#1A1A1A">(미정)</text>
+<rect x="210.0" y="72" width="560" height="62" rx="12" fill="#1A1A1A"/>
+<text x="226.0" y="92" font-size="10.5" font-weight="700" fill="#F47725">Lv5 · 워크플로우 — 이 에이전트가 묶는 단위</text>
+<text x="490.0" y="118" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">(미정)</text>
+<path d="M490.0 134 L490.0 150 L166.0 150 L166.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M490.0 134 L490.0 150 L328.0 150 L328.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M490.0 134 L490.0 150 L490.0 150 L490.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M490.0 134 L490.0 150 L652.0 150 L652.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M490.0 134 L490.0 150 L814.0 150 L814.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<rect x="91.0" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.8"/>
+<path d="M91.0 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F7F5F2"/>
+<text x="102.0" y="188" font-size="10" font-weight="700" fill="#E3DFDA">Lv6 · (미정)</text>
+<text x="102.0" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">quote-par…</text>
+<text x="102.0" y="236" font-size="10.5" fill="#6E6E6E">Skill화 (미정)</text>
+<text x="102.0" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 팀원A</text>
+<rect x="253.0" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.8"/>
+<path d="M253.0 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F7F5F2"/>
+<text x="264.0" y="188" font-size="10" font-weight="700" fill="#E3DFDA">Lv6 · (미정)</text>
+<text x="264.0" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">compare-u…</text>
+<text x="264.0" y="236" font-size="10.5" fill="#6E6E6E">Skill화 (미정)</text>
+<text x="264.0" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 팀원B</text>
+<rect x="415.0" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.8"/>
+<path d="M415.0 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F7F5F2"/>
+<text x="426.0" y="188" font-size="10" font-weight="700" fill="#E3DFDA">Lv6 · (미정)</text>
+<text x="426.0" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">weekly-dr…</text>
+<text x="426.0" y="236" font-size="10.5" fill="#6E6E6E">Skill화 (미정)</text>
+<text x="426.0" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 팀장</text>
+<rect x="577.0" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.8"/>
+<path d="M577.0 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F7F5F2"/>
+<text x="588.0" y="188" font-size="10" font-weight="700" fill="#E3DFDA">Lv6 · (미정)</text>
+<text x="588.0" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">retry-req…</text>
+<text x="588.0" y="236" font-size="10.5" fill="#6E6E6E">Skill화 (미정)</text>
+<text x="588.0" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 팀원A</text>
+<rect x="739.0" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.8"/>
+<path d="M739.0 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F7F5F2"/>
+<text x="750.0" y="188" font-size="10" font-weight="700" fill="#E3DFDA">Lv6 · (미정)</text>
+<text x="750.0" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">confirm-b…</text>
+<text x="750.0" y="236" font-size="10.5" fill="#6E6E6E">Skill화 (미정)</text>
+<text x="750.0" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 팀장</text>
+<text x="490.0" y="290" text-anchor="middle" font-size="10.5" fill="#6E6E6E">한 사람이 만든 Lv6 스킬 하나가 카드 하나 · 테두리 색 = Human 여부 · ◆ 갈림길 · ↩ 루프백</text>
 </svg></div></div>
 </section>
 
@@ -322,74 +307,56 @@
     <h2>실행 흐름 설계도</h2>
     <span class="hint">아래 실행이 이 지도를 따라갑니다</span></div>
   <div class="panel">
-    <div class="lane-scroll"><svg viewBox="0 0 1198 326" width="1198" height="326" role="img" aria-label="실행 흐름 설계도">
-<rect x="0" y="44" width="1198" height="66" rx="8" fill="#F1F8F3"/>
-<text x="12" y="82" font-size="11" font-weight="700" fill="#1E7A46">자동</text>
-<rect x="0" y="120" width="1198" height="66" rx="8" fill="#FFF6F0"/>
-<text x="12" y="158" font-size="11" font-weight="700" fill="#F47725">증강</text>
-<rect x="0" y="196" width="1198" height="66" rx="8" fill="#FDF2F4"/>
-<text x="12" y="234" font-size="11" font-weight="700" fill="#EA002C">사람고유</text>
+    <div class="lane-scroll"><svg viewBox="0 0 1040 98" width="1040" height="98" role="img" aria-label="실행 흐름 설계도">
 <text x="92" y="53" font-size="10.5" font-weight="700" fill="#1A1A1A">● 시작</text>
-<text x="1098" y="205" text-anchor="end" font-size="10.5" font-weight="700" fill="#1A1A1A">■ 종료</text>
+<text x="802" y="53" text-anchor="end" font-size="10.5" font-weight="700" fill="#1A1A1A">■ 종료</text>
 <defs><marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#E3DFDA"/></marker><marker id="al" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#5B4FCF"/></marker></defs>
 <path d="M210 82 H225.0 V82 H240" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M358 82 H373.0 V158 H388" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M506 158 H521.0 V82 H536" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M506 158 H521.0 V158 H684" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M506 158 H521.0 V158 H832" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M654 82 H669.0 V234 H980" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M950 158 H965.0 V234 H980" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
-<rect x="92" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.6"/>
-<text x="151.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">1. 증빙서류판독</text>
-<text x="151.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E">높음</text>
-<rect x="240" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.6"/>
-<text x="299.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">2. 신청서생성</text>
-<text x="299.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E">높음</text>
-<rect x="388" y="136" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#F47725" stroke-width="1.6"/>
-<text x="447.0" y="156" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">3. 지급기준대조</text>
-<text x="447.0" y="171" text-anchor="middle" font-size="10" fill="#6E6E6E">◆ 갈림길</text>
-<rect x="536" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.6"/>
-<text x="595.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">4. 자동지급상신</text>
-<text x="595.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E">높음</text>
-<rect x="684" y="136" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#F47725" stroke-width="1.6"/>
-<text x="743.0" y="156" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">5. 보완요청작성</text>
-<text x="743.0" y="171" text-anchor="middle" font-size="10" fill="#6E6E6E">중간</text>
-<rect x="832" y="136" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#F47725" stroke-width="1.6"/>
-<text x="891.0" y="156" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">6. 예외심사요청</text>
-<text x="891.0" y="171" text-anchor="middle" font-size="10" fill="#6E6E6E">낮음</text>
-<rect x="980" y="212" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#EA002C" stroke-width="2.4"/>
-<text x="1039.0" y="232" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">7. 지급승인</text>
-<text x="1039.0" y="247" text-anchor="middle" font-size="10" fill="#6E6E6E">⛔ 멈춤</text>
-<text x="447.0" y="298" text-anchor="middle" font-size="10" fill="#F47725">◆ 기준 충족 -&gt; 자동지급상신; 증빙 미비 -&gt; 보완요청작성; 기준 모호·한도 초과 -&gt; 예외심사요청</text>
+<path d="M358 82 H373.0 V82 H388" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M506 82 H521.0 V82 H536" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M654 82 H669.0 V82 H684" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="92" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.6"/>
+<text x="151.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">1. quote-p…</text>
+<text x="151.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E"></text>
+<rect x="240" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.6"/>
+<text x="299.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">2. compare…</text>
+<text x="299.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E"></text>
+<rect x="388" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.6"/>
+<text x="447.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">3. weekly-…</text>
+<text x="447.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E"></text>
+<rect x="536" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.6"/>
+<text x="595.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">4. retry-r…</text>
+<text x="595.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E"></text>
+<rect x="684" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#E3DFDA" stroke-width="1.6"/>
+<text x="743.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">5. confirm…</text>
+<text x="743.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E"></text>
 </svg></div>
-    <div class="legend"><span class="item"><span class="sw" style="background:#F1F8F3;border:1px solid #1E7A46"></span>자동</span><span class="item"><span class="sw" style="background:#FFF6F0;border:1px solid #F47725"></span>증강</span><span class="item"><span class="sw" style="background:#FDF2F4;border:1px solid #EA002C"></span>사람고유</span><span class="item"><span class="sw" style="border:1px dashed #5B4FCF"></span>↩ 루프백</span><span class="item" style="color:#F47725">◆ 갈림길</span></div>
+    <div class="legend"><span class="item"><span class="sw" style="border:1px dashed #5B4FCF"></span>↩ 루프백</span><span class="item" style="color:#F47725">◆ 갈림길</span></div>
   </div>
 </section>
 
 <section class="sec">
   <div class="sec-head"><span class="no">③</span>
-    <h2>Lv6 스킬 7개 — 만든 사람과 판단 기준</h2></div>
-  <div class="skill-grid"><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">1. 증빙서류판독</div><div class="io"><b>입력</b> 의료비청구건판독·지급판정입력 → <b>출력</b> 증빙서류판독결과</div><div class="io"><b>읽기</b> 청구접수대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">2. 신청서생성</div><div class="io"><b>입력</b> 증빙서류판독결과 → <b>출력</b> 신청서생성결과</div><div class="io"><b>쓰기</b> 신청서초안.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">3. 지급기준대조</div><div class="io"><b>입력</b> 신청서생성결과 → <b>출력</b> 지급기준대조결과</div><div class="io"><b>읽기</b> 지급기준표.csv</div><div class="rule"><span class="k">갈림길</span>기준 충족 -&gt; 자동지급상신; 증빙 미비 -&gt; 보완요청작성; 기준 모호·한도 초과 -&gt; 예외심사요청</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">4. 자동지급상신</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 자동지급상신결과</div><div class="io"><b>쓰기</b> 지급대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">5. 보완요청작성</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 보완요청작성결과</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">6. 예외심사요청</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 예외심사요청결과</div><div class="io"><b>쓰기</b> 예외심사대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 팀장</span><span class="tag human">Lv6 · 사람고유</span><div class="sname">7. 지급승인</div><div class="io"><b>입력</b> 자동지급상신결과, 예외심사요청결과 → <b>출력</b> 지급승인결과</div></div></div>
+    <h2>Lv6 스킬 5개 — 만든 사람과 판단 기준</h2></div>
+  <div class="skill-grid"><div class="skill"><span class="owner">👤 팀원A</span><span class="tag ">Lv6 · (미정)</span><div class="sname">1. quote-parse</div><div class="io"><b>입력</b> 견적메일 → <b>출력</b> 파싱결과</div><div class="io"><b>읽기</b> 승인공급사목록.xlsx</div></div><div class="skill"><span class="owner">👤 팀원B</span><span class="tag ">Lv6 · (미정)</span><div class="sname">2. compare-update</div><div class="io"><b>입력</b> 파싱결과 → <b>출력</b> 갱신된비교표</div><div class="io"><b>읽기</b> 승인공급사목록.xlsx, 견적비교표.xlsx</div><div class="io"><b>쓰기</b> 견적비교표.xlsx</div></div><div class="skill"><span class="owner">👤 팀장</span><span class="tag ">Lv6 · (미정)</span><div class="sname">3. weekly-draft</div><div class="io"><b>입력</b> 갱신된비교표 → <b>출력</b> 품의초안, 검토필요목록</div><div class="io"><b>읽기</b> 견적비교표.xlsx</div></div><div class="skill"><span class="owner">👤 팀원A</span><span class="tag ">Lv6 · (미정)</span><div class="sname">4. retry-request</div><div class="io"><b>입력</b> 품의초안, 검토필요목록 → <b>출력</b> 재요청초안</div><div class="io"><b>읽기</b> 승인공급사목록.xlsx</div></div><div class="skill"><span class="owner">👤 팀장</span><span class="tag ">Lv6 · (미정)</span><div class="sname">5. confirm-brief</div><div class="io"><b>입력</b> 재요청초안, 품의초안 → <b>출력</b> 확인브리핑</div><div class="io"><b>읽기</b> 견적비교표.xlsx</div></div></div>
 </section>
 
 <section class="sec">
   <div class="sec-head"><span class="no">④</span>
     <h2>폴더 트리</h2>
     <span class="hint">교육생이 받는 팩의 실제 모양</span></div>
-  <div class="panel"><pre class="tree">medical-expense-agent/
+  <div class="panel"><pre class="tree">team-agent/
 ├─ README.md          처음 보는 사람을 위한 사용 안내
 ├─ agent-plan.md      팀 목적과 실행 흐름의 원본 (SSOT)
 ├─ AGENTS.md          역할 · 하는 일 · 하지 않는 일
 ├─ CONTRACT.md        표·기록자·순서·정지 지점의 합의
 │
 ├─ skills/depth/
-│   ├─ 증빙서류판독/    SKILL.md · 자동
-│   ├─ 신청서생성/    SKILL.md · 자동
-│   ├─ 지급기준대조/    SKILL.md · 증강
-│   ├─ 자동지급상신/    SKILL.md · 자동
-│   ├─ 보완요청작성/    SKILL.md · 증강
-│   ├─ 예외심사요청/    SKILL.md · 증강
-│   └─ 지급승인/    SKILL.md · 사람고유
+│   ├─ quote-parse/    SKILL.md · 
+│   ├─ compare-update/    SKILL.md · 
+│   ├─ weekly-draft/    SKILL.md · 
+│   ├─ retry-request/    SKILL.md · 
+│   └─ confirm-brief/    SKILL.md · 
 │
 ├─ data/              사람이 넣는 원본
 └─ out/               에이전트가 만드는 결과 (run.py 실행 시)</pre></div>
@@ -406,60 +373,52 @@
 <div class="app">
 
 <div class="top">
-  <div class="mark">의</div>
+  <div class="mark">구</div>
   <div>
-    <h1>의료비 판독 AI</h1>
-    <div class="sub">SKI AX 과제 · Talent AX실 · HR AI · Lv5 「의료비 청구 건 판독·지급 판정」</div>
+    <h1>구매기획팀 Lv.5 에이전트</h1>
+    <div class="sub">team-agent</div>
   </div>
-  <span class="pill">팀 에이전트 · 갈림길</span>
+  <span class="pill">팀 스킬팩 · 계약 흐름</span>
 </div>
 
 <div class="rail">
   <span class="cap start" id="cap-start">● 시작</span><span class="arrow">›</span>
-  <span class="n done" data-skill="증빙서류판독"><i class="dot"></i>증빙서류판독</span>
+  <span class="n done" data-skill="quote-parse"><i class="dot"></i>quote-parse</span>
   <span class="arrow">›</span>
-  <span class="n done" data-skill="신청서생성"><i class="dot"></i>신청서생성</span>
+  <span class="n done" data-skill="compare-update"><i class="dot"></i>compare-update</span>
   <span class="arrow">›</span>
-  <span class="n fork" data-skill="지급기준대조"><i class="dot"></i>◆ 지급기준대조</span>
+  <span class="n done" data-skill="weekly-draft"><i class="dot"></i>weekly-draft</span>
   <span class="arrow">›</span>
-  <span class="n done" data-skill="자동지급상신"><i class="dot"></i>자동지급상신</span>
+  <span class="n done" data-skill="retry-request"><i class="dot"></i>retry-request</span>
   <span class="arrow">›</span>
-  <span class="n done" data-skill="보완요청작성"><i class="dot"></i>보완요청작성</span>
-  <span class="arrow">›</span>
-  <span class="n done" data-skill="예외심사요청"><i class="dot"></i>예외심사요청</span>
-  <span class="arrow">›</span>
-  <span class="n halt" data-skill="지급승인"><i class="dot"></i>⛔ 지급승인</span>
+  <span class="n done" data-skill="confirm-brief"><i class="dot"></i>confirm-brief</span>
   <span class="arrow">›</span><span class="cap end" id="cap-end">■ 종료</span>
 </div>
 
 <main>
 <div class="log">
 
-  <div class="card"><header><b>입력</b><span class="tag">2026년 7~8월 접수분</span></header><div class="body"><p>청구접수대장 <b>11건</b> · 지급기준표 <b>4건</b></p></div></div>
+  <div class="card"><header><b>입력</b><span class="tag">계약이 선언한 표 — 값은 읽지 않았습니다</span></header><div class="body"><p>견적비교표.xlsx <span style="color:var(--muted)">(값 안 읽음)</span> · 승인공급사목록.xlsx <span style="color:var(--muted)">(값 안 읽음)</span></p></div></div>
 
-  <div class="st card" data-i="0" data-kind="step" data-skill="1. 증빙서류판독" data-label="11건 판독. 그중 **1건은 판독불가**입니다 — 증빙유형에 「영수증」이 없거나 증빙파일 칸이 비어 있습니"><header><b>1. 증빙서류판독</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>11건 판독. 그중 <b>1건은 판독불가</b>입니다 — 증빙유형에 「영수증」이 없거나 증빙파일 칸이 비어 있습니다.</p><div class="warn">⚠️ 금액을 추정하지 않았습니다. 규칙: 증빙유형에 「영수증」이 없으면 판독 불가로 표시한다.</div></div></div>
+  <div class="st card" data-i="0" data-kind="step" data-skill="1. quote-parse" data-label="(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)"><header><b>1. quote-parse</b><span class="tag ">(미정)</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)</p></div></div>
 
-  <div class="st card" data-i="1" data-kind="step" data-skill="2. 신청서생성" data-label="신청서초안 **11행**을 만들었습니다. 판독불가 건도 버리지 않고 상태 칸에 남겼습니다."><header><b>2. 신청서생성</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>신청서초안 <b>11행</b>을 만들었습니다. 판독불가 건도 버리지 않고 상태 칸에 남겼습니다.</p><div class="files"><span class="file">→ out/신청서초안.csv <b>11건</b></span></div></div></div>
+  <div class="st card" data-i="1" data-kind="step" data-skill="2. compare-update" data-label="(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)"><header><b>2. compare-update</b><span class="tag ">(미정)</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)</p><div class="files"><span class="file">→ 견적비교표.xlsx</span></div></div></div>
 
-  <div class="st card fork-card" data-i="2" data-kind="fork" data-skill="3. 지급기준대조" data-label="지급기준표.csv와 대조해 **세 갈래로 갈랐습니다.**"><header><b>3. 지급기준대조</b><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>지급기준표.csv와 대조해 <b>세 갈래로 갈랐습니다.</b></p><div class="warn">⚠️ 판단이 서지 않는 건은 자동지급 쪽으로 기울이지 않고 예외심사로 보냅니다. 규칙: 기준항목을 하나로 정할 수 없으면 자동지급상신으로 보내지 않는다.</div><div class="branches"><div class="br"><div class="cond">기준 충족</div><div class="to">→ 자동지급상신</div><div class="cnt">6<span>건</span></div></div><div class="br"><div class="cond">증빙 미비</div><div class="to">→ 보완요청작성</div><div class="cnt">1<span>건</span></div></div><div class="br"><div class="cond">모호 · 한도 초과</div><div class="to">→ 예외심사요청</div><div class="cnt">4<span>건</span></div></div></div></div></div>
+  <div class="st card" data-i="2" data-kind="step" data-skill="3. weekly-draft" data-label="(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)"><header><b>3. weekly-draft</b><span class="tag ">(미정)</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)</p></div></div>
 
-  <div class="st card" data-i="3" data-kind="step" data-skill="4. 자동지급상신" data-label="6건을 지급대장에 올렸습니다. 상태는 전부 **승인대기**입니다 — 지급이 실행된 것이 아닙니다."><header><b>4. 자동지급상신</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>6건을 지급대장에 올렸습니다. 상태는 전부 <b>승인대기</b>입니다 — 지급이 실행된 것이 아닙니다.</p><div class="scroll"><table><thead><tr><th>청구번호</th><th>성명</th><th>기준항목</th><th>청구금액</th><th>지급액</th><th>상태</th></tr></thead><tbody><tr><td>MED-2026-0431</td><td>김선호</td><td>일반진료</td><td class="num">182,000</td><td class="num">145,600</td><td>승인대기</td></tr><tr><td>MED-2026-0432</td><td>박지우</td><td>치과보철</td><td class="num">940,000</td><td class="num">658,000</td><td>승인대기</td></tr><tr><td>MED-2026-0433</td><td>이한결</td><td>중증질환</td><td class="num">2,450,000</td><td class="num">2,205,000</td><td>승인대기</td></tr><tr><td>MED-2026-0434</td><td>정유진</td><td>일반진료</td><td class="num">76,000</td><td class="num">60,800</td><td>승인대기</td></tr><tr><td>MED-2026-0436</td><td>조성우</td><td>일반진료</td><td class="num">1,180,000</td><td class="num">944,000</td><td>승인대기</td></tr><tr><td>MED-2026-0438</td><td>윤도현</td><td>일반진료</td><td class="num">315,000</td><td class="num">252,000</td><td>승인대기</td></tr></tbody></table></div><div class="files"><span class="file">→ out/지급대장.csv <b>6건</b></span></div></div></div>
+  <div class="st card" data-i="3" data-kind="step" data-skill="4. retry-request" data-label="(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)"><header><b>4. retry-request</b><span class="tag ">(미정)</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)</p></div></div>
 
-  <div class="st card halt" data-i="4" data-kind="halt" data-skill="5. 보완요청작성" data-label="1건에 대해 안내문 초안을 만들었습니다. 재제출 기한은 접수일 +14일입니다."><header><b>5. 보완요청작성</b><span class="tag aug">증강</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>1건에 대해 안내문 초안을 만들었습니다. 재제출 기한은 접수일 +14일입니다.</p><div class="warn">⚠️ <b>발송하지 않았습니다.</b> 이 갈래의 끝이고, 담당자가 확인할 때까지 멈춥니다.</div><ul class="chk"><li>☐ MED-2026-0435 최민아 — 필수 증빙(영수증) 누락 — 금액 판정을 하지 않음</li></ul><div class="files"><span class="file">→ out/보완요청안내문.md</span></div><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
-
-  <div class="st card" data-i="5" data-kind="step" data-skill="6. 예외심사요청" data-label="4건을 심사 대기로 올렸습니다. **지급 여부를 추천하지 않았습니다** — 판단은 심사자가 합니다."><header><b>6. 예외심사요청</b><span class="tag aug">증강</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>4건을 심사 대기로 올렸습니다. <b>지급 여부를 추천하지 않았습니다</b> — 판단은 심사자가 합니다.</p><div class="scroll"><table><thead><tr><th>청구번호</th><th>성명</th><th>예외사유</th><th>심사근거</th></tr></thead><tbody><tr><td>MED-2026-0437</td><td>한서연</td><td>시력교정</td><td>미용·선택 시술은 지원 대상 아님 (자기부담률 100%)</td></tr><tr><td>MED-2026-0439</td><td>신재호</td><td>일반진료</td><td>청구 4,100,000원 &gt; 연간한도 3,000,000원</td></tr><tr><td>MED-2026-0440</td><td>오세영</td><td>일반진료</td><td>수진자관계 &#x27;형제자매&#x27;는 적용대상(본인/배우자/자녀/부모) 아님</td></tr><tr><td>MED-2026-0441</td><td>배수민</td><td>기준항목 특정 불가</td><td>진단코드 U07.9 — 지급기준표에 해당 항목 없음</td></tr></tbody></table></div><div class="files"><span class="file">→ out/예외심사대장.csv <b>4건</b></span></div></div></div>
-
-  <div class="st card halt" data-i="6" data-kind="halt" data-skill="7. 지급승인" data-label="**여기서 멈췄습니다.** 에이전트는 아무것도 승인하지 않았습니다. 자동지급 상신 6건(합계 4,265,40"><header><b>7. 지급승인</b><span class="tag human">사람고유</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p><b>여기서 멈췄습니다.</b> 에이전트는 아무것도 승인하지 않았습니다. 자동지급 상신 6건(합계 4,265,400원)과 예외심사 대기 4건이 복리후생 팀장 확인을 기다립니다.</p><div class="actions"><button class="primary">6건 승인</button><button>예외 4건 검토</button><button>전체 반려</button></div><p class="disabled-note">※ 목업입니다. 이 팩에는 실행 코드가 없습니다 — 버튼은 동작하지 않습니다.</p><div class="files"><span class="file">→ out/승인대기목록.md</span></div><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
+  <div class="st card halt" data-i="4" data-kind="halt" data-skill="5. confirm-brief" data-label="(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)"><header><b>5. confirm-brief</b><span class="tag human">사람고유</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>(판단기준이 아직 (미정)입니다 — 와이어프레임에서 채웁니다)</p><div class="warn">⚠️ 여기서 멈춥니다. 사람이 확인해야 다음으로 갑니다.</div><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
 
 </div>
 
 <div class="foot">
-  경로 A(자동지급) 6건 · 경로 B(보완) 1건 · 경로 C(예외심사) 4건 = 총 11건 · 사람 확인 없이 나간 것 없음<br>
+  계약이 선언한 흐름을 걸었습니다 — 스킬 5개 · 갈림길 0곳 · 루프백 0곳 · 정지 1곳. **숫자는 없습니다 — 데이터를 읽지 않았습니다.**<br>
   
-  이 화면은 <code>python3 run.py</code>의 실제 실행 결과입니다 — 숫자·표는 <code>out/trace.json</code>에서 그대로 가져왔습니다.
+  이 화면은 <code>check/orchestrate.py</code>가 계약을 걸어 만든 것입니다 — 숫자는 없습니다.
   데이터를 고치고 다시 돌리면 이 화면도 다시 만들어야 합니다:
-  <code>python3 check/make_mockup.py medical-expense-agent</code><br>
-  SKI AX 과제 · Talent AX실 · HR AI · 데이터는 실습용 가상 값입니다.
+  <code>python3 check/make_mockup.py team-agent</code><br>
+  team-agent · 데이터는 실습용 가상 값입니다.
 </div>
 </main>
 </div>
@@ -467,96 +426,76 @@
 <script type="application/json" id="agent-data">
 {
  "schema": "agent-summary/v0.2",
- "source": "SKI AX 과제 · Talent AX실 · HR AI",
+ "source": "team-agent",
  "agent": {
-  "name": "의료비 판독 AI",
+  "name": "구매기획팀 Lv.5 에이전트",
   "level": "Lv.5",
-  "one_liner": "접수된 의료비 청구 건을 판독해 **지급 / 보완 / 예외심사** 중 어디로 갈지 가르고, 각 갈래의 서류를 초안까지 만들어 사람 앞에 놓는다."
+  "one_liner": "\"수신된 견적 메일을 읽어 비교표를 갱신하고 발주 품의 초안을 만든다.\""
  },
  "levels": {
-  "lv4": "의료비 지원 운영",
-  "lv5": "의료비 청구 건 판독·지급 판정",
+  "lv4": "",
+  "lv5": "",
   "lv6": [
    {
-    "name": "증빙서류판독",
-    "human": "자동",
-    "owner": "복리후생 담당",
-    "skillability": "높음",
+    "name": "quote-parse",
+    "human": "",
+    "owner": "팀원A",
+    "skillability": "",
     "next": [
-     "신청서생성"
+     "compare-update"
     ],
     "loop_to": ""
    },
    {
-    "name": "신청서생성",
-    "human": "자동",
-    "owner": "복리후생 담당",
-    "skillability": "높음",
+    "name": "compare-update",
+    "human": "",
+    "owner": "팀원B",
+    "skillability": "",
     "next": [
-     "지급기준대조"
+     "weekly-draft"
     ],
     "loop_to": ""
    },
    {
-    "name": "지급기준대조",
-    "human": "증강",
-    "owner": "복리후생 담당",
-    "skillability": "중간",
+    "name": "weekly-draft",
+    "human": "",
+    "owner": "팀장",
+    "skillability": "",
     "next": [
-     "자동지급상신",
-     "보완요청작성",
-     "예외심사요청"
+     "retry-request"
     ],
     "loop_to": ""
    },
    {
-    "name": "자동지급상신",
-    "human": "자동",
-    "owner": "복리후생 담당",
-    "skillability": "높음",
+    "name": "retry-request",
+    "human": "",
+    "owner": "팀원A",
+    "skillability": "",
     "next": [
-     "지급승인"
+     "confirm-brief"
     ],
     "loop_to": ""
    },
    {
-    "name": "보완요청작성",
-    "human": "증강",
-    "owner": "복리후생 담당",
-    "skillability": "중간",
-    "next": [],
-    "loop_to": ""
-   },
-   {
-    "name": "예외심사요청",
-    "human": "증강",
-    "owner": "복리후생 담당",
-    "skillability": "낮음",
-    "next": [
-     "지급승인"
-    ],
-    "loop_to": ""
-   },
-   {
-    "name": "지급승인",
-    "human": "사람고유",
-    "owner": "복리후생 팀장",
-    "skillability": "낮음",
+    "name": "confirm-brief",
+    "human": "",
+    "owner": "팀장",
+    "skillability": "",
     "next": [],
     "loop_to": ""
    }
   ]
  },
  "stats": {
-  "skills": 7,
-  "ai_tasks": 6,
-  "human_points": 1,
-  "forks": 1,
+  "skills": 5,
+  "ai_tasks": 0,
+  "human_points": 0,
+  "forks": 0,
   "loops": 0,
-  "steps": 7
+  "steps": 5
  },
- "verdict": "팀 에이전트 · 갈림길",
- "summary": "경로 A(자동지급) 6건 · 경로 B(보완) 1건 · 경로 C(예외심사) 4건 = 총 11건 · 사람 확인 없이 나간 것 없음"
+ "verdict": "팀 스킬팩",
+ "summary": "계약이 선언한 흐름을 걸었습니다 — 스킬 5개 · 갈림길 0곳 · 루프백 0곳 · 정지 1곳. **숫자는 없습니다 — 데이터를 읽지 않았습니다.**"
 }
 </script>
 

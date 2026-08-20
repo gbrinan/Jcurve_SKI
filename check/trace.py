@@ -23,13 +23,15 @@ SCHEMA = 1
 
 class Trace:
     def __init__(self, title, source="", lv4="", lv5=""):
-        self.d = {"schema": SCHEMA, "title": title, "source": source,
+        # mode: "run" = run.py가 실제로 돌린 기록 (숫자가 진짜)
+        #       "contract" = orchestrate.py가 계약을 걸어 본 기록 (숫자 없음)
+        self.d = {"schema": SCHEMA, "mode": "run", "title": title, "source": source,
                   "lv4": lv4, "lv5": lv5, "inputs": [], "steps": [],
                   "loops": [], "summary": ""}
         self._cycle = None
 
     # ── 입력 ──
-    def input(self, name, count, note=""):
+    def input(self, name, count=None, note=""):
         self.d["inputs"].append({"name": name, "count": count, "note": note})
         return self
 

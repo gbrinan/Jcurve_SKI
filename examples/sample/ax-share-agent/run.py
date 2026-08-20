@@ -11,14 +11,25 @@ skills/depth/{공유대상자목록정리, 관련회의록첨부, 메일본문�
 규칙이 없다. 필터·첨부·초안 작성은 data/의 원본 값만으로 수행한다.
 """
 import csv
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
+for cand in (HERE.parents[2] / "check", HERE.parent / "check", HERE / "check"):
+    if (cand / "trace.py").is_file():
+        sys.path.insert(0, str(cand))
+        break
+else:
+    sys.exit("trace.py를 찾지 못했습니다 — 툴킷의 check/ 폴더가 있어야 합니다.")
+from trace import Trace   # noqa: E402
 
 
 def main():
     data, out = HERE / "data", HERE / "out"
     out.mkdir(exist_ok=True)
+    TR = Trace("계열사 AX전략 공유 에이전트",
+               source="SKI AX 과제 · 계열사 AX전략 팀장 공유",
+               lv4="AX전략 공유하기", lv5="계열사 AX전략 팀장에게 공유")
 
     # 1) 공유대상자목록정리 — "대상" 표시된 후보만
     cands = list(csv.DictReader(open(data / "공유대상자후보.csv", encoding="utf-8")))
@@ -30,6 +41,12 @@ def main():
             w.writerow({"이름": r["이름"], "소속": r["소속"], "직책": r["직책"]})
     print(f"[1 공유대상자목록정리] 후보 {len(cands)}명 중 대상 {len(targets)}명 선정 "
           f"({', '.join(r['이름'] + '(' + r['소속'] + ')' for r in targets)})")
+    TR.input("공유대상자후보", len(cands), "AX전략 공유 대상 선정")
+    TR.step("1. 공유대상자목록정리", "증강",
+            f"후보 {len(cands)}명 중 **대상 {len(targets)}명**을 골랐습니다. "
+            f"「대상」으로 표시된 행만 씁니다 — 판단하지 않습니다.")
+    TR.table("공유대상자목록", targets, ["이름", "소속", "직책"])
+    TR.file("out/공유대상자목록.csv", len(targets))
 
     # 2) 관련회의록첨부 — 주제="AX전략"인 회의록만
     minutes = list(csv.DictReader(open(data / "회의록목록.csv", encoding="utf-8")))
@@ -40,6 +57,11 @@ def main():
             f.write(f"- {r['파일명']} ({r['일자']})\n")
     print(f"[2 관련회의록첨부] 회의록 {len(minutes)}건 중 AX전략 관련 {len(attach)}건 첨부 "
           f"({', '.join(r['파일명'] for r in attach)})")
+    TR.input("회의록목록", len(minutes))
+    TR.step("2. 관련회의록첨부", "증강",
+            f"회의록 {len(minutes)}건 중 주제가 「AX전략」인 **{len(attach)}건**만 첨부했습니다.")
+    TR.table("첨부파일목록", attach, ["파일명", "일자", "주제"])
+    TR.file("out/첨부파일목록.md", len(attach))
 
     # 3) 메일본문작성 — 1·2 산출물을 그대로 받아 초안 조립 (발송하지 않음)
     to_line = "; ".join(f"{r['이름']}({r['소속']})" for r in targets)
@@ -58,6 +80,10 @@ AX전략 관련 최근 논의 내용을 공유드립니다. 첨부된 회의록�
 """
     (out / "메일초안.md").write_text(draft, encoding="utf-8")
     print(f"[3 메일본문작성] 초안 생성 — 수신 {len(targets)}명, 첨부 {len(attach)}건. 발송하지 않음")
+    TR.step("3. 메일본문작성", "증강",
+            f"1·2단계 산출물을 그대로 받아 초안을 조립했습니다 — 수신 {len(targets)}명, "
+            f"첨부 {len(attach)}건. **발송하지 않았습니다.**")
+    TR.file("out/메일초안.md")
 
     # 4) 메일발송 — 사람고유(halt_at). 여기서 멈추고 확인을 요청한다.
     halt = f"""# 발송 대기 — 사람 확인 필요
@@ -76,6 +102,18 @@ AX전략 관련 최근 논의 내용을 공유드립니다. 첨부된 회의록�
 """
     (out / "발송대기.md").write_text(halt, encoding="utf-8")
     print("[4 메일발송] 사람고유 — 확인 요청 후 정지. 자동 발송 없음")
+    TR.halt("4. 메일발송", "사람고유",
+            "**여기서 멈췄습니다.** 에이전트는 메일을 보내지 않았습니다. "
+            f"수신 {len(targets)}명 · 첨부 {len(attach)}건을 담당자가 확인한 뒤 직접 발송합니다.",
+            actions=[f"{len(targets)}명에게 발송", "초안 수정", "취소"],
+            checklist=[f"{r['이름']} ({r['소속']} · {r['직책']})" for r in targets])
+    TR.warn("이 팩에 메일 발송 코드가 없습니다.")
+    TR.file("out/발송대기.md")
+
+    TR.done(f"후보 {len(cands)}명 → 대상 {len(targets)}명 · 회의록 {len(minutes)}건 → "
+            f"첨부 {len(attach)}건 · 발송 없음")
+    TR.save(out)
+    print("  → out/trace.json (실행 기록 — 목업 화면이 이것을 읽습니다)")
 
     print("\n" + "=" * 50)
     print(f"산출물: {sorted(p.name for p in out.iterdir())}")

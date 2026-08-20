@@ -84,6 +84,13 @@
          border:1px solid var(--line);background:var(--bg);color:var(--muted)}
   button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
   .disabled-note{font-size:12px;color:var(--muted);margin-top:7px}
+  /* 계약 흐름 기록임을 화면이 먼저 말한다 — 숫자가 없는 이유 */
+  .modebar{max-width:1120px;margin:0 auto;padding:12px 22px;font-size:13px;
+           display:flex;gap:10px;align-items:flex-start;
+           background:#F8F7FE;border-bottom:1px solid var(--loop);color:var(--loop)}
+  .modebar b{color:var(--text)}
+  .modebar .ic{font-size:15px;line-height:1.3}
+
   /* ── 요약·설계도 (실행 앞단) ─────────────────────────────────────── */
   .hero{background:var(--text);color:#fff;padding:44px 0 38px}
   .hero .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
@@ -455,8 +462,7 @@
 <div class="foot">
   루프백 1회 (차이대사 L4) · 최종 2회차에 차이 0 · 사람 확인 없이 마감된 것 없음<br>
   루프백: 차이분석조정 ↩ 계정검증대사 (2회차)<br>
-  이 화면은 <code>python3 run.py</code>의 실제 실행 결과입니다 —
-  숫자·표는 <code>out/trace.json</code>에서 그대로 가져왔습니다.
+  이 화면은 <code>python3 run.py</code>의 실제 실행 결과입니다 — 숫자·표는 <code>out/trace.json</code>에서 그대로 가져왔습니다.
   데이터를 고치고 다시 돌리면 이 화면도 다시 만들어야 합니다:
   <code>python3 check/make_mockup.py quarterly-close-agent</code><br>
   AX전략 워크샵 · 재무본부 회계관리팀 · P-A2-1 · 데이터는 실습용 가상 값입니다.

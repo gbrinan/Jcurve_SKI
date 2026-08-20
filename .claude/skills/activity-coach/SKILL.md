@@ -101,12 +101,38 @@ Do not reach for the heaviest one by default. Each answers a different question.
 | **`agent-mockup.html`** | "What does it do?" | `check/make_mockup.py <pack>` | After `run.py` exists and has been run |
 | **`agent-plan-deck.html`** | "How do we present it?" | `slide-pack` skill | Only when a team is presenting |
 
-### Execution mockup
+### Execution mockup — two ways to get one
+
+Every mockup is built from `out/trace.json`. There are two ways to produce that file,
+and the page states which one it was.
+
+**A. Contract walk — works on any pack, no code to write**
 
 ```bash
-python3 run.py                          # writes out/trace.json
-python3 check/make_mockup.py <pack>     # reads it, writes agent-mockup.html
+python3 check/orchestrate.py <pack>                        # walks every branch
+python3 check/orchestrate.py <pack> --take 계정검증대사=차이분석조정
+python3 check/make_mockup.py <pack>
 ```
+
+It reads `CONTRACT.md`'s `chain`/`halt_at` and each skill's `next`/`when`/`loop_to`/
+`loop_exit`, walks the flow, and records what each step is *supposed* to do (the first
+line of its 판단기준). **It does not evaluate anything.** The judgment rules are Korean
+prose; whether "차이가 1건이라도 있으면" holds is not something it can decide. So it
+reads no data, produces no counts, and at a fork walks **both** branches instead of
+choosing. The trace is marked `mode: contract` and the page opens with a banner saying
+exactly this.
+
+**B. Real run — the pack has a `run.py`**
+
+```bash
+python3 run.py                          # records through check/trace.py, mode: run
+python3 check/make_mockup.py <pack>
+```
+
+Now the counts are real, because something actually processed the data.
+
+Use A to show a team the shape of what they designed. Use B when the numbers matter.
+Never present A as if it were B — that is what the banner is for.
 
 **Every number on that screen comes from `out/trace.json`.** Never hand-edit the HTML —
 change the data, re-run, regenerate. A mockup typed from a log drifts the moment the

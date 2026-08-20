@@ -245,12 +245,42 @@ AX전략 워크샵 **재무본부 회계관리팀**의 실제 산출물(Agent 1~
 | **`agent-mockup.html`** 실행 화면 | 이게 **무슨 일을 하나** | `check/make_mockup.py` | `run.py`가 있고 돌린 뒤 |
 | **`agent-plan-deck.html`** 발표 덱 | 이걸 **어떻게 설명하나** | `slide-pack` 스킬 | 발표할 때만 |
 
-### 실행 화면 목업
+### 실행 화면 목업 — 두 가지 길
+
+목업은 전부 `out/trace.json`에서 만듭니다. 그 파일을 만드는 길이 둘이고, **화면이 어느 쪽인지 말합니다.**
+
+**A. 계약 흐름 — 어느 팩에서든, 코드를 안 써도 됩니다**
 
 ```bash
-python3 run.py                                              # out/trace.json 생성
-python3 check/make_mockup.py examples/sample/<팩>            # 그걸 읽어 화면 생성
+python3 check/orchestrate.py examples/sample/<팩>              # 모든 갈래를 다 걸음
+python3 check/orchestrate.py <팩> --take 계정검증대사=차이분석조정  # 갈래 지정
+python3 check/make_mockup.py examples/sample/<팩>
 ```
+
+`CONTRACT.md`의 `chain`·`halt_at`과 각 스킬의 `next`/`when`/`loop_to`/`loop_exit`을 읽어
+흐름을 걷고, 각 단계가 **무엇을 하기로 되어 있는지**(판단기준 첫 줄)를 기록합니다.
+
+**계산하지 않습니다.** 판단기준은 한국어 문장이라 「차이가 1건이라도 있으면」이 참인지 알 수 없습니다.
+그래서 데이터를 읽지 않고, 건수를 만들지 않고, 갈림길에서 고르지 않고 **양쪽을 다** 걷습니다.
+기록에 `mode: contract`가 찍히고 화면 맨 위에 그 사실이 배너로 뜹니다.
+
+**B. 실제 실행 — 팩에 `run.py`가 있을 때**
+
+```bash
+python3 run.py                                              # mode: run
+python3 check/make_mockup.py examples/sample/<팩>
+```
+
+이때 숫자가 진짜입니다. 무언가가 실제로 데이터를 처리했으니까요.
+
+| | A 계약 흐름 | B 실제 실행 |
+|---|---|---|
+| 필요한 것 | CONTRACT.md만 | `run.py` (사람이 만듦) |
+| 숫자 | 없음 | 있음 |
+| 갈림길 | 양쪽 다 표시 | 실제로 간 쪽 |
+| 쓸 때 | 설계한 모양을 보여줄 때 | 숫자가 중요할 때 |
+
+**A를 B인 것처럼 보여주지 마십시오** — 배너가 그것을 막으려고 있습니다.
 
 **화면의 모든 숫자가 `out/trace.json`에서 옵니다.** HTML을 손으로 고치지 마십시오 —
 데이터를 고치고, 다시 돌리고, 다시 만드십시오. 예전에는 실행 로그를 보고 숫자를 타이핑했는데,
