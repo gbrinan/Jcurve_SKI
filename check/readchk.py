@@ -19,9 +19,11 @@ from pathlib import Path
 # 갈래의 무게 — 숫자가 작을수록 먼저 정해야 한다
 STAKES = {
     "검수없음": (1, "사람 확인 없이 결과가 나간다"),
+    "루프탈출미정": (2, "탈출 조건 없는 반복은 무한히 돈다"),
     "기록자충돌": (2, "같은 표에 둘이 써서 데이터가 덮인다"),
     "임계값상충": (3, "같은 규칙이 문서마다 다른 값이다"),
     "중간정지누락": (4, "중간 사람 판단이 halt_at에 없다"),
+    "분기조건미정": (4, "갈림길에서 어느 쪽으로 갈지 정하는 규칙이 없다"),
     "데이터미정": (5, "표·칸 이름이 아직 없다"),
     "연동미정": (6, "다른 스킬과의 연결이 미정이다"),
 }
@@ -74,11 +76,15 @@ def main(pack_dir):
         order.append(cur); seen.add(cur)
         cur = nexts[cur][0] if nexts[cur] else None
 
-    branching = any(len(v) > 1 for v in nexts.values())
+    loops = {n: m["loop_to"].strip() for n, (m, _) in skills.items()
+             if m.get("loop_to") and str(m.get("loop_to")).strip() not in ("", "null")}
+    branching = any(len(v) > 1 for v in nexts.values()) or bool(loops)
     # human 필드가 하나도 없으면 태스크 수를 "0개"라고 단정하지 않는다 — 모르는 것과 없는 것은 다르다.
     known_human = any(humans.values())
     if branching:
-        kind = "팀 에이전트(갈림길 있음)"
+        why = [w for w, on in [("갈림길", any(len(v) > 1 for v in nexts.values())),
+                               ("루프백", bool(loops))] if on]
+        kind = f"팀 에이전트({'·'.join(why)} 있음)"
     elif known_human and len(ai) < 3:
         kind = f"팀 스킬팩(순차 실행) — AI 태스크 {len(ai)}개"
     else:
@@ -87,8 +93,9 @@ def main(pack_dir):
     restate = [
         (f"- 출처 업무: Lv4 「{lv4}」 › Lv5 「{lv5}」" if lv4 != "(미정)" or lv5 != "(미정)"
          else "- 출처 업무: 기획서에 Lv4·Lv5가 적혀 있지 않다"),
-        f"- 스킬 {len(skills)}개를 " + ("갈림길이 있는 흐름으로" if branching else "한 줄로") +
-        " 이었다: " + (" → ".join(order) if order else "(순서 확정 안 됨)"),
+        f"- 스킬 {len(skills)}개를 " + ("갈림길·루프백이 있는 흐름으로" if branching else "한 줄로") +
+        " 이었다: " + (" → ".join(order) if order else "(순서 확정 안 됨)")
+        + ("".join(f" · {a} ↩ {b}" for a, b in loops.items()) if loops else ""),
         (f"- AI가 맡는 태스크 {len(ai)}개, 사람이 직접 하는 태스크 {len(human_only)}개"
          + (f" ({', '.join(human_only)})" if human_only else ""))
         if known_human else
@@ -110,6 +117,26 @@ def main(pack_dir):
                           ["끝에 사람 검토 태스크를 하나 추가한다 (권장)",
                            "뒤따르는 다른 Lv5가 검수 지점임을 기록한다",
                            "검수 없이 나가는 설계임을 위험으로 명시하고 그대로 둔다"]))
+
+    # ①-2 루프백에 탈출 조건이 있는가 — 없으면 무한반복이다
+    for src, dst in loops.items():
+        ex = (skills[src][0].get("loop_exit") or "").strip()
+        if not ex or ex.startswith("(미정"):
+            forks.append(("루프탈출미정", src,
+                          f"「{src}」이 「{dst}」로 되돌아가는데 반복이 언제 끝나는지 적혀 있지 않습니다.",
+                          ["원본 흐름도(디자인캠프)의 ◆ 조건을 loop_exit에 옮겨 적는다",
+                           "최대 반복 횟수를 정해 loop_exit에 적는다"]))
+
+    # ①-3 갈림길에 조건이 있는가
+    for n, vs in nexts.items():
+        if len(vs) > 1:
+            when = (skills[n][0].get("when") or "").strip()
+            if not (when and all(t in when for t in vs)):
+                forks.append(("분기조건미정", n,
+                              f"「{n}」에서 {', '.join(vs)}(으)로 갈리는데 어느 쪽으로 갈지 정하는 "
+                              f"규칙(when)이 없습니다.",
+                              ["원본 흐름도의 ◆ 조건을 when 칸에 그대로 옮긴다",
+                               "와이어프레임 판단기준에서 조건을 뽑아 적는다"]))
 
     # ② 중간 사람 판단이 halt_at에 들어 있는가
     halt = set()

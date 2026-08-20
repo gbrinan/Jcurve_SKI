@@ -32,8 +32,10 @@ def parse(path):
         if not m:
             continue
         nx = re.search(r'nx:"([^"]*)"', ent)
+        w = re.search(r'w:"([^"]*)"', ent)     # 갈림길 조건 (원본 흐름도의 ◆ 문장)
         lv6.append({"n": m.group(1), "h": m.group(2), "s": m.group(3),
-                    "nx": nx.group(1) if nx else None})
+                    "nx": nx.group(1) if nx else None,
+                    "w": w.group(1) if w else ""})
     return dict(lv4=lv4, lv5=lv5, sel=sel, lv6=lv6, tgt=tgt)
 
 
@@ -48,20 +50,26 @@ def wire(tasks, names):
     nx 칸이 **비어 있으면** 그 갈래는 거기서 끝난다. 갈림길에서 갈라진 짧은 갈래가 흐름 중간에
     적혀 있어도 끝으로 남길 수 있어야 한다.
     nx에 이름이 둘 이상이면 그 자리가 갈림길이고, 그때 비로소 산출물이 에이전트가 된다.
+
+    **위에 이미 나온 태스크**를 가리키면 그것은 루프백이다 — 반려·재작업·재대사처럼
+    실제 업무가 되돌아가는 자리다. next에 섞지 않고 loop_to로 따로 돌려준다.
+    반환: (앞으로 가는 next 목록, 루프백 대상 목록) 각 태스크별.
     """
-    known = set(names)
-    out = []
+    known = {n: i for i, n in enumerate(names)}
+    fwd, back = [], []
     for i, t in enumerate(tasks):
         raw = t.get("nx")
         if raw is None:                                   # 칸 자체가 없다 → 다음 줄
-            out.append([names[i + 1]] if i + 1 < len(tasks) else [])
+            fwd.append([names[i + 1]] if i + 1 < len(tasks) else [])
+            back.append([])
             continue
         picked = [slug(x.strip()) for x in raw.split("|") if x.strip()]
         unknown = [x for x in picked if x not in known]
         if unknown:
             raise SystemExit(f"설계도 오류: 「{t['n']}」의 다음 태스크에 없는 이름 {unknown}")
-        out.append(picked)                                # 비어 있으면 끝점
-    return out
+        fwd.append([x for x in picked if known[x] > i])   # 아래로 = 앞으로
+        back.append([x for x in picked if known[x] <= i])  # 위로(자신 포함) = 루프백
+    return fwd, back
 
 
 def paths(names, nexts, start):
@@ -89,7 +97,7 @@ def main(html, out_dir):
     tasks, names = d["lv6"], [slug(t["n"]) for t in d["lv6"]]
     lv5 = d["lv5"][d["sel"]]
 
-    nexts = wire(tasks, names)
+    nexts, backs = wire(tasks, names)
     targets = {x for nx in nexts for x in nx}
     starts = [n for n in names if n not in targets]
     preds = {n: [names[i] for i, nx in enumerate(nexts) if n in nx] for n in names}
@@ -107,10 +115,16 @@ def main(html, out_dir):
                 f"> Human 여부: {t['h']} · Skill화 용이성: {t['s'] or '미완료'}", "",
                 "## 판단기준 · 예외",
                 "(미정 — 세션 4 와이어프레임에서 3단 파고들기로 채운다)", ""]
-        if len(nexts[i]) > 1:
+        if len(nexts[i]) > 1 or backs[i]:
+            outs_all = nexts[i] + [f"{b}(루프백)" for b in backs[i]]
             body += ["## 갈림길",
-                     f"이 태스크의 결과에 따라 다음이 갈린다: {' 또는 '.join(nexts[i])}.",
-                     "어느 쪽으로 갈지 정하는 판단기준은 (미정) — 와이어프레임에서 채운다.", ""]
+                     f"이 태스크의 결과에 따라 다음이 갈린다: {' 또는 '.join(outs_all)}.",
+                     (f"판단기준(원본 흐름도의 ◆): {t['w']}" if t.get("w")
+                      else "어느 쪽으로 갈지 정하는 판단기준은 (미정) — 와이어프레임에서 채운다."), ""]
+        if backs[i]:
+            body += ["## 되돌아가기 (루프백)",
+                     f"- 이 태스크에서 {', '.join(backs[i])}(으)로 되돌아갈 수 있다 — 반려·재작업 흐름.",
+                     f"- 반복이 끝나는 조건: {t['w'] or '(미정 — 원본 흐름도의 ◆ 조건을 옮겨 적는다)'}", ""]
         if t["h"] == "사람고유":
             body += ["## 사람이 확인하고 멈추는 지점",
                      f"- {t['n']} — 사람이 직접 판단한다. 자동으로 진행하지 않는다.", ""]
@@ -123,13 +137,20 @@ def main(html, out_dir):
               f"human: {t['h']}", f"skillability: {t['s'] or '미완료'}",
               f"inputs: [{', '.join(ins)}]",
               f"outputs: [{name}결과]", "reads: []", "writes: []",
-              f"next: {nxt}", "---", ""]
+              f"next: {nxt}"]
+        if backs[i]:
+            fm += [f"loop_to: {backs[i][0]}",
+                   f"loop_exit: {t['w'] or '(미정 — 원본 흐름도의 ◆ 조건)'}"]
+        if len(nexts[i]) > 1 and t.get("w"):
+            fm.append(f"when: {t['w']}")
+        fm += ["---", ""]
         (sdir / "SKILL.md").write_text("\n".join(fm + body) + "\n", encoding="utf-8")
 
     ai = [t for t in tasks if t["h"] in ("자동", "증강")]
     human_only = [t for t in tasks if t["h"] == "사람고유"]
     terminals = [names[i] for i, nx in enumerate(nexts) if not nx]
     branching = any(len(nx) > 1 for nx in nexts)
+    looping = any(backs)
     # 끝점은 모두 정지 지점이다. 사람고유 지점은 중간에 있어도 반드시 넣는다.
     halt = list(dict.fromkeys([slug(t["n"]) for t in human_only] + terminals))
 
@@ -141,7 +162,9 @@ def main(html, out_dir):
     payloads = [slug(lv5) + "입력"] + [n + "결과" for n in names]
     contract = ["# 통합 계약 (워크플로우 설계도 변환 초안)", "",
                 f"Lv4 「{d['lv4']}」 · Lv5 「{lv5}」의 Lv6 태스크 {len(tasks)}개를 이었다."
-                + (f" 갈림길이 있어 경로가 {len(routes)}개다." if branching else " 갈림길 없는 직선이다."), "",
+                + (f" 갈림길이 있어 경로가 {len(routes)}개다." if branching else " 갈림길 없는 직선이다.")
+                + ("".join(f"\n루프백: {names[i]} ↩ {b} (탈출: {tasks[i].get('w') or '(미정)'})"
+                           for i, bs in enumerate(backs) for b in bs) if looping else ""), "",
                 "```contract", "tables:", "  (미정): (설계도 단계엔 표·칸 명세가 없음)",
                 "writers:", "  (미정): (미정)",
                 "chain: " + "; ".join(" -> ".join(r) for r in routes),
@@ -159,10 +182,12 @@ def main(html, out_dir):
             "## 2-1. 태스크 구성", "| # | Lv6 | Human 여부 | Skill화 | 다음 태스크 |",
             "|---|---|---|---|---|"]
     for i, t in enumerate(tasks):
-        nx = " 또는 ".join(nexts[i]) if nexts[i] else "(끝)"
+        parts = list(nexts[i]) + [f"{b} ↩루프백" for b in backs[i]]
+        nx = " 또는 ".join(parts) if parts else "(끝)"
         plan.append(f"| {i+1} | {t['n']} | {t['h']} | {t['s'] or '미완료'} | {nx} |")
     plan += ["", f"AI 태스크(자동+증강) {len(ai)}개 · 사람고유 {len(human_only)}개"
-             + (f" · 갈림길 있음(경로 {len(routes)}개)" if branching else " · 갈림길 없음"), "",
+             + (f" · 갈림길 있음(경로 {len(routes)}개)" if branching else " · 갈림길 없음")
+             + (" · 루프백 있음" if looping else ""), "",
              "## 3. 데이터 명세", "| 표 이름 | 칸 이름 | 원본 위치(SSOT) | 읽기/쓰기 |",
              "|---|---|---|---|", "| (미정) | (미정) | (미정) | (미정) |",
              "> 설계도에는 표·칸 명세가 없다. 세션 6 인터뷰 Q3에서 확정한다.", "",
@@ -184,7 +209,7 @@ def main(html, out_dir):
     ids = {n: f"T{i}" for i, n in enumerate(names)}
     for i, t in enumerate(tasks):
         n = names[i]
-        shape = (f'{ids[n]}{{"{n}"}}' if len(nexts[i]) > 1
+        shape = (f'{ids[n]}{{"{n}"}}' if len(nexts[i]) + len(backs[i]) > 1
                  else f'{ids[n]}["{n}"]')
         plan.append(f"  {shape}")
         if t["h"] == "사람고유":
@@ -192,8 +217,11 @@ def main(html, out_dir):
     for i, nx in enumerate(nexts):
         for m in nx:
             plan.append(f"  {ids[names[i]]} --> {ids[m]}")
+    for i, bs in enumerate(backs):
+        for b in bs:
+            plan.append(f'  {ids[names[i]]} -.->|"↩ {tasks[i].get("w") or "재작업"}"| {ids[b]}')
     plan += ["```", "",
-             "- 마름모 = 갈림길 · 빨간 테두리 = 사람이 직접 판단하는 지점", "",
+             "- 마름모 = 갈림길 · 빨간 테두리 = 사람이 직접 판단하는 지점 · 점선 = 루프백(되돌아가기)", "",
              "## 9. 폴더 트리", "```mermaid", "graph TD", '  R["📁 팀-agent/"]',
              '  R --> A["README.md"]', '  R --> B["agent-plan.md · SSOT"]',
              '  R --> C["AGENTS.md"]', '  R --> D["CONTRACT.md"]',
@@ -213,9 +241,13 @@ def main(html, out_dir):
     print(f"  스킬 {len(tasks)}개 · AI 태스크 {len(ai)}개 · 사람고유 {len(human_only)}개")
     if len(ai) < 3:
         print(f"  ⚠️ AI 태스크가 3개 미만 → 점검기가 '팀 스킬팩'으로 분기합니다 (ATF ③다단계성)")
-    elif branching:
-        print(f"  ✅ 갈림길 {sum(1 for nx in nexts if len(nx) > 1)}곳 · 경로 {len(routes)}개 "
-              f"→ '팀 에이전트'로 판정됩니다 (ATF ④순서 가변성)")
+    elif branching or looping:
+        marks = []
+        if branching:
+            marks.append(f"갈림길 {sum(1 for nx in nexts if len(nx) > 1)}곳 · 경로 {len(routes)}개")
+        if looping:
+            marks.append(f"루프백 {sum(len(b) for b in backs)}곳")
+        print(f"  ✅ {' · '.join(marks)} → '팀 에이전트'로 판정됩니다 (ATF ④순서 가변성)")
     else:
         print("  · 갈림길 없음 → '팀 스킬팩(순차 실행)'으로 판정됩니다. "
               "설계도의 '다음 태스크' 칸을 다시 보십시오.")

@@ -117,13 +117,13 @@
 // ── 상태. adapt_workflow.py가 읽는 형식과 이름을 그대로 쓴다.
 //    lv6의 nx가 이번에 추가된 칸이다 — "|"로 구분한 다음 태스크 이름들.
 let lv5=[{n:"의료비 청구 건 판독·지급 판정"}];
-let lv6=[{n:"증빙서류판독",h:"자동",s:"높음",nx:"신청서생성"}];
+let lv6=[{n:"증빙서류판독",h:"자동",s:"높음",nx:"신청서생성",w:""}];
 let sel=0;
 let tgt=0;
 const HUMANS=["자동","증강","사람고유"], SKILLS=["높음","중간","낮음",""];
 
 function add5(){ lv5.push({n:""}); render(); }
-function add6(){ lv6.push({n:"",h:"자동",s:"",nx:""}); render(); }
+function add6(){ lv6.push({n:"",h:"자동",s:"",nx:"",w:""}); render(); }
 function del5(i){ lv5.splice(i,1); if(sel>=lv5.length) sel=Math.max(0,lv5.length-1); render(); }
 function del6(i){ const gone=lv6[i].n; lv6.splice(i,1);
   lv6.forEach(t=>{ t.nx=(t.nx||"").split("|").map(s=>s.trim()).filter(s=>s&&s!==gone).join(" | "); });
@@ -159,7 +159,11 @@ function render(){
             <button class="x" onclick="setNx(${i},${j},'')">✕</button></div>`).join("")}
           <div style="display:flex;gap:4px">
             <select onchange="setNx(${i},${picked.length},this.value)">${opts()}</select></div>
-          ${picked.length>1?'<span class="tag h">갈림길</span>':''}</td>
+          ${picked.length>1?'<span class="tag h">갈림길</span>':''}
+          ${picked.some(p=>idxOf(p)<=i)?'<span class="tag h">↩ 루프백</span>':''}
+          ${(picked.length>1||picked.some(p=>idxOf(p)<=i))?`<input type="text" value="${esc(t.w||'')}"
+             placeholder="◆ 조건 (예: 차이 발견? Yes -> A; No -> B)" style="margin-top:4px;font-size:12px"
+             oninput="lv6[${i}].w=this.value;paint()">`:''}</td>
       <td><button class="x" onclick="del6(${i})">✕</button></td>
     </tr>`;
   }).join("");
@@ -183,21 +187,24 @@ function setNx(i,j,v){
   lv6[i].nx=[...new Set(picked.filter(Boolean))].join(" | ");
   render();
 }
+const idxOf=n=>lv6.findIndex(t=>t.n===n);
 const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 // ── 판정: adapt_workflow.py / run_check.py와 같은 규칙을 화면에서 미리 보여준다.
 function nexts(){
-  const m={};
+  const m={}, loops={};
   lv6.forEach((t,i)=>{
     const p=(t.nx||"").split("|").map(s=>s.trim()).filter(Boolean);
-    m[t.n]= p.length ? p : (i+1<lv6.length ? [lv6[i+1].n] : []);   // 비면 다음 줄 (하위호환)
+    const fwd=p.filter(x=>idxOf(x)>i), back=p.filter(x=>idxOf(x)<=i&&idxOf(x)>=0);
+    m[t.n]= p.length ? fwd : (i+1<lv6.length ? [lv6[i+1].n] : []);   // 비면 다음 줄 (하위호환)
+    if(back.length) loops[t.n]=back;
   });
-  return m;
+  return {m, loops};
 }
 function paint(){
   const named=lv6.filter(t=>t.n);
-  const nx=nexts();
-  const branching = named.some(t=>(nx[t.n]||[]).length>1);
+  const {m:nx, loops}=nexts();
+  const branching = named.some(t=>(nx[t.n]||[]).length>1) || Object.keys(loops).length>0;
   const ai = named.filter(t=>t.h==="자동"||t.h==="증강");
   const humanOnly = named.filter(t=>t.h==="사람고유");
   const v=document.getElementById("verdict");
@@ -210,7 +217,9 @@ function paint(){
       태스크를 더 쪼개거나, 이대로 스킬 묶음으로 씁니다.`;
   } else if(branching){
     v.className="verdict agent";
-    v.innerHTML=`<strong>팀 에이전트 (갈림길 있음) ✅</strong>
+    const why=[named.some(t=>(nx[t.n]||[]).length>1)?"갈림길":null,
+               Object.keys(loops).length?"루프백":null].filter(Boolean).join("·");
+    v.innerHTML=`<strong>팀 에이전트 (${why} 있음) ✅</strong>
       AI 태스크 ${ai.length}개 · 사람고유 ${humanOnly.length}개.
       ATF ③다단계성과 ④순서 가변성을 둘 다 넘었습니다.`;
   } else {
@@ -218,7 +227,8 @@ function paint(){
     v.innerHTML=`<strong>팀 스킬팩 (순차 실행)</strong>
       AI 태스크 ${ai.length}개는 충분한데 갈림길이 없습니다. 순서가 매번 같습니다.
       <b>“이 태스크 결과에 따라 다음이 갈리는 경우가 정말 없는가”</b>를 한 번 더 보십시오 —
-      갈리는 순간 그대로 에이전트가 됩니다.`;
+      갈리는 순간 그대로 에이전트가 됩니다. 반려·재작업으로 <b>되돌아가는</b> 흐름(루프백)도
+      순서를 바꿉니다 — 위에 있는 태스크를 다음 태스크로 고르면 됩니다.`;
   }
 
   // 흐름
@@ -230,9 +240,11 @@ function paint(){
        ${starts.length>1?'<span class="tag h">시작점이 2개 이상 — 점검기 L3에서 걸립니다</span>':''}</div>
     ${named.map(t=>{
       const to=(nx[t.n]||[]);
+      const lp=(loops[t.n]||[]);
       return `<div><code>${esc(t.n)}</code>
         <span class="tag ${t.h==="사람고유"?"h":""}">${t.h}</span>
-        ${to.length? "→ "+to.map(x=>`<code>${esc(x)}</code>`).join(" 또는 ") : "→ <em>끝</em>"}</div>`;
+        ${to.length? "→ "+to.map(x=>`<code>${esc(x)}</code>`).join(" 또는 ") : (lp.length?"":"→ <em>끝</em>")}
+        ${lp.length? ' <span class="tag h">↩ '+lp.map(esc).join(", ")+"로 되돌아감</span>" : ""}</div>`;
     }).join("")}
     <div style="margin-top:8px;color:var(--muted)">끝점: ${ends.map(e=>esc(e)).join(", ")||"없음"}
       ${ends.length>1?" — 끝점이 여럿입니다. 점검기는 끝점마다 사람 확인 지점을 요구합니다.":""}</div>` : "";
@@ -243,7 +255,7 @@ function paint(){
 // ── 내보내기: adapt_workflow.py의 정규식이 읽는 선언 블록 그대로
 function decl(){
   const j5 = lv5.map(w=>`{n:"${w.n}"}`).join(",");
-  const j6 = lv6.map(t=>`{n:"${t.n}",h:"${t.h}",s:"${t.s||""}",nx:"${t.nx||""}"}`).join(",\n  ");
+  const j6 = lv6.map(t=>`{n:"${t.n}",h:"${t.h}",s:"${t.s||""}",nx:"${t.nx||""}",w:"${(t.w||"").replace(/"/g,"'")}"}`).join(",\n  ");
   return `let lv5=[${j5}];\nlet lv6=[\n  ${j6}\n];\nlet sel=${sel};\nlet tgt=${tgt};`;
 }
 function page(){

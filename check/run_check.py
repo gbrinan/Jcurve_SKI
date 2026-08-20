@@ -132,6 +132,47 @@ def main(pack_dir):
             return False
         return any(walk(n) for n in skills)
 
+    # 루프백(되돌아가기): next와 별도의 뒤로 가는 화살표.
+    # 원본 업무(디자인캠프 Process Flow)에는 루프백이 실제로 있다 — 반려·재작업·재대사.
+    # next에 섞으면 순환 검사가 무의미해지므로 loop_to라는 다른 칸으로 받는다.
+    loops = {n: m["loop_to"].strip() for n, (m, _, _) in skills.items()
+             if m.get("loop_to") and str(m.get("loop_to")).strip() not in ("", "null")}
+    for src, dst in loops.items():
+        check("L3", f"루프백: {src}↩{dst} 대상 실재", dst in skills,
+              f"없는 스킬로 되돌아감: {dst}" if dst not in skills else "")
+        # 루프백은 반드시 '뒤로' 가야 한다. 앞으로 가는 화살표를 loop_to에 숨기면
+        # 순환 검사를 우회하게 되므로, 대상에서 next만 따라 자신에게 돌아올 수 있어야 한다.
+        if dst in skills:
+            seen_, q_ = set(), [dst]
+            while q_:
+                c = q_.pop()
+                for nx2 in nexts.get(c, []):
+                    if nx2 in skills and nx2 not in seen_:
+                        seen_.add(nx2); q_.append(nx2)
+            check("L3", f"루프백: {src}↩{dst} 방향", src in seen_,
+                  f"{dst}에서 next로 {src}에 닿지 않음 — 루프백이 아니라 앞으로 가는 화살표"
+                  if src not in seen_ else "")
+        # 탈출 조건 없는 루프는 무한반복이다. 없으면 실패, (미정)이면 수용된 위험으로 남긴다.
+        ex = (skills[src][0].get("loop_exit") or "").strip()
+        if not ex:
+            check("L3", f"루프백: {src}↩{dst} 탈출 조건", False,
+                  "loop_exit 없음 — 언제 반복이 끝나는지 아무도 모른다")
+        elif ex.startswith("(미정"):
+            check("L3", f"루프백: {src}↩{dst} 탈출 조건", None,
+                  "탈출 조건 (미정) — 와이어프레임·인터뷰에서 채워야 한다")
+        else:
+            check("L3", f"루프백: {src}↩{dst} 탈출 조건", True)
+
+    # 갈림길 조건: 어느 쪽으로 갈지 정하는 규칙. 원본(디자인캠프)에는 ◆ 조건이 글로 있다.
+    # 없다고 막지는 않는다 — 수용된 위험(⚠️)으로 남겨 사라지지 않게 한다.
+    for n, vs in nexts.items():
+        if len(vs) > 1:
+            when = (skills[n][0].get("when") or "").strip()
+            covered = when and all(t in when for t in vs)
+            check("L3", f"갈림길 조건: {n}", True if covered else None,
+                  "" if covered else
+                  f"when 칸에 {vs} 각각의 조건이 없음 — 원본 흐름도의 ◆ 조건을 옮겨 적으십시오")
+
     check("L3", "흐름: 시작점 1개", len(starts) == 1, f"시작점 {starts}")
     check("L3", "흐름: 모든 스킬에 도달(고아 없음)", reached == set(skills),
           f"도달 못 함: {sorted(set(skills) - reached)}")
@@ -150,7 +191,8 @@ def main(pack_dir):
     # ── 산출물 유형 분기 ──
     # 두 가지를 본다: AI에 맡길 태스크가 몇 개인가(ATF ③다단계성), 갈림길이 있는가(ATF ④순서 가변성).
     # 어느 쪽도 탈락 사유가 아니다. 이름을 정확히 붙이고 다음 걸음을 알려줄 뿐이다.
-    branching = any(len(v) > 1 for v in nexts.values())
+    # 갈림길뿐 아니라 루프백도 순서를 바꾼다 — 반려가 나면 같은 일을 다시 돈다.
+    branching = any(len(v) > 1 for v in nexts.values()) or bool(loops)
     humans = {n: (m.get("human") or "").strip() for n, (m, _, _) in skills.items()}
     ai_tasks = [n for n, h in humans.items() if h in ("자동", "증강")]
     human_only = [n for n, h in humans.items() if h == "사람고유"]
@@ -164,7 +206,12 @@ def main(pack_dir):
             "    다음 중 하나를 고르십시오 — 태스크를 더 쪼개 3개 이상으로 만들거나, 이대로 스킬 묶음으로 씁니다.",
         ]
     elif branching:
-        pack_kind = "팀 에이전트 (갈림길 있음)"
+        why = []
+        if any(len(v) > 1 for v in nexts.values()):
+            why.append("갈림길")
+        if loops:
+            why.append("루프백")
+        pack_kind = f"팀 에이전트 ({'·'.join(why)} 있음)"
         kind_note = []
     else:
         pack_kind = "팀 스킬팩 (순차 실행)"
@@ -174,6 +221,8 @@ def main(pack_dir):
         ]
 
     # 체인 중간의 사람고유 지점은 L4가 보지 못한다(끝점만 검사). 여기서 알려준다.
+    # next가 없으면 끝점이다. 루프백만 있는 스킬도 끝점으로 본다 —
+    # 탈출 조건이 차면 흐름이 거기서 끝나므로, 끝점의 검사(사람 확인·자동 발송 금지)를 받아야 한다.
     terminals = [n for n in skills if not nexts.get(n)]
     mid_human = [n for n in human_only if n not in terminals]
     chain = [n for n in _topo(skills, nexts)] if reached == set(skills) else []
