@@ -37,8 +37,18 @@ def rich(s):
     return s
 
 
-def money(s):
-    """표의 정수 칸에 천 단위 쉼표. 화면에서만 — 원본 파일은 그대로 둔다."""
+# 식별자를 담는 칸. 여기 숫자는 수량이 아니므로 자릿수를 끊지 않는다.
+ID_COL = re.compile(r"코드|번호|ID|no\.?$", re.I)
+
+
+def money(s, col=""):
+    """표의 정수 칸에 천 단위 쉼표. 화면에서만 — 원본 파일은 그대로 둔다.
+
+    계정코드·분개번호처럼 **식별자인 칸은 건드리지 않는다.** 1010을 1,010으로 쓰면
+    금액처럼 보인다 (브라우저에서 실제로 그렇게 나왔다).
+    """
+    if ID_COL.search(col or ""):
+        return s
     if re.fullmatch(r"-?\d{4,}", s):
         return f"{int(s):,}"
     return s
@@ -113,10 +123,15 @@ def rail(sk, tr):
         for l in tr.get("loops", []):
             if l["to"] == n and l.get("cycles"):
                 times = f" ×{l['cycles']}"
-        out.append(f'<span class="n {cls}">{extra}{e(n)}{times}</span>')
+        out.append(f'<span class="n {cls}" data-skill="{e(n)}">'
+                   f'<i class="dot"></i>{extra}{e(n)}{times}</span>')
         if i < len(order) - 1:
             out.append('<span class="arrow">›</span>')
-    return "\n  ".join(out)
+    # 원본 흐름도(디자인캠프)의 ● 시작 / ■ 종료 표기를 그대로 쓴다.
+    return ('<span class="cap start" id="cap-start">● 시작</span>'
+            '<span class="arrow">›</span>\n  ' + "\n  ".join(out)
+            + '\n  <span class="arrow">›</span>'
+              '<span class="cap end" id="cap-end">■ 종료</span>')
 
 
 def table_html(t):
@@ -125,17 +140,18 @@ def table_html(t):
     for r in t["rows"]:
         cls = f' class="{r["mark"]}"' if r.get("mark") else ""
         tds = "".join(
-            f'<td class="num">{e(money(c))}</td>' if re.fullmatch(r"-?[\d,]+", c)
-            else f"<td>{e(c)}</td>"
-            for c in r["cells"])
+            (f'<td class="num">{e(money(c, col))}</td>' if re.fullmatch(r"-?[\d,]+", c)
+             else f"<td>{e(c)}</td>")
+            for c, col in zip(r["cells"], t["cols"]))
         body.append(f"<tr{cls}>{tds}</tr>")
     return (f'<div class="scroll"><table><thead><tr>{head}</tr></thead>'
             f'<tbody>{"".join(body)}</tbody></table></div>')
 
 
-def step_html(s, sk):
+def step_html(s, sk, idx):
     if s["kind"] == "loopback":
-        return (f'<div class="loopback">↩ {e(s["to"])}로 되돌아감'
+        return (f'<div class="st loopback" data-i="{idx}" data-kind="loopback" '
+                f'data-skill="{e(s["to"])}">↩ {e(s["to"])}로 되돌아감'
                 f'{" &nbsp;·&nbsp; 탈출 조건: " + e(s["exit"]) if s.get("exit") else ""}</div>')
 
     hc = HUMAN_CLS.get(s.get("human"), "")
@@ -182,7 +198,17 @@ def step_html(s, sk):
         body.append(f'<div class="files"><span class="file">→ {e(f["path"])}{cnt}</span></div>')
 
     cls = {"fork": " fork-card", "halt": " halt"}.get(s["kind"], "")
-    return (f'<div class="card{cls}"><header><b>{e(s["skill"])}</b>{"".join(tags)}</header>'
+    # 재생 중 이 단계가 사람을 기다린다는 것을 화면이 직접 말한다.
+    if s["kind"] == "halt":
+        body.append('<div class="waitbar">⏸ <b>사람 확인 대기</b> — '
+                    '확인해야 다음으로 넘어갑니다.'
+                    '<button class="go" type="button">확인하고 계속 ▶</button></div>')
+    bare = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s.get("note", ""))).strip()
+    return (f'<div class="st card{cls}" data-i="{idx}" data-kind="{s["kind"]}" '
+            f'data-skill="{e(s["skill"])}" data-label="{e(bare[:60])}">'
+            f'<header><b>{e(s["skill"])}</b>{"".join(tags)}'
+            f'<span class="ms" data-ms=""></span></header>'
+            f'<div class="run"><i class="spin"></i>처리 중…</div>'
             f'<div class="body">{"".join(body)}</div></div>')
 
 
@@ -203,8 +229,9 @@ def css(tk):
   .top .sub{{font-size:12px;color:var(--muted)}}
   .pill{{margin-left:auto;font-size:11px;border:1px solid var(--line);border-radius:999px;
         padding:3px 10px;color:var(--muted)}}
-  .rail{{display:flex;gap:6px;padding:14px 22px;overflow-x:auto;align-items:center;
-        border-bottom:1px solid var(--line);background:var(--bg-soft)}}
+  .rail{{display:flex;gap:6px;padding:12px 22px;overflow-x:auto;align-items:center;
+        border-bottom:1px solid var(--line);background:var(--bg-soft);
+        position:sticky;top:59px;z-index:4}}
   .rail .n{{flex:none;font-size:12px;padding:5px 11px;border-radius:999px;white-space:nowrap;
            border:1px solid var(--line);background:var(--bg);color:var(--muted)}}
   .rail .n.done{{border-color:var(--ok);color:var(--ok)}}
@@ -268,6 +295,78 @@ def css(tk):
         font-size:12px;color:var(--muted);line-height:1.8}}
   .foot code{{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;
              padding:1px 5px}}
+
+  /* ── 재생 ─────────────────────────────────────────────────────────── */
+  body.play .st{{opacity:0;transform:translateY(6px);
+                 transition:opacity .28s ease,transform .28s ease}}
+  body.play .st.shown{{opacity:1;transform:none}}
+  body.play .st:not(.shown){{pointer-events:none;height:0;margin:0;overflow:hidden;border:0}}
+  .st.now{{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-sub) 28%,transparent)}}
+  .rail .n{{opacity:.35;transition:opacity .2s ease}}
+  body:not(.play) .rail .n,
+  .rail .n.lit{{opacity:1}}
+  .rail .n.now{{outline:2px solid var(--brand-sub);outline-offset:2px}}
+
+  .waitbar{{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-top:11px;
+           padding:10px 12px;border-radius:8px;font-size:13px;
+           background:#FDF2F4;border:1px solid var(--brand);color:var(--brand)}}
+  body.play .st.waiting .waitbar{{display:flex}}
+  .waitbar .go{{margin-left:auto;cursor:pointer;background:var(--brand);color:#fff;
+               border-color:var(--brand);font-size:12px;padding:6px 12px}}
+  .st.waiting{{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}}
+
+  /* ── 하단 진행 바 ─────────────────────────────────────────────────── */
+  .dock{{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);
+        border-top:1px solid var(--line);box-shadow:0 -2px 12px rgba(0,0,0,.06)}}
+  .dock .track{{height:4px;background:var(--bg-soft)}}
+  .dock .fill{{height:100%;width:0;background:var(--brand);transition:width .3s ease}}
+  .dock.waiting .fill{{background:var(--brand-sub)}}
+  .dock.done .fill{{background:var(--ok)}}
+  .dock .row{{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:10px;
+             padding:9px 22px;flex-wrap:wrap}}
+  .dock .pct{{font-size:16px;font-weight:700;letter-spacing:-.02em;
+             font-variant-numeric:tabular-nums;min-width:52px}}
+  .dock .what{{font-size:13px;color:var(--muted);flex:1;min-width:160px;
+              overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+  .dock .what b{{color:var(--text)}}
+  .dock button{{cursor:pointer;font-size:12px;padding:6px 12px}}
+  .dock button:hover{{border-color:var(--brand);color:var(--brand)}}
+  .dock button.primary:hover{{color:#fff;opacity:.9}}
+  .dock .keys{{font-size:11px;color:var(--muted);width:100%}}
+  main{{padding-bottom:120px}}
+  /* 노드 상태 점 · 시작/종료 캡 */
+  .rail .dot{{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.35;
+             display:inline-block;margin-right:6px;vertical-align:1px}}
+  .rail .n.lit .dot{{opacity:1}}
+  .rail .n.now .dot{{animation:pulse 1s ease-in-out infinite}}
+  @keyframes pulse{{50%{{opacity:.25}}}}
+  .rail .cap{{flex:none;font-size:11px;color:var(--muted);opacity:.4;
+             transition:opacity .2s ease,color .2s ease}}
+  .rail .cap.on{{opacity:1;color:var(--text);font-weight:600}}
+  body:not(.play) .rail .cap{{opacity:1}}
+  body.play .rail .n{{cursor:pointer}}
+
+  /* 처리 중 */
+  .st .run{{display:none;align-items:center;gap:8px;padding:11px 14px;font-size:13px;
+           color:var(--muted);border-bottom:1px solid var(--line);background:var(--bg-soft)}}
+  .st.working .run{{display:flex}}
+  .st.working .body{{display:none}}
+  .spin{{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);
+        border-top-color:var(--brand-sub);animation:spin .7s linear infinite;flex:none}}
+  @keyframes spin{{to{{transform:rotate(360deg)}}}}
+  .st .ms{{margin-left:auto;font-size:11px;color:var(--muted);
+          font-variant-numeric:tabular-nums;opacity:0;transition:opacity .2s ease}}
+  .st .ms.on{{opacity:1}}
+  .st.loopback.working{{opacity:.6}}
+
+  .dock .clock{{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;
+               border:1px solid var(--line);border-radius:6px;padding:5px 9px}}
+  .dock .clock b{{color:var(--text)}}
+
+  @media (prefers-reduced-motion:reduce){{
+    body.play .st,.dock .fill{{transition:none}}
+    .spin,.rail .n.now .dot{{animation:none}}
+  }}
 """
 
 
@@ -294,7 +393,7 @@ def main(pack_dir):
         f'<span class="tag">{e(tr["inputs"][0].get("note", "")) if tr["inputs"] else ""}</span>'
         f'</header><div class="body"><p>{ins}</p></div></div>') if tr["inputs"] else ""
 
-    steps = "\n\n  ".join(step_html(s, sk) for s in tr["steps"])
+    steps = "\n\n  ".join(step_html(s, sk, i) for i, s in enumerate(tr["steps"]))
     loops = " · ".join(f"{e(l['from'])} ↩ {e(l['to'])}"
                        + (f" ({l['cycles']}회차)" if l.get("cycles") else "")
                        for l in tr.get("loops", []))
@@ -346,6 +445,181 @@ def main(pack_dir):
 </div>
 </main>
 </div>
+
+<div class="dock" id="dock">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="row">
+    <span class="pct" id="pct">0%</span>
+    <span class="clock" id="clock" title="시뮬레이션 시간입니다 — 실제 실행은 1초 미만입니다">
+      ⏱ <b>0.0</b>s</span>
+    <span class="what" id="what">▶ 실행을 누르면 한 단계씩 진행됩니다</span>
+    <button class="primary" id="play" type="button">▶ 실행</button>
+    <button id="next" type="button">다음 단계 ›</button>
+    <button id="speed" type="button">1×</button>
+    <button id="reset" type="button">처음으로</button>
+    <span class="keys">스페이스 재생·일시정지 · → 다음 단계 · R 처음으로 ·
+      레일의 단계를 클릭하면 거기까지 건너뜁니다 ·
+      <b>시간은 시뮬레이션 값</b>입니다 (실제 실행은 1초 미만) ·
+      끝까지 보려면 <b>전체 보기</b>를 누르십시오
+      <button id="all" type="button" style="padding:2px 8px;margin-left:6px">전체 보기</button></span>
+  </div>
+</div>
+
+<script>
+// 재생 컨트롤러 — 데이터는 건드리지 않는다. 이미 그려진 단계를 순서대로 보여줄 뿐이다.
+// 사람고유(halt) 단계에서는 **반드시 멈춘다.** 이 목업이 말하려는 것이 그것이다.
+(function () {{
+  const steps = [...document.querySelectorAll('.st')];
+  const rail  = [...document.querySelectorAll('.rail .n')];
+  const fill = document.getElementById('fill'), pct = document.getElementById('pct');
+  const what = document.getElementById('what'), dock = document.getElementById('dock');
+  const bPlay = document.getElementById('play'), bNext = document.getElementById('next');
+  const bSpd = document.getElementById('speed'), bReset = document.getElementById('reset');
+  const bAll = document.getElementById('all');
+  const clock = document.getElementById('clock').querySelector('b');
+  const capS = document.getElementById('cap-start'), capE = document.getElementById('cap-end');
+  const SPEEDS = [1, 2, 4], DELAY = 1100, WORK = 420;
+  let i = 0, timer = null, work = null, tick2 = null;
+  let playing = false, spd = 0, waiting = false, held = null, t0 = 0, elapsed = 0;
+
+  const bare = n => (n || '').replace(/^\s*\d+[.)]\s*/, '').trim();   // "5. 계정검증대사" → "계정검증대사"
+  const railFor = n => rail.filter(r => bare(r.dataset.skill) === bare(n));
+
+  function showClock() {{ clock.textContent = (elapsed / 1000).toFixed(1); }}
+  function clockOn() {{ t0 = Date.now(); clearInterval(tick2);
+    tick2 = setInterval(() => {{ elapsed += 100; showClock(); }}, 100); }}
+  function clockOff() {{ clearInterval(tick2); tick2 = null; }}
+
+  // 숫자를 0에서 세어 올린다 — 방금 계산된 것처럼 보이게.
+  function countUp(el) {{
+    const end = parseInt(el.dataset.n ?? el.textContent.replace(/[^0-9]/g, ''), 10);
+    if (!Number.isFinite(end) || end === 0) return;
+    el.dataset.n = end; let v = 0;
+    const st = setInterval(() => {{
+      v = Math.min(end, v + Math.max(1, Math.ceil(end / 12)));
+      el.firstChild.nodeValue = v;
+      if (v >= end) clearInterval(st);
+    }}, 45);
+  }}
+
+  function paint() {{
+    const p = Math.round(i / steps.length * 100);
+    fill.style.width = p + '%'; pct.textContent = p + '%';
+    dock.classList.toggle('done', i >= steps.length);
+    dock.classList.toggle('waiting', waiting);
+    bPlay.textContent = playing ? '⏸ 일시정지' : (i >= steps.length ? '↻ 다시' : '▶ 실행');
+    if (i >= steps.length) {{ what.innerHTML = '<b>완료</b> — 모든 단계가 끝났습니다.'; return; }}
+    const s = steps[i];
+    what.innerHTML = waiting
+      ? '⏸ <b>' + bare(held.dataset.skill) + '</b> — 사람 확인 대기. 확인해야 다음으로 갑니다.'
+      : (i === 0 ? '▶ 실행을 누르면 한 단계씩 진행됩니다'
+                 : '다음: <b>' + bare(s.dataset.skill) + '</b>');
+  }}
+
+  function reveal(done) {{
+    if (i >= steps.length) {{ stop(); capE.classList.add('on'); paint(); return; }}
+    const s = steps[i];
+    steps.forEach(x => x.classList.remove('now'));
+    rail.forEach(r => r.classList.remove('now'));
+    capS.classList.add('on');
+    s.classList.add('shown', 'now', 'working');       // 먼저 "처리 중"을 보여준다
+    railFor(s.dataset.skill).forEach(r => r.classList.add('lit', 'now'));
+    s.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+    const dur = WORK / SPEEDS[spd];
+    clearTimeout(work);
+    work = setTimeout(() => {{                          // 그 다음 결과로 바뀐다
+      s.classList.remove('working');
+      const ms = s.querySelector('.ms');
+      if (ms) {{ ms.textContent = (0.08 + Math.random() * 0.35).toFixed(2) + 's';
+                ms.classList.add('on'); }}
+      s.querySelectorAll('.br .cnt:not(.none)').forEach(countUp);
+      i++;
+      if (s.dataset.kind === 'halt' && i < steps.length) {{
+        waiting = true; held = s; s.classList.add('waiting'); stop(); paint(); return;
+      }}
+      if (i >= steps.length) {{ capE.classList.add('on'); stop(); }}
+      paint();
+      if (done) done();
+    }}, dur);
+  }}
+
+  function tick() {{ reveal(() => {{ if (playing && !waiting) schedule(); }}); }}
+  function schedule() {{ clearTimeout(timer); timer = setTimeout(tick, DELAY / SPEEDS[spd]); }}
+  function stop() {{ playing = false; clearTimeout(timer); clockOff(); }}
+
+  function play() {{
+    if (waiting) return;
+    if (i >= steps.length) {{ reset(); setTimeout(play, 350); return; }}
+    playing = true; clockOn(); paint(); tick();
+  }}
+  function reset() {{
+    stop(); clearTimeout(work); waiting = false; held = null; i = 0; elapsed = 0; showClock();
+    capS.classList.remove('on'); capE.classList.remove('on');
+    steps.forEach(x => {{ x.classList.remove('shown', 'now', 'waiting', 'working');
+      const m = x.querySelector('.ms'); if (m) {{ m.textContent = ''; m.classList.remove('on'); }}
+      x.querySelectorAll('.br .cnt').forEach(c => {{
+        if (c.dataset.n) c.firstChild.nodeValue = c.dataset.n; }}); }});
+    rail.forEach(r => r.classList.remove('lit', 'now'));
+    document.body.classList.add('play');
+    window.scrollTo({{ top: 0, behavior: 'smooth' }}); paint();
+  }}
+  function showAll() {{
+    stop(); clearTimeout(work); waiting = false; held = null; i = steps.length;
+    steps.forEach(x => {{ x.classList.add('shown');
+      x.classList.remove('now', 'waiting', 'working'); }});
+    rail.forEach(r => r.classList.add('lit'));
+    capS.classList.add('on'); capE.classList.add('on');
+    paint();
+  }}
+
+  // 레일을 클릭하면 그 단계까지 건너뛴다 — 데모에서 보고 싶은 대목만 짚어 보여줄 때.
+  function jumpTo(name) {{
+    const at = steps.findIndex(s => bare(s.dataset.skill) === bare(name));
+    if (at < 0) return;
+    stop(); clearTimeout(work); waiting = false; held = null;
+    steps.forEach((x, k) => {{
+      x.classList.toggle('shown', k <= at);
+      x.classList.remove('now', 'waiting', 'working');
+      const m = x.querySelector('.ms');
+      if (m && k <= at && !m.textContent) {{
+        m.textContent = (0.08 + Math.random() * 0.35).toFixed(2) + 's'; m.classList.add('on'); }}
+    }});
+    // 건너뛴 지점까지의 레일도 함께 켠다 — 지나온 것이 꺼져 있으면 어디까지 왔는지 안 보인다.
+    const passed = new Set(steps.slice(0, at + 1).map(s => bare(s.dataset.skill)));
+    rail.forEach(r => {{ r.classList.remove('now');
+                        r.classList.toggle('lit', passed.has(bare(r.dataset.skill))); }});
+    railFor(name).forEach(r => r.classList.add('now'));
+    steps[at].classList.add('now');
+    i = at + 1; capS.classList.add('on');
+    capE.classList.toggle('on', i >= steps.length);
+    steps[at].scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+    paint();
+  }}
+  function proceed() {{     // 사람 확인 버튼
+    if (!waiting) return;
+    waiting = false; held = null;
+    steps.forEach(x => x.classList.remove('waiting'));
+    paint(); play();
+  }}
+
+  bPlay.onclick = () => (playing ? (stop(), paint()) : play());
+  bNext.onclick = () => {{ if (waiting) return proceed(); stop(); reveal(); }};
+  bReset.onclick = reset;
+  bAll.onclick = showAll;
+  bSpd.onclick = () => {{ spd = (spd + 1) % SPEEDS.length; bSpd.textContent = SPEEDS[spd] + '×';
+                         if (playing) schedule(); }};
+  document.querySelectorAll('.waitbar .go').forEach(b => b.onclick = proceed);
+  rail.forEach(r => r.onclick = () => jumpTo(r.dataset.skill));
+  addEventListener('keydown', ev => {{
+    if (ev.target.tagName === 'INPUT') return;
+    if (ev.code === 'Space') {{ ev.preventDefault(); waiting ? proceed() : bPlay.onclick(); }}
+    if (ev.key === 'ArrowRight') {{ ev.preventDefault(); bNext.onclick(); }}
+    if (ev.key === 'r' || ev.key === 'R') reset();
+  }});
+
+  reset();   // 자바스크립트가 살아 있을 때만 재생 모드로 — 꺼져 있으면 전부 그냥 보인다
+}})();
+</script>
 </body>
 </html>
 """

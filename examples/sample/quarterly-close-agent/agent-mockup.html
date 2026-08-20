@@ -22,8 +22,9 @@
   .top .sub{font-size:12px;color:var(--muted)}
   .pill{margin-left:auto;font-size:11px;border:1px solid var(--line);border-radius:999px;
         padding:3px 10px;color:var(--muted)}
-  .rail{display:flex;gap:6px;padding:14px 22px;overflow-x:auto;align-items:center;
-        border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .rail{display:flex;gap:6px;padding:12px 22px;overflow-x:auto;align-items:center;
+        border-bottom:1px solid var(--line);background:var(--bg-soft);
+        position:sticky;top:59px;z-index:4}
   .rail .n{flex:none;font-size:12px;padding:5px 11px;border-radius:999px;white-space:nowrap;
            border:1px solid var(--line);background:var(--bg);color:var(--muted)}
   .rail .n.done{border-color:var(--ok);color:var(--ok)}
@@ -87,6 +88,78 @@
         font-size:12px;color:var(--muted);line-height:1.8}
   .foot code{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;
              padding:1px 5px}
+
+  /* ── 재생 ─────────────────────────────────────────────────────────── */
+  body.play .st{opacity:0;transform:translateY(6px);
+                 transition:opacity .28s ease,transform .28s ease}
+  body.play .st.shown{opacity:1;transform:none}
+  body.play .st:not(.shown){pointer-events:none;height:0;margin:0;overflow:hidden;border:0}
+  .st.now{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-sub) 28%,transparent)}
+  .rail .n{opacity:.35;transition:opacity .2s ease}
+  body:not(.play) .rail .n,
+  .rail .n.lit{opacity:1}
+  .rail .n.now{outline:2px solid var(--brand-sub);outline-offset:2px}
+
+  .waitbar{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-top:11px;
+           padding:10px 12px;border-radius:8px;font-size:13px;
+           background:#FDF2F4;border:1px solid var(--brand);color:var(--brand)}
+  body.play .st.waiting .waitbar{display:flex}
+  .waitbar .go{margin-left:auto;cursor:pointer;background:var(--brand);color:#fff;
+               border-color:var(--brand);font-size:12px;padding:6px 12px}
+  .st.waiting{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+
+  /* ── 하단 진행 바 ─────────────────────────────────────────────────── */
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);
+        border-top:1px solid var(--line);box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  .dock .track{height:4px;background:var(--bg-soft)}
+  .dock .fill{height:100%;width:0;background:var(--brand);transition:width .3s ease}
+  .dock.waiting .fill{background:var(--brand-sub)}
+  .dock.done .fill{background:var(--ok)}
+  .dock .row{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:10px;
+             padding:9px 22px;flex-wrap:wrap}
+  .dock .pct{font-size:16px;font-weight:700;letter-spacing:-.02em;
+             font-variant-numeric:tabular-nums;min-width:52px}
+  .dock .what{font-size:13px;color:var(--muted);flex:1;min-width:160px;
+              overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dock .what b{color:var(--text)}
+  .dock button{cursor:pointer;font-size:12px;padding:6px 12px}
+  .dock button:hover{border-color:var(--brand);color:var(--brand)}
+  .dock button.primary:hover{color:#fff;opacity:.9}
+  .dock .keys{font-size:11px;color:var(--muted);width:100%}
+  main{padding-bottom:120px}
+  /* 노드 상태 점 · 시작/종료 캡 */
+  .rail .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.35;
+             display:inline-block;margin-right:6px;vertical-align:1px}
+  .rail .n.lit .dot{opacity:1}
+  .rail .n.now .dot{animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.25}}
+  .rail .cap{flex:none;font-size:11px;color:var(--muted);opacity:.4;
+             transition:opacity .2s ease,color .2s ease}
+  .rail .cap.on{opacity:1;color:var(--text);font-weight:600}
+  body:not(.play) .rail .cap{opacity:1}
+  body.play .rail .n{cursor:pointer}
+
+  /* 처리 중 */
+  .st .run{display:none;align-items:center;gap:8px;padding:11px 14px;font-size:13px;
+           color:var(--muted);border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .st.working .run{display:flex}
+  .st.working .body{display:none}
+  .spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);
+        border-top-color:var(--brand-sub);animation:spin .7s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .st .ms{margin-left:auto;font-size:11px;color:var(--muted);
+          font-variant-numeric:tabular-nums;opacity:0;transition:opacity .2s ease}
+  .st .ms.on{opacity:1}
+  .st.loopback.working{opacity:.6}
+
+  .dock .clock{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;
+               border:1px solid var(--line);border-radius:6px;padding:5px 9px}
+  .dock .clock b{color:var(--text)}
+
+  @media (prefers-reduced-motion:reduce){
+    body.play .st,.dock .fill{transition:none}
+    .spin,.rail .n.now .dot{animation:none}
+  }
 </style>
 </head>
 <body>
@@ -102,19 +175,21 @@
 </div>
 
 <div class="rail">
-  <span class="n done">결산일정수립</span>
+  <span class="cap start" id="cap-start">● 시작</span><span class="arrow">›</span>
+  <span class="n done" data-skill="결산일정수립"><i class="dot"></i>결산일정수립</span>
   <span class="arrow">›</span>
-  <span class="n done">원장잔액수집</span>
+  <span class="n done" data-skill="원장잔액수집"><i class="dot"></i>원장잔액수집</span>
   <span class="arrow">›</span>
-  <span class="n done">조정분개작성</span>
+  <span class="n done" data-skill="조정분개작성"><i class="dot"></i>조정분개작성</span>
   <span class="arrow">›</span>
-  <span class="n done">주석초안작성</span>
+  <span class="n done" data-skill="주석초안작성"><i class="dot"></i>주석초안작성</span>
   <span class="arrow">›</span>
-  <span class="n fork">◆ 계정검증대사 ×2</span>
+  <span class="n fork" data-skill="계정검증대사"><i class="dot"></i>◆ 계정검증대사 ×2</span>
   <span class="arrow">›</span>
-  <span class="n loop">↩ 차이분석조정</span>
+  <span class="n loop" data-skill="차이분석조정"><i class="dot"></i>↩ 차이분석조정</span>
   <span class="arrow">›</span>
-  <span class="n halt">⛔ 결산마감</span>
+  <span class="n halt" data-skill="결산마감"><i class="dot"></i>⛔ 결산마감</span>
+  <span class="arrow">›</span><span class="cap end" id="cap-end">■ 종료</span>
 </div>
 
 <main>
@@ -122,23 +197,23 @@
 
   <div class="card"><header><b>입력</b><span class="tag">2026년 3분기 결산 · data/결산데이터.md</span></header><div class="body"><p>SAP원장 <b>12건</b> · 계열사 <b>5건</b> · 외부확인서 <b>7건</b> · 전기주석 <b>5건</b></p></div></div>
 
-  <div class="card"><header><b>1. 결산일정수립</b><span class="tag aug">증강</span></header><div class="body"><p>결산캘린더 6행 · 미완료 6건 (마감일 2026-08-21 — PP-2 T+5일)</p><div class="warn">⚠️ PP-2 [WAIT/높음] 결산 마감 일정 촉박(T+5일) — 일정을 앞당기지는 못합니다. 남은 일수를 보이게 만들 뿐입니다.</div></div></div>
+  <div class="st card" data-i="0" data-kind="step" data-skill="1. 결산일정수립" data-label="결산캘린더 6행 · 미완료 6건 (마감일 2026-08-21 — PP-2 T+5일)"><header><b>1. 결산일정수립</b><span class="tag aug">증강</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>결산캘린더 6행 · 미완료 6건 (마감일 2026-08-21 — PP-2 T+5일)</p><div class="warn">⚠️ PP-2 [WAIT/높음] 결산 마감 일정 촉박(T+5일) — 일정을 앞당기지는 못합니다. 남은 일수를 보이게 만들 뿐입니다.</div></div></div>
 
-  <div class="card"><header><b>2. 원장잔액수집</b><span class="tag auto">자동</span></header><div class="body"><p>계정 12개를 읽고 이상/신규 2건을 표시했습니다 (전기 대비 ±30% 초과 또는 부호 반전).</p><div class="warn">⚠️ 계열사 미수신 2곳 — SK지오센트릭, SK엔무브. 0으로 채우지 않고 합계에서 제외했습니다. (PP-6 [WAIT/높음])</div><div class="files"><span class="file">→ out/잔액수집결과.md <b>12건</b></span></div></div></div>
+  <div class="st card" data-i="1" data-kind="step" data-skill="2. 원장잔액수집" data-label="계정 12개를 읽고 이상/신규 2건을 표시했습니다 (전기 대비 ±30% 초과 또는 부호 반전)."><header><b>2. 원장잔액수집</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>계정 12개를 읽고 이상/신규 2건을 표시했습니다 (전기 대비 ±30% 초과 또는 부호 반전).</p><div class="warn">⚠️ 계열사 미수신 2곳 — SK지오센트릭, SK엔무브. 0으로 채우지 않고 합계에서 제외했습니다. (PP-6 [WAIT/높음])</div><div class="files"><span class="file">→ out/잔액수집결과.md <b>12건</b></span></div></div></div>
 
-  <div class="card"><header><b>3. 조정분개작성</b><span class="tag aug">증강</span></header><div class="body"><p>조정분개 초안 2건. 그중 1건은 사유를 알 수 없어 <b>지어내지 않았습니다.</b> 검토·승인(A-A2-1-3-3)은 하지 않습니다 — 초안까지입니다.</p><div class="scroll"><table><thead><tr><th>분개번호</th><th>계정코드</th><th>차변</th><th>대변</th><th>사유</th><th>상태</th></tr></thead><tbody><tr><td>ADJ-3Q-001</td><td class="num">1,310</td><td class="num">412,000,000</td><td class="num">0</td><td>선급금 신규 계상 — 전기 잔액 없음</td><td>초안</td></tr><tr class="diff"><td>ADJ-3Q-002</td><td class="num">2,210</td><td class="num">360,000,000</td><td class="num">0</td><td>사유확인필요</td><td>사유확인필요</td></tr></tbody></table></div><div class="files"><span class="file">→ out/조정분개장.md <b>2건</b></span></div></div></div>
+  <div class="st card" data-i="2" data-kind="step" data-skill="3. 조정분개작성" data-label="조정분개 초안 2건. 그중 1건은 사유를 알 수 없어 **지어내지 않았습니다.** 검토·승인(A-A2-1-3"><header><b>3. 조정분개작성</b><span class="tag aug">증강</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>조정분개 초안 2건. 그중 1건은 사유를 알 수 없어 <b>지어내지 않았습니다.</b> 검토·승인(A-A2-1-3-3)은 하지 않습니다 — 초안까지입니다.</p><div class="scroll"><table><thead><tr><th>분개번호</th><th>계정코드</th><th>차변</th><th>대변</th><th>사유</th><th>상태</th></tr></thead><tbody><tr><td>ADJ-3Q-001</td><td class="num">1310</td><td class="num">412,000,000</td><td class="num">0</td><td>선급금 신규 계상 — 전기 잔액 없음</td><td>초안</td></tr><tr class="diff"><td>ADJ-3Q-002</td><td class="num">2210</td><td class="num">360,000,000</td><td class="num">0</td><td>사유확인필요</td><td>사유확인필요</td></tr></tbody></table></div><div class="files"><span class="file">→ out/조정분개장.md <b>2건</b></span></div></div></div>
 
-  <div class="card"><header><b>4. 주석초안작성</b><span class="tag aug">증강</span></header><div class="body"><p>주석 5개에 당기 숫자를 채웠습니다. 전기 대비 ±20%를 넘는 설명필요 0건. 전기주석에 없는 항목은 숫자를 채우지 않고 <code>신규항목</code>으로 남깁니다.</p><div class="files"><span class="file">→ out/주석초안.md <b>5건</b></span></div></div></div>
+  <div class="st card" data-i="3" data-kind="step" data-skill="4. 주석초안작성" data-label="주석 5개에 당기 숫자를 채웠습니다. 전기 대비 ±20%를 넘는 설명필요 0건. 전기주석에 없는 항목은 숫자"><header><b>4. 주석초안작성</b><span class="tag aug">증강</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>주석 5개에 당기 숫자를 채웠습니다. 전기 대비 ±20%를 넘는 설명필요 0건. 전기주석에 없는 항목은 숫자를 채우지 않고 <code>신규항목</code>으로 남깁니다.</p><div class="files"><span class="file">→ out/주석초안.md <b>5건</b></span></div></div></div>
 
-  <div class="card fork-card"><header><b>5. 계정검증대사</b><span class="cycle">1회차</span><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span></header><div class="body"><p>외부확인서와 SAP 원장을 계정별로 맞췄습니다. <b>차이 1건</b>입니다.</p><div class="warn">⚠️ 확인서 미수신 1건 — 차이로 세지 않습니다. <b>차이가 없는 것과 확인할 수 없는 것은 다릅니다.</b></div><div class="branches"><div class="br taken"><div class="cond">차이 발견? → Yes</div><div class="to">→ 차이분석조정</div><div class="cnt">1<span>건</span></div></div><div class="br"><div class="cond">차이 발견? → No</div><div class="to">→ 결산마감</div><div class="cnt none">—</div></div></div><div class="scroll"><table><thead><tr><th>계정코드</th><th>계정명</th><th>원장잔액</th><th>확인잔액</th><th>차이</th><th>상태</th><th>회차</th></tr></thead><tbody><tr><td class="num">1,010</td><td>현금및현금성자산</td><td class="num">4,820,000,000</td><td class="num">4,820,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr><td class="num">1,020</td><td>단기금융상품</td><td class="num">12,000,000,000</td><td class="num">12,000,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr class="diff"><td class="num">1,110</td><td>매출채권</td><td class="num">8,340,000,000</td><td class="num">8,220,000,000</td><td class="num">120,000,000</td><td>차이</td><td class="num">1</td></tr><tr><td class="num">2,010</td><td>매입채무</td><td class="num">-5,930,000,000</td><td class="num">-5,930,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr class="na"><td class="num">2,110</td><td>단기차입금</td><td class="num">-9,000,000,000</td><td></td><td></td><td>확인서미수신</td><td class="num">1</td></tr></tbody></table></div></div></div>
+  <div class="st card fork-card" data-i="4" data-kind="fork" data-skill="5. 계정검증대사" data-label="외부확인서와 SAP 원장을 계정별로 맞췄습니다. **차이 1건**입니다."><header><b>5. 계정검증대사</b><span class="cycle">1회차</span><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>외부확인서와 SAP 원장을 계정별로 맞췄습니다. <b>차이 1건</b>입니다.</p><div class="warn">⚠️ 확인서 미수신 1건 — 차이로 세지 않습니다. <b>차이가 없는 것과 확인할 수 없는 것은 다릅니다.</b></div><div class="branches"><div class="br taken"><div class="cond">차이 발견? → Yes</div><div class="to">→ 차이분석조정</div><div class="cnt">1<span>건</span></div></div><div class="br"><div class="cond">차이 발견? → No</div><div class="to">→ 결산마감</div><div class="cnt none">—</div></div></div><div class="scroll"><table><thead><tr><th>계정코드</th><th>계정명</th><th>원장잔액</th><th>확인잔액</th><th>차이</th><th>상태</th><th>회차</th></tr></thead><tbody><tr><td class="num">1010</td><td>현금및현금성자산</td><td class="num">4,820,000,000</td><td class="num">4,820,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr><td class="num">1020</td><td>단기금융상품</td><td class="num">12,000,000,000</td><td class="num">12,000,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr class="diff"><td class="num">1110</td><td>매출채권</td><td class="num">8,340,000,000</td><td class="num">8,220,000,000</td><td class="num">120,000,000</td><td>차이</td><td class="num">1</td></tr><tr><td class="num">2010</td><td>매입채무</td><td class="num">-5,930,000,000</td><td class="num">-5,930,000,000</td><td class="num">0</td><td>일치</td><td class="num">1</td></tr><tr class="na"><td class="num">2110</td><td>단기차입금</td><td class="num">-9,000,000,000</td><td></td><td></td><td>확인서미수신</td><td class="num">1</td></tr></tbody></table></div></div></div>
 
-  <div class="card halt"><header><b>6. 차이분석조정</b><span class="cycle">1회차</span><span class="tag human">사람고유</span><span class="tag human">멈춤</span></header><div class="body"><p>차이 1건의 목록과 근거만 만들었습니다. <b>조정 금액은 정하지 않았습니다.</b></p><div class="warn">⚠️ 결산담당 확정 대기. 조정이 확정되면 계정검증대사로 되돌아가 다시 맞춰봅니다.</div><ul class="chk"><li>☐ 1110 매출채권 — 원장 8,340,000,000 vs 확인 8,220,000,000 = 차이 120,000,000</li></ul></div></div>
+  <div class="st card halt" data-i="5" data-kind="halt" data-skill="6. 차이분석조정" data-label="차이 1건의 목록과 근거만 만들었습니다. **조정 금액은 정하지 않았습니다.**"><header><b>6. 차이분석조정</b><span class="cycle">1회차</span><span class="tag human">사람고유</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>차이 1건의 목록과 근거만 만들었습니다. <b>조정 금액은 정하지 않았습니다.</b></p><div class="warn">⚠️ 결산담당 확정 대기. 조정이 확정되면 계정검증대사로 되돌아가 다시 맞춰봅니다.</div><ul class="chk"><li>☐ 1110 매출채권 — 원장 8,340,000,000 vs 확인 8,220,000,000 = 차이 120,000,000</li></ul><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
 
-  <div class="loopback">↩ 계정검증대사로 되돌아감 &nbsp;·&nbsp; 탈출 조건: 차이가 0이 되면</div>
+  <div class="st loopback" data-i="6" data-kind="loopback" data-skill="계정검증대사">↩ 계정검증대사로 되돌아감 &nbsp;·&nbsp; 탈출 조건: 차이가 0이 되면</div>
 
-  <div class="card fork-card"><header><b>5. 계정검증대사</b><span class="cycle">2회차</span><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span></header><div class="body"><p>외부확인서와 SAP 원장을 계정별로 맞췄습니다. <b>차이 0건</b>입니다.</p><div class="warn">⚠️ 확인서 미수신 1건 — 차이로 세지 않습니다. <b>차이가 없는 것과 확인할 수 없는 것은 다릅니다.</b></div><div class="branches"><div class="br"><div class="cond">차이 발견? → Yes</div><div class="to">→ 차이분석조정</div><div class="cnt none">—</div></div><div class="br taken"><div class="cond">차이 발견? → No</div><div class="to">→ 결산마감</div><div class="cnt none">—</div></div></div><div class="scroll"><table><thead><tr><th>계정코드</th><th>계정명</th><th>원장잔액</th><th>확인잔액</th><th>차이</th><th>상태</th><th>회차</th></tr></thead><tbody><tr><td class="num">1,010</td><td>현금및현금성자산</td><td class="num">4,820,000,000</td><td class="num">4,820,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">1,020</td><td>단기금융상품</td><td class="num">12,000,000,000</td><td class="num">12,000,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">1,110</td><td>매출채권</td><td class="num">8,340,000,000</td><td class="num">8,220,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">2,010</td><td>매입채무</td><td class="num">-5,930,000,000</td><td class="num">-5,930,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr class="na"><td class="num">2,110</td><td>단기차입금</td><td class="num">-9,000,000,000</td><td></td><td></td><td>확인서미수신</td><td class="num">2</td></tr></tbody></table></div></div></div>
+  <div class="st card fork-card" data-i="7" data-kind="fork" data-skill="5. 계정검증대사" data-label="외부확인서와 SAP 원장을 계정별로 맞췄습니다. **차이 0건**입니다."><header><b>5. 계정검증대사</b><span class="cycle">2회차</span><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>외부확인서와 SAP 원장을 계정별로 맞췄습니다. <b>차이 0건</b>입니다.</p><div class="warn">⚠️ 확인서 미수신 1건 — 차이로 세지 않습니다. <b>차이가 없는 것과 확인할 수 없는 것은 다릅니다.</b></div><div class="branches"><div class="br"><div class="cond">차이 발견? → Yes</div><div class="to">→ 차이분석조정</div><div class="cnt none">—</div></div><div class="br taken"><div class="cond">차이 발견? → No</div><div class="to">→ 결산마감</div><div class="cnt none">—</div></div></div><div class="scroll"><table><thead><tr><th>계정코드</th><th>계정명</th><th>원장잔액</th><th>확인잔액</th><th>차이</th><th>상태</th><th>회차</th></tr></thead><tbody><tr><td class="num">1010</td><td>현금및현금성자산</td><td class="num">4,820,000,000</td><td class="num">4,820,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">1020</td><td>단기금융상품</td><td class="num">12,000,000,000</td><td class="num">12,000,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">1110</td><td>매출채권</td><td class="num">8,340,000,000</td><td class="num">8,220,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr><td class="num">2010</td><td>매입채무</td><td class="num">-5,930,000,000</td><td class="num">-5,930,000,000</td><td class="num">0</td><td>일치</td><td class="num">2</td></tr><tr class="na"><td class="num">2110</td><td>단기차입금</td><td class="num">-9,000,000,000</td><td></td><td></td><td>확인서미수신</td><td class="num">2</td></tr></tbody></table></div></div></div>
 
-  <div class="card halt"><header><b>7. 결산마감</b><span class="tag human">사람고유</span><span class="tag human">멈춤</span></header><div class="body"><p><b>여기서 멈췄습니다.</b> 에이전트는 원장을 잠그지 않았고, 마감 전표도 처리하지 않았습니다. 대사는 <b>2회차</b>만에 차이 0에 도달했고, 마감 전 확인할 것 <b>4건</b>이 남았습니다.</p><ul class="chk"><li>☐ 계열사 미수신 — SK지오센트릭 (PP-6)</li><li>☐ 계열사 미수신 — SK엔무브 (PP-6)</li><li>☐ 확인서 미수신 — 2110 단기차입금 (차이 없음이 아니라 확인 불가)</li><li>☐ 조정 사유 확인 — ADJ-3Q-002 계정 2210</li></ul><div class="actions"><button class="primary">마감 승인 및 원장 Lock</button><button>점검 항목 4건 확인</button><button>결산담당에게 반려</button></div><p class="disabled-note">※ 목업입니다. 이 팩에는 실행 코드가 없습니다 — 버튼은 동작하지 않습니다.</p><div class="files"><span class="file">→ out/마감점검표.md</span></div></div></div>
+  <div class="st card halt" data-i="8" data-kind="halt" data-skill="7. 결산마감" data-label="**여기서 멈췄습니다.** 에이전트는 원장을 잠그지 않았고, 마감 전표도 처리하지 않았습니다. 대사는 **2"><header><b>7. 결산마감</b><span class="tag human">사람고유</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p><b>여기서 멈췄습니다.</b> 에이전트는 원장을 잠그지 않았고, 마감 전표도 처리하지 않았습니다. 대사는 <b>2회차</b>만에 차이 0에 도달했고, 마감 전 확인할 것 <b>4건</b>이 남았습니다.</p><ul class="chk"><li>☐ 계열사 미수신 — SK지오센트릭 (PP-6)</li><li>☐ 계열사 미수신 — SK엔무브 (PP-6)</li><li>☐ 확인서 미수신 — 2110 단기차입금 (차이 없음이 아니라 확인 불가)</li><li>☐ 조정 사유 확인 — ADJ-3Q-002 계정 2210</li></ul><div class="actions"><button class="primary">마감 승인 및 원장 Lock</button><button>점검 항목 4건 확인</button><button>결산담당에게 반려</button></div><p class="disabled-note">※ 목업입니다. 이 팩에는 실행 코드가 없습니다 — 버튼은 동작하지 않습니다.</p><div class="files"><span class="file">→ out/마감점검표.md</span></div><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
 
 </div>
 
@@ -153,5 +228,180 @@
 </div>
 </main>
 </div>
+
+<div class="dock" id="dock">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="row">
+    <span class="pct" id="pct">0%</span>
+    <span class="clock" id="clock" title="시뮬레이션 시간입니다 — 실제 실행은 1초 미만입니다">
+      ⏱ <b>0.0</b>s</span>
+    <span class="what" id="what">▶ 실행을 누르면 한 단계씩 진행됩니다</span>
+    <button class="primary" id="play" type="button">▶ 실행</button>
+    <button id="next" type="button">다음 단계 ›</button>
+    <button id="speed" type="button">1×</button>
+    <button id="reset" type="button">처음으로</button>
+    <span class="keys">스페이스 재생·일시정지 · → 다음 단계 · R 처음으로 ·
+      레일의 단계를 클릭하면 거기까지 건너뜁니다 ·
+      <b>시간은 시뮬레이션 값</b>입니다 (실제 실행은 1초 미만) ·
+      끝까지 보려면 <b>전체 보기</b>를 누르십시오
+      <button id="all" type="button" style="padding:2px 8px;margin-left:6px">전체 보기</button></span>
+  </div>
+</div>
+
+<script>
+// 재생 컨트롤러 — 데이터는 건드리지 않는다. 이미 그려진 단계를 순서대로 보여줄 뿐이다.
+// 사람고유(halt) 단계에서는 **반드시 멈춘다.** 이 목업이 말하려는 것이 그것이다.
+(function () {
+  const steps = [...document.querySelectorAll('.st')];
+  const rail  = [...document.querySelectorAll('.rail .n')];
+  const fill = document.getElementById('fill'), pct = document.getElementById('pct');
+  const what = document.getElementById('what'), dock = document.getElementById('dock');
+  const bPlay = document.getElementById('play'), bNext = document.getElementById('next');
+  const bSpd = document.getElementById('speed'), bReset = document.getElementById('reset');
+  const bAll = document.getElementById('all');
+  const clock = document.getElementById('clock').querySelector('b');
+  const capS = document.getElementById('cap-start'), capE = document.getElementById('cap-end');
+  const SPEEDS = [1, 2, 4], DELAY = 1100, WORK = 420;
+  let i = 0, timer = null, work = null, tick2 = null;
+  let playing = false, spd = 0, waiting = false, held = null, t0 = 0, elapsed = 0;
+
+  const bare = n => (n || '').replace(/^\s*\d+[.)]\s*/, '').trim();   // "5. 계정검증대사" → "계정검증대사"
+  const railFor = n => rail.filter(r => bare(r.dataset.skill) === bare(n));
+
+  function showClock() { clock.textContent = (elapsed / 1000).toFixed(1); }
+  function clockOn() { t0 = Date.now(); clearInterval(tick2);
+    tick2 = setInterval(() => { elapsed += 100; showClock(); }, 100); }
+  function clockOff() { clearInterval(tick2); tick2 = null; }
+
+  // 숫자를 0에서 세어 올린다 — 방금 계산된 것처럼 보이게.
+  function countUp(el) {
+    const end = parseInt(el.dataset.n ?? el.textContent.replace(/[^0-9]/g, ''), 10);
+    if (!Number.isFinite(end) || end === 0) return;
+    el.dataset.n = end; let v = 0;
+    const st = setInterval(() => {
+      v = Math.min(end, v + Math.max(1, Math.ceil(end / 12)));
+      el.firstChild.nodeValue = v;
+      if (v >= end) clearInterval(st);
+    }, 45);
+  }
+
+  function paint() {
+    const p = Math.round(i / steps.length * 100);
+    fill.style.width = p + '%'; pct.textContent = p + '%';
+    dock.classList.toggle('done', i >= steps.length);
+    dock.classList.toggle('waiting', waiting);
+    bPlay.textContent = playing ? '⏸ 일시정지' : (i >= steps.length ? '↻ 다시' : '▶ 실행');
+    if (i >= steps.length) { what.innerHTML = '<b>완료</b> — 모든 단계가 끝났습니다.'; return; }
+    const s = steps[i];
+    what.innerHTML = waiting
+      ? '⏸ <b>' + bare(held.dataset.skill) + '</b> — 사람 확인 대기. 확인해야 다음으로 갑니다.'
+      : (i === 0 ? '▶ 실행을 누르면 한 단계씩 진행됩니다'
+                 : '다음: <b>' + bare(s.dataset.skill) + '</b>');
+  }
+
+  function reveal(done) {
+    if (i >= steps.length) { stop(); capE.classList.add('on'); paint(); return; }
+    const s = steps[i];
+    steps.forEach(x => x.classList.remove('now'));
+    rail.forEach(r => r.classList.remove('now'));
+    capS.classList.add('on');
+    s.classList.add('shown', 'now', 'working');       // 먼저 "처리 중"을 보여준다
+    railFor(s.dataset.skill).forEach(r => r.classList.add('lit', 'now'));
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const dur = WORK / SPEEDS[spd];
+    clearTimeout(work);
+    work = setTimeout(() => {                          // 그 다음 결과로 바뀐다
+      s.classList.remove('working');
+      const ms = s.querySelector('.ms');
+      if (ms) { ms.textContent = (0.08 + Math.random() * 0.35).toFixed(2) + 's';
+                ms.classList.add('on'); }
+      s.querySelectorAll('.br .cnt:not(.none)').forEach(countUp);
+      i++;
+      if (s.dataset.kind === 'halt' && i < steps.length) {
+        waiting = true; held = s; s.classList.add('waiting'); stop(); paint(); return;
+      }
+      if (i >= steps.length) { capE.classList.add('on'); stop(); }
+      paint();
+      if (done) done();
+    }, dur);
+  }
+
+  function tick() { reveal(() => { if (playing && !waiting) schedule(); }); }
+  function schedule() { clearTimeout(timer); timer = setTimeout(tick, DELAY / SPEEDS[spd]); }
+  function stop() { playing = false; clearTimeout(timer); clockOff(); }
+
+  function play() {
+    if (waiting) return;
+    if (i >= steps.length) { reset(); setTimeout(play, 350); return; }
+    playing = true; clockOn(); paint(); tick();
+  }
+  function reset() {
+    stop(); clearTimeout(work); waiting = false; held = null; i = 0; elapsed = 0; showClock();
+    capS.classList.remove('on'); capE.classList.remove('on');
+    steps.forEach(x => { x.classList.remove('shown', 'now', 'waiting', 'working');
+      const m = x.querySelector('.ms'); if (m) { m.textContent = ''; m.classList.remove('on'); }
+      x.querySelectorAll('.br .cnt').forEach(c => {
+        if (c.dataset.n) c.firstChild.nodeValue = c.dataset.n; }); });
+    rail.forEach(r => r.classList.remove('lit', 'now'));
+    document.body.classList.add('play');
+    window.scrollTo({ top: 0, behavior: 'smooth' }); paint();
+  }
+  function showAll() {
+    stop(); clearTimeout(work); waiting = false; held = null; i = steps.length;
+    steps.forEach(x => { x.classList.add('shown');
+      x.classList.remove('now', 'waiting', 'working'); });
+    rail.forEach(r => r.classList.add('lit'));
+    capS.classList.add('on'); capE.classList.add('on');
+    paint();
+  }
+
+  // 레일을 클릭하면 그 단계까지 건너뛴다 — 데모에서 보고 싶은 대목만 짚어 보여줄 때.
+  function jumpTo(name) {
+    const at = steps.findIndex(s => bare(s.dataset.skill) === bare(name));
+    if (at < 0) return;
+    stop(); clearTimeout(work); waiting = false; held = null;
+    steps.forEach((x, k) => {
+      x.classList.toggle('shown', k <= at);
+      x.classList.remove('now', 'waiting', 'working');
+      const m = x.querySelector('.ms');
+      if (m && k <= at && !m.textContent) {
+        m.textContent = (0.08 + Math.random() * 0.35).toFixed(2) + 's'; m.classList.add('on'); }
+    });
+    // 건너뛴 지점까지의 레일도 함께 켠다 — 지나온 것이 꺼져 있으면 어디까지 왔는지 안 보인다.
+    const passed = new Set(steps.slice(0, at + 1).map(s => bare(s.dataset.skill)));
+    rail.forEach(r => { r.classList.remove('now');
+                        r.classList.toggle('lit', passed.has(bare(r.dataset.skill))); });
+    railFor(name).forEach(r => r.classList.add('now'));
+    steps[at].classList.add('now');
+    i = at + 1; capS.classList.add('on');
+    capE.classList.toggle('on', i >= steps.length);
+    steps[at].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    paint();
+  }
+  function proceed() {     // 사람 확인 버튼
+    if (!waiting) return;
+    waiting = false; held = null;
+    steps.forEach(x => x.classList.remove('waiting'));
+    paint(); play();
+  }
+
+  bPlay.onclick = () => (playing ? (stop(), paint()) : play());
+  bNext.onclick = () => { if (waiting) return proceed(); stop(); reveal(); };
+  bReset.onclick = reset;
+  bAll.onclick = showAll;
+  bSpd.onclick = () => { spd = (spd + 1) % SPEEDS.length; bSpd.textContent = SPEEDS[spd] + '×';
+                         if (playing) schedule(); };
+  document.querySelectorAll('.waitbar .go').forEach(b => b.onclick = proceed);
+  rail.forEach(r => r.onclick = () => jumpTo(r.dataset.skill));
+  addEventListener('keydown', ev => {
+    if (ev.target.tagName === 'INPUT') return;
+    if (ev.code === 'Space') { ev.preventDefault(); waiting ? proceed() : bPlay.onclick(); }
+    if (ev.key === 'ArrowRight') { ev.preventDefault(); bNext.onclick(); }
+    if (ev.key === 'r' || ev.key === 'R') reset();
+  });
+
+  reset();   // 자바스크립트가 살아 있을 때만 재생 모드로 — 꺼져 있으면 전부 그냥 보인다
+})();
+</script>
 </body>
 </html>

@@ -22,8 +22,9 @@
   .top .sub{font-size:12px;color:var(--muted)}
   .pill{margin-left:auto;font-size:11px;border:1px solid var(--line);border-radius:999px;
         padding:3px 10px;color:var(--muted)}
-  .rail{display:flex;gap:6px;padding:14px 22px;overflow-x:auto;align-items:center;
-        border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .rail{display:flex;gap:6px;padding:12px 22px;overflow-x:auto;align-items:center;
+        border-bottom:1px solid var(--line);background:var(--bg-soft);
+        position:sticky;top:59px;z-index:4}
   .rail .n{flex:none;font-size:12px;padding:5px 11px;border-radius:999px;white-space:nowrap;
            border:1px solid var(--line);background:var(--bg);color:var(--muted)}
   .rail .n.done{border-color:var(--ok);color:var(--ok)}
@@ -87,6 +88,78 @@
         font-size:12px;color:var(--muted);line-height:1.8}
   .foot code{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;
              padding:1px 5px}
+
+  /* ── 재생 ─────────────────────────────────────────────────────────── */
+  body.play .st{opacity:0;transform:translateY(6px);
+                 transition:opacity .28s ease,transform .28s ease}
+  body.play .st.shown{opacity:1;transform:none}
+  body.play .st:not(.shown){pointer-events:none;height:0;margin:0;overflow:hidden;border:0}
+  .st.now{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-sub) 28%,transparent)}
+  .rail .n{opacity:.35;transition:opacity .2s ease}
+  body:not(.play) .rail .n,
+  .rail .n.lit{opacity:1}
+  .rail .n.now{outline:2px solid var(--brand-sub);outline-offset:2px}
+
+  .waitbar{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-top:11px;
+           padding:10px 12px;border-radius:8px;font-size:13px;
+           background:#FDF2F4;border:1px solid var(--brand);color:var(--brand)}
+  body.play .st.waiting .waitbar{display:flex}
+  .waitbar .go{margin-left:auto;cursor:pointer;background:var(--brand);color:#fff;
+               border-color:var(--brand);font-size:12px;padding:6px 12px}
+  .st.waiting{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+
+  /* ── 하단 진행 바 ─────────────────────────────────────────────────── */
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);
+        border-top:1px solid var(--line);box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  .dock .track{height:4px;background:var(--bg-soft)}
+  .dock .fill{height:100%;width:0;background:var(--brand);transition:width .3s ease}
+  .dock.waiting .fill{background:var(--brand-sub)}
+  .dock.done .fill{background:var(--ok)}
+  .dock .row{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:10px;
+             padding:9px 22px;flex-wrap:wrap}
+  .dock .pct{font-size:16px;font-weight:700;letter-spacing:-.02em;
+             font-variant-numeric:tabular-nums;min-width:52px}
+  .dock .what{font-size:13px;color:var(--muted);flex:1;min-width:160px;
+              overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dock .what b{color:var(--text)}
+  .dock button{cursor:pointer;font-size:12px;padding:6px 12px}
+  .dock button:hover{border-color:var(--brand);color:var(--brand)}
+  .dock button.primary:hover{color:#fff;opacity:.9}
+  .dock .keys{font-size:11px;color:var(--muted);width:100%}
+  main{padding-bottom:120px}
+  /* 노드 상태 점 · 시작/종료 캡 */
+  .rail .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.35;
+             display:inline-block;margin-right:6px;vertical-align:1px}
+  .rail .n.lit .dot{opacity:1}
+  .rail .n.now .dot{animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.25}}
+  .rail .cap{flex:none;font-size:11px;color:var(--muted);opacity:.4;
+             transition:opacity .2s ease,color .2s ease}
+  .rail .cap.on{opacity:1;color:var(--text);font-weight:600}
+  body:not(.play) .rail .cap{opacity:1}
+  body.play .rail .n{cursor:pointer}
+
+  /* 처리 중 */
+  .st .run{display:none;align-items:center;gap:8px;padding:11px 14px;font-size:13px;
+           color:var(--muted);border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .st.working .run{display:flex}
+  .st.working .body{display:none}
+  .spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);
+        border-top-color:var(--brand-sub);animation:spin .7s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .st .ms{margin-left:auto;font-size:11px;color:var(--muted);
+          font-variant-numeric:tabular-nums;opacity:0;transition:opacity .2s ease}
+  .st .ms.on{opacity:1}
+  .st.loopback.working{opacity:.6}
+
+  .dock .clock{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;
+               border:1px solid var(--line);border-radius:6px;padding:5px 9px}
+  .dock .clock b{color:var(--text)}
+
+  @media (prefers-reduced-motion:reduce){
+    body.play .st,.dock .fill{transition:none}
+    .spin,.rail .n.now .dot{animation:none}
+  }
 </style>
 </head>
 <body>
@@ -102,19 +175,21 @@
 </div>
 
 <div class="rail">
-  <span class="n done">증빙서류판독</span>
+  <span class="cap start" id="cap-start">● 시작</span><span class="arrow">›</span>
+  <span class="n done" data-skill="증빙서류판독"><i class="dot"></i>증빙서류판독</span>
   <span class="arrow">›</span>
-  <span class="n done">신청서생성</span>
+  <span class="n done" data-skill="신청서생성"><i class="dot"></i>신청서생성</span>
   <span class="arrow">›</span>
-  <span class="n fork">◆ 지급기준대조</span>
+  <span class="n fork" data-skill="지급기준대조"><i class="dot"></i>◆ 지급기준대조</span>
   <span class="arrow">›</span>
-  <span class="n done">자동지급상신</span>
+  <span class="n done" data-skill="자동지급상신"><i class="dot"></i>자동지급상신</span>
   <span class="arrow">›</span>
-  <span class="n done">보완요청작성</span>
+  <span class="n done" data-skill="보완요청작성"><i class="dot"></i>보완요청작성</span>
   <span class="arrow">›</span>
-  <span class="n done">예외심사요청</span>
+  <span class="n done" data-skill="예외심사요청"><i class="dot"></i>예외심사요청</span>
   <span class="arrow">›</span>
-  <span class="n halt">⛔ 지급승인</span>
+  <span class="n halt" data-skill="지급승인"><i class="dot"></i>⛔ 지급승인</span>
+  <span class="arrow">›</span><span class="cap end" id="cap-end">■ 종료</span>
 </div>
 
 <main>
@@ -122,19 +197,19 @@
 
   <div class="card"><header><b>입력</b><span class="tag">2026년 7~8월 접수분</span></header><div class="body"><p>청구접수대장 <b>11건</b> · 지급기준표 <b>4건</b></p></div></div>
 
-  <div class="card"><header><b>1. 증빙서류판독</b><span class="tag auto">자동</span></header><div class="body"><p>11건 판독. 그중 <b>1건은 판독불가</b>입니다 — 증빙유형에 「영수증」이 없거나 증빙파일 칸이 비어 있습니다.</p><div class="warn">⚠️ 금액을 추정하지 않았습니다. 규칙: 증빙유형에 「영수증」이 없으면 판독 불가로 표시한다.</div></div></div>
+  <div class="st card" data-i="0" data-kind="step" data-skill="1. 증빙서류판독" data-label="11건 판독. 그중 **1건은 판독불가**입니다 — 증빙유형에 「영수증」이 없거나 증빙파일 칸이 비어 있습니"><header><b>1. 증빙서류판독</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>11건 판독. 그중 <b>1건은 판독불가</b>입니다 — 증빙유형에 「영수증」이 없거나 증빙파일 칸이 비어 있습니다.</p><div class="warn">⚠️ 금액을 추정하지 않았습니다. 규칙: 증빙유형에 「영수증」이 없으면 판독 불가로 표시한다.</div></div></div>
 
-  <div class="card"><header><b>2. 신청서생성</b><span class="tag auto">자동</span></header><div class="body"><p>신청서초안 <b>11행</b>을 만들었습니다. 판독불가 건도 버리지 않고 상태 칸에 남겼습니다.</p><div class="files"><span class="file">→ out/신청서초안.csv <b>11건</b></span></div></div></div>
+  <div class="st card" data-i="1" data-kind="step" data-skill="2. 신청서생성" data-label="신청서초안 **11행**을 만들었습니다. 판독불가 건도 버리지 않고 상태 칸에 남겼습니다."><header><b>2. 신청서생성</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>신청서초안 <b>11행</b>을 만들었습니다. 판독불가 건도 버리지 않고 상태 칸에 남겼습니다.</p><div class="files"><span class="file">→ out/신청서초안.csv <b>11건</b></span></div></div></div>
 
-  <div class="card fork-card"><header><b>3. 지급기준대조</b><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span></header><div class="body"><p>지급기준표.csv와 대조해 <b>세 갈래로 갈랐습니다.</b></p><div class="warn">⚠️ 판단이 서지 않는 건은 자동지급 쪽으로 기울이지 않고 예외심사로 보냅니다. 규칙: 기준항목을 하나로 정할 수 없으면 자동지급상신으로 보내지 않는다.</div><div class="branches"><div class="br"><div class="cond">기준 충족</div><div class="to">→ 자동지급상신</div><div class="cnt">6<span>건</span></div></div><div class="br"><div class="cond">증빙 미비</div><div class="to">→ 보완요청작성</div><div class="cnt">1<span>건</span></div></div><div class="br"><div class="cond">모호 · 한도 초과</div><div class="to">→ 예외심사요청</div><div class="cnt">4<span>건</span></div></div></div></div></div>
+  <div class="st card fork-card" data-i="2" data-kind="fork" data-skill="3. 지급기준대조" data-label="지급기준표.csv와 대조해 **세 갈래로 갈랐습니다.**"><header><b>3. 지급기준대조</b><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>지급기준표.csv와 대조해 <b>세 갈래로 갈랐습니다.</b></p><div class="warn">⚠️ 판단이 서지 않는 건은 자동지급 쪽으로 기울이지 않고 예외심사로 보냅니다. 규칙: 기준항목을 하나로 정할 수 없으면 자동지급상신으로 보내지 않는다.</div><div class="branches"><div class="br"><div class="cond">기준 충족</div><div class="to">→ 자동지급상신</div><div class="cnt">6<span>건</span></div></div><div class="br"><div class="cond">증빙 미비</div><div class="to">→ 보완요청작성</div><div class="cnt">1<span>건</span></div></div><div class="br"><div class="cond">모호 · 한도 초과</div><div class="to">→ 예외심사요청</div><div class="cnt">4<span>건</span></div></div></div></div></div>
 
-  <div class="card"><header><b>4. 자동지급상신</b><span class="tag auto">자동</span></header><div class="body"><p>6건을 지급대장에 올렸습니다. 상태는 전부 <b>승인대기</b>입니다 — 지급이 실행된 것이 아닙니다.</p><div class="scroll"><table><thead><tr><th>청구번호</th><th>성명</th><th>기준항목</th><th>청구금액</th><th>지급액</th><th>상태</th></tr></thead><tbody><tr><td>MED-2026-0431</td><td>김선호</td><td>일반진료</td><td class="num">182,000</td><td class="num">145,600</td><td>승인대기</td></tr><tr><td>MED-2026-0432</td><td>박지우</td><td>치과보철</td><td class="num">940,000</td><td class="num">658,000</td><td>승인대기</td></tr><tr><td>MED-2026-0433</td><td>이한결</td><td>중증질환</td><td class="num">2,450,000</td><td class="num">2,205,000</td><td>승인대기</td></tr><tr><td>MED-2026-0434</td><td>정유진</td><td>일반진료</td><td class="num">76,000</td><td class="num">60,800</td><td>승인대기</td></tr><tr><td>MED-2026-0436</td><td>조성우</td><td>일반진료</td><td class="num">1,180,000</td><td class="num">944,000</td><td>승인대기</td></tr><tr><td>MED-2026-0438</td><td>윤도현</td><td>일반진료</td><td class="num">315,000</td><td class="num">252,000</td><td>승인대기</td></tr></tbody></table></div><div class="files"><span class="file">→ out/지급대장.csv <b>6건</b></span></div></div></div>
+  <div class="st card" data-i="3" data-kind="step" data-skill="4. 자동지급상신" data-label="6건을 지급대장에 올렸습니다. 상태는 전부 **승인대기**입니다 — 지급이 실행된 것이 아닙니다."><header><b>4. 자동지급상신</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>6건을 지급대장에 올렸습니다. 상태는 전부 <b>승인대기</b>입니다 — 지급이 실행된 것이 아닙니다.</p><div class="scroll"><table><thead><tr><th>청구번호</th><th>성명</th><th>기준항목</th><th>청구금액</th><th>지급액</th><th>상태</th></tr></thead><tbody><tr><td>MED-2026-0431</td><td>김선호</td><td>일반진료</td><td class="num">182,000</td><td class="num">145,600</td><td>승인대기</td></tr><tr><td>MED-2026-0432</td><td>박지우</td><td>치과보철</td><td class="num">940,000</td><td class="num">658,000</td><td>승인대기</td></tr><tr><td>MED-2026-0433</td><td>이한결</td><td>중증질환</td><td class="num">2,450,000</td><td class="num">2,205,000</td><td>승인대기</td></tr><tr><td>MED-2026-0434</td><td>정유진</td><td>일반진료</td><td class="num">76,000</td><td class="num">60,800</td><td>승인대기</td></tr><tr><td>MED-2026-0436</td><td>조성우</td><td>일반진료</td><td class="num">1,180,000</td><td class="num">944,000</td><td>승인대기</td></tr><tr><td>MED-2026-0438</td><td>윤도현</td><td>일반진료</td><td class="num">315,000</td><td class="num">252,000</td><td>승인대기</td></tr></tbody></table></div><div class="files"><span class="file">→ out/지급대장.csv <b>6건</b></span></div></div></div>
 
-  <div class="card halt"><header><b>5. 보완요청작성</b><span class="tag aug">증강</span><span class="tag human">멈춤</span></header><div class="body"><p>1건에 대해 안내문 초안을 만들었습니다. 재제출 기한은 접수일 +14일입니다.</p><div class="warn">⚠️ <b>발송하지 않았습니다.</b> 이 갈래의 끝이고, 담당자가 확인할 때까지 멈춥니다.</div><ul class="chk"><li>☐ MED-2026-0435 최민아 — 필수 증빙(영수증) 누락 — 금액 판정을 하지 않음</li></ul><div class="files"><span class="file">→ out/보완요청안내문.md</span></div></div></div>
+  <div class="st card halt" data-i="4" data-kind="halt" data-skill="5. 보완요청작성" data-label="1건에 대해 안내문 초안을 만들었습니다. 재제출 기한은 접수일 +14일입니다."><header><b>5. 보완요청작성</b><span class="tag aug">증강</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>1건에 대해 안내문 초안을 만들었습니다. 재제출 기한은 접수일 +14일입니다.</p><div class="warn">⚠️ <b>발송하지 않았습니다.</b> 이 갈래의 끝이고, 담당자가 확인할 때까지 멈춥니다.</div><ul class="chk"><li>☐ MED-2026-0435 최민아 — 필수 증빙(영수증) 누락 — 금액 판정을 하지 않음</li></ul><div class="files"><span class="file">→ out/보완요청안내문.md</span></div><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
 
-  <div class="card"><header><b>6. 예외심사요청</b><span class="tag aug">증강</span></header><div class="body"><p>4건을 심사 대기로 올렸습니다. <b>지급 여부를 추천하지 않았습니다</b> — 판단은 심사자가 합니다.</p><div class="scroll"><table><thead><tr><th>청구번호</th><th>성명</th><th>예외사유</th><th>심사근거</th></tr></thead><tbody><tr><td>MED-2026-0437</td><td>한서연</td><td>시력교정</td><td>미용·선택 시술은 지원 대상 아님 (자기부담률 100%)</td></tr><tr><td>MED-2026-0439</td><td>신재호</td><td>일반진료</td><td>청구 4,100,000원 &gt; 연간한도 3,000,000원</td></tr><tr><td>MED-2026-0440</td><td>오세영</td><td>일반진료</td><td>수진자관계 &#x27;형제자매&#x27;는 적용대상(본인/배우자/자녀/부모) 아님</td></tr><tr><td>MED-2026-0441</td><td>배수민</td><td>기준항목 특정 불가</td><td>진단코드 U07.9 — 지급기준표에 해당 항목 없음</td></tr></tbody></table></div><div class="files"><span class="file">→ out/예외심사대장.csv <b>4건</b></span></div></div></div>
+  <div class="st card" data-i="5" data-kind="step" data-skill="6. 예외심사요청" data-label="4건을 심사 대기로 올렸습니다. **지급 여부를 추천하지 않았습니다** — 판단은 심사자가 합니다."><header><b>6. 예외심사요청</b><span class="tag aug">증강</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>4건을 심사 대기로 올렸습니다. <b>지급 여부를 추천하지 않았습니다</b> — 판단은 심사자가 합니다.</p><div class="scroll"><table><thead><tr><th>청구번호</th><th>성명</th><th>예외사유</th><th>심사근거</th></tr></thead><tbody><tr><td>MED-2026-0437</td><td>한서연</td><td>시력교정</td><td>미용·선택 시술은 지원 대상 아님 (자기부담률 100%)</td></tr><tr><td>MED-2026-0439</td><td>신재호</td><td>일반진료</td><td>청구 4,100,000원 &gt; 연간한도 3,000,000원</td></tr><tr><td>MED-2026-0440</td><td>오세영</td><td>일반진료</td><td>수진자관계 &#x27;형제자매&#x27;는 적용대상(본인/배우자/자녀/부모) 아님</td></tr><tr><td>MED-2026-0441</td><td>배수민</td><td>기준항목 특정 불가</td><td>진단코드 U07.9 — 지급기준표에 해당 항목 없음</td></tr></tbody></table></div><div class="files"><span class="file">→ out/예외심사대장.csv <b>4건</b></span></div></div></div>
 
-  <div class="card halt"><header><b>7. 지급승인</b><span class="tag human">사람고유</span><span class="tag human">멈춤</span></header><div class="body"><p><b>여기서 멈췄습니다.</b> 에이전트는 아무것도 승인하지 않았습니다. 자동지급 상신 6건(합계 4,265,400원)과 예외심사 대기 4건이 복리후생 팀장 확인을 기다립니다.</p><div class="actions"><button class="primary">6건 승인</button><button>예외 4건 검토</button><button>전체 반려</button></div><p class="disabled-note">※ 목업입니다. 이 팩에는 실행 코드가 없습니다 — 버튼은 동작하지 않습니다.</p><div class="files"><span class="file">→ out/승인대기목록.md</span></div></div></div>
+  <div class="st card halt" data-i="6" data-kind="halt" data-skill="7. 지급승인" data-label="**여기서 멈췄습니다.** 에이전트는 아무것도 승인하지 않았습니다. 자동지급 상신 6건(합계 4,265,40"><header><b>7. 지급승인</b><span class="tag human">사람고유</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p><b>여기서 멈췄습니다.</b> 에이전트는 아무것도 승인하지 않았습니다. 자동지급 상신 6건(합계 4,265,400원)과 예외심사 대기 4건이 복리후생 팀장 확인을 기다립니다.</p><div class="actions"><button class="primary">6건 승인</button><button>예외 4건 검토</button><button>전체 반려</button></div><p class="disabled-note">※ 목업입니다. 이 팩에는 실행 코드가 없습니다 — 버튼은 동작하지 않습니다.</p><div class="files"><span class="file">→ out/승인대기목록.md</span></div><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
 
 </div>
 
@@ -149,5 +224,180 @@
 </div>
 </main>
 </div>
+
+<div class="dock" id="dock">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="row">
+    <span class="pct" id="pct">0%</span>
+    <span class="clock" id="clock" title="시뮬레이션 시간입니다 — 실제 실행은 1초 미만입니다">
+      ⏱ <b>0.0</b>s</span>
+    <span class="what" id="what">▶ 실행을 누르면 한 단계씩 진행됩니다</span>
+    <button class="primary" id="play" type="button">▶ 실행</button>
+    <button id="next" type="button">다음 단계 ›</button>
+    <button id="speed" type="button">1×</button>
+    <button id="reset" type="button">처음으로</button>
+    <span class="keys">스페이스 재생·일시정지 · → 다음 단계 · R 처음으로 ·
+      레일의 단계를 클릭하면 거기까지 건너뜁니다 ·
+      <b>시간은 시뮬레이션 값</b>입니다 (실제 실행은 1초 미만) ·
+      끝까지 보려면 <b>전체 보기</b>를 누르십시오
+      <button id="all" type="button" style="padding:2px 8px;margin-left:6px">전체 보기</button></span>
+  </div>
+</div>
+
+<script>
+// 재생 컨트롤러 — 데이터는 건드리지 않는다. 이미 그려진 단계를 순서대로 보여줄 뿐이다.
+// 사람고유(halt) 단계에서는 **반드시 멈춘다.** 이 목업이 말하려는 것이 그것이다.
+(function () {
+  const steps = [...document.querySelectorAll('.st')];
+  const rail  = [...document.querySelectorAll('.rail .n')];
+  const fill = document.getElementById('fill'), pct = document.getElementById('pct');
+  const what = document.getElementById('what'), dock = document.getElementById('dock');
+  const bPlay = document.getElementById('play'), bNext = document.getElementById('next');
+  const bSpd = document.getElementById('speed'), bReset = document.getElementById('reset');
+  const bAll = document.getElementById('all');
+  const clock = document.getElementById('clock').querySelector('b');
+  const capS = document.getElementById('cap-start'), capE = document.getElementById('cap-end');
+  const SPEEDS = [1, 2, 4], DELAY = 1100, WORK = 420;
+  let i = 0, timer = null, work = null, tick2 = null;
+  let playing = false, spd = 0, waiting = false, held = null, t0 = 0, elapsed = 0;
+
+  const bare = n => (n || '').replace(/^\s*\d+[.)]\s*/, '').trim();   // "5. 계정검증대사" → "계정검증대사"
+  const railFor = n => rail.filter(r => bare(r.dataset.skill) === bare(n));
+
+  function showClock() { clock.textContent = (elapsed / 1000).toFixed(1); }
+  function clockOn() { t0 = Date.now(); clearInterval(tick2);
+    tick2 = setInterval(() => { elapsed += 100; showClock(); }, 100); }
+  function clockOff() { clearInterval(tick2); tick2 = null; }
+
+  // 숫자를 0에서 세어 올린다 — 방금 계산된 것처럼 보이게.
+  function countUp(el) {
+    const end = parseInt(el.dataset.n ?? el.textContent.replace(/[^0-9]/g, ''), 10);
+    if (!Number.isFinite(end) || end === 0) return;
+    el.dataset.n = end; let v = 0;
+    const st = setInterval(() => {
+      v = Math.min(end, v + Math.max(1, Math.ceil(end / 12)));
+      el.firstChild.nodeValue = v;
+      if (v >= end) clearInterval(st);
+    }, 45);
+  }
+
+  function paint() {
+    const p = Math.round(i / steps.length * 100);
+    fill.style.width = p + '%'; pct.textContent = p + '%';
+    dock.classList.toggle('done', i >= steps.length);
+    dock.classList.toggle('waiting', waiting);
+    bPlay.textContent = playing ? '⏸ 일시정지' : (i >= steps.length ? '↻ 다시' : '▶ 실행');
+    if (i >= steps.length) { what.innerHTML = '<b>완료</b> — 모든 단계가 끝났습니다.'; return; }
+    const s = steps[i];
+    what.innerHTML = waiting
+      ? '⏸ <b>' + bare(held.dataset.skill) + '</b> — 사람 확인 대기. 확인해야 다음으로 갑니다.'
+      : (i === 0 ? '▶ 실행을 누르면 한 단계씩 진행됩니다'
+                 : '다음: <b>' + bare(s.dataset.skill) + '</b>');
+  }
+
+  function reveal(done) {
+    if (i >= steps.length) { stop(); capE.classList.add('on'); paint(); return; }
+    const s = steps[i];
+    steps.forEach(x => x.classList.remove('now'));
+    rail.forEach(r => r.classList.remove('now'));
+    capS.classList.add('on');
+    s.classList.add('shown', 'now', 'working');       // 먼저 "처리 중"을 보여준다
+    railFor(s.dataset.skill).forEach(r => r.classList.add('lit', 'now'));
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const dur = WORK / SPEEDS[spd];
+    clearTimeout(work);
+    work = setTimeout(() => {                          // 그 다음 결과로 바뀐다
+      s.classList.remove('working');
+      const ms = s.querySelector('.ms');
+      if (ms) { ms.textContent = (0.08 + Math.random() * 0.35).toFixed(2) + 's';
+                ms.classList.add('on'); }
+      s.querySelectorAll('.br .cnt:not(.none)').forEach(countUp);
+      i++;
+      if (s.dataset.kind === 'halt' && i < steps.length) {
+        waiting = true; held = s; s.classList.add('waiting'); stop(); paint(); return;
+      }
+      if (i >= steps.length) { capE.classList.add('on'); stop(); }
+      paint();
+      if (done) done();
+    }, dur);
+  }
+
+  function tick() { reveal(() => { if (playing && !waiting) schedule(); }); }
+  function schedule() { clearTimeout(timer); timer = setTimeout(tick, DELAY / SPEEDS[spd]); }
+  function stop() { playing = false; clearTimeout(timer); clockOff(); }
+
+  function play() {
+    if (waiting) return;
+    if (i >= steps.length) { reset(); setTimeout(play, 350); return; }
+    playing = true; clockOn(); paint(); tick();
+  }
+  function reset() {
+    stop(); clearTimeout(work); waiting = false; held = null; i = 0; elapsed = 0; showClock();
+    capS.classList.remove('on'); capE.classList.remove('on');
+    steps.forEach(x => { x.classList.remove('shown', 'now', 'waiting', 'working');
+      const m = x.querySelector('.ms'); if (m) { m.textContent = ''; m.classList.remove('on'); }
+      x.querySelectorAll('.br .cnt').forEach(c => {
+        if (c.dataset.n) c.firstChild.nodeValue = c.dataset.n; }); });
+    rail.forEach(r => r.classList.remove('lit', 'now'));
+    document.body.classList.add('play');
+    window.scrollTo({ top: 0, behavior: 'smooth' }); paint();
+  }
+  function showAll() {
+    stop(); clearTimeout(work); waiting = false; held = null; i = steps.length;
+    steps.forEach(x => { x.classList.add('shown');
+      x.classList.remove('now', 'waiting', 'working'); });
+    rail.forEach(r => r.classList.add('lit'));
+    capS.classList.add('on'); capE.classList.add('on');
+    paint();
+  }
+
+  // 레일을 클릭하면 그 단계까지 건너뛴다 — 데모에서 보고 싶은 대목만 짚어 보여줄 때.
+  function jumpTo(name) {
+    const at = steps.findIndex(s => bare(s.dataset.skill) === bare(name));
+    if (at < 0) return;
+    stop(); clearTimeout(work); waiting = false; held = null;
+    steps.forEach((x, k) => {
+      x.classList.toggle('shown', k <= at);
+      x.classList.remove('now', 'waiting', 'working');
+      const m = x.querySelector('.ms');
+      if (m && k <= at && !m.textContent) {
+        m.textContent = (0.08 + Math.random() * 0.35).toFixed(2) + 's'; m.classList.add('on'); }
+    });
+    // 건너뛴 지점까지의 레일도 함께 켠다 — 지나온 것이 꺼져 있으면 어디까지 왔는지 안 보인다.
+    const passed = new Set(steps.slice(0, at + 1).map(s => bare(s.dataset.skill)));
+    rail.forEach(r => { r.classList.remove('now');
+                        r.classList.toggle('lit', passed.has(bare(r.dataset.skill))); });
+    railFor(name).forEach(r => r.classList.add('now'));
+    steps[at].classList.add('now');
+    i = at + 1; capS.classList.add('on');
+    capE.classList.toggle('on', i >= steps.length);
+    steps[at].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    paint();
+  }
+  function proceed() {     // 사람 확인 버튼
+    if (!waiting) return;
+    waiting = false; held = null;
+    steps.forEach(x => x.classList.remove('waiting'));
+    paint(); play();
+  }
+
+  bPlay.onclick = () => (playing ? (stop(), paint()) : play());
+  bNext.onclick = () => { if (waiting) return proceed(); stop(); reveal(); };
+  bReset.onclick = reset;
+  bAll.onclick = showAll;
+  bSpd.onclick = () => { spd = (spd + 1) % SPEEDS.length; bSpd.textContent = SPEEDS[spd] + '×';
+                         if (playing) schedule(); };
+  document.querySelectorAll('.waitbar .go').forEach(b => b.onclick = proceed);
+  rail.forEach(r => r.onclick = () => jumpTo(r.dataset.skill));
+  addEventListener('keydown', ev => {
+    if (ev.target.tagName === 'INPUT') return;
+    if (ev.code === 'Space') { ev.preventDefault(); waiting ? proceed() : bPlay.onclick(); }
+    if (ev.key === 'ArrowRight') { ev.preventDefault(); bNext.onclick(); }
+    if (ev.key === 'r' || ev.key === 'R') reset();
+  });
+
+  reset();   // 자바스크립트가 살아 있을 때만 재생 모드로 — 꺼져 있으면 전부 그냥 보인다
+})();
+</script>
 </body>
 </html>

@@ -132,6 +132,33 @@ TR.done("경로 A 6건 · B 1건 · C 4건").save(OUT)
 Colors come from `DESIGN.md` — the mockup never carries its own palette.
 Buttons on a halt step are rendered disabled on purpose: the pack has no execution code.
 
+### The mockup plays back
+
+The generated page is not a static screenshot. It runs:
+
+| Control | What it does |
+|---|---|
+| **▶ 실행** | Reveals steps one at a time from ● 시작 |
+| Per step | Shows `처리 중…` with a spinner first, then the result and a duration badge |
+| **Rail** | Pinned at the top; the current node pulses, passed nodes light up, unreached stay dim |
+| **Progress bar** | Fixed at the bottom, 0 → 100%, with an elapsed clock |
+| **다음 단계 ›** | One step at a time |
+| **1× / 2× / 4×** | Playback speed |
+| Rail click | Jumps to that step — for demoing one part |
+| **전체 보기** | Skips playback, shows everything |
+| Keyboard | Space = play/pause, → = next, R = restart |
+
+**A human-only step stops playback.** The bar turns orange, the card shows
+`⏸ 사람 확인 대기`, and nothing advances until someone presses **확인하고 계속 ▶**.
+That is the point of the whole screen — the agent does not pass a human gate by itself,
+and the mockup should not either.
+
+Two honesty rules the generator keeps:
+- The elapsed clock is labeled **시뮬레이션 값** in the dock. The real run takes under a
+  second; the timing exists to make the steps readable, not to claim a measurement.
+- With JavaScript off, every step is simply visible. The page degrades to the static
+  version rather than showing a blank log.
+
 ## Required files in a pack
 
 | File | Missing means |
