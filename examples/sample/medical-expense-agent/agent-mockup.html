@@ -84,6 +84,62 @@
          border:1px solid var(--line);background:var(--bg);color:var(--muted)}
   button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
   .disabled-note{font-size:12px;color:var(--muted);margin-top:7px}
+  /* ── 요약·설계도 (실행 앞단) ─────────────────────────────────────── */
+  .hero{background:var(--text);color:#fff;padding:44px 0 38px}
+  .hero .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+  .hero .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.12em;
+                 color:rgba(255,255,255,.55);margin-bottom:14px}
+  .hero h1{font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.02em;
+           line-height:1.15;margin-bottom:4px}
+  .hero h1 small{font-size:.36em;font-weight:600;color:var(--brand-sub);margin-left:12px;
+                 letter-spacing:0}
+  .hero .one{font-size:clamp(14px,2vw,17px);color:rgba(255,255,255,.8);max-width:680px;
+             margin-top:12px}
+  .hero .one b{color:#fff}
+  .lvpath{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:20px;
+          font-size:12px;color:rgba(255,255,255,.6)}
+  .lvpath .lv{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+              border-radius:999px;padding:4px 12px}
+  .lvpath .lv b{color:#fff}
+  .lvpath .lv.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+  .stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+        border-radius:12px;padding:14px 16px}
+  .stat .n{font-size:24px;font-weight:700;letter-spacing:-.01em;
+           font-variant-numeric:tabular-nums}
+  .stat .n em{font-style:normal;font-size:13px;color:rgba(255,255,255,.55);margin-left:2px}
+  .stat .l{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+  @media(max-width:680px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  .sec{margin:0 0 30px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:13px;flex-wrap:wrap}
+  .sec-head .no{font-size:12px;font-weight:700;color:var(--brand);background:#FDF2F4;
+                padding:3px 10px;border-radius:6px}
+  .sec-head h2{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .sec-head .hint{font-size:12.5px;color:var(--muted)}
+  .panel{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .lane-scroll{overflow-x:auto;padding-bottom:4px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;
+          color:var(--muted)}
+  .legend .item{display:flex;align-items:center;gap:6px}
+  .legend .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .skill-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:760px){.skill-grid{grid-template-columns:1fr}}
+  .skill{background:var(--bg);border:1px solid var(--line);border-radius:12px;
+         padding:16px 18px;position:relative}
+  .skill .owner{position:absolute;top:14px;right:16px;font-size:11.5px;font-weight:700;
+                color:var(--muted);background:var(--bg-soft);padding:3px 9px;border-radius:999px}
+  .skill .sname{font-size:14px;font-weight:700;margin:6px 0 6px}
+  .skill .io{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+  .skill .io b{color:var(--text);font-weight:600}
+  .skill .rule{font-size:12.5px;background:var(--bg-soft);border-left:3px solid var(--brand-sub);
+               padding:7px 11px;border-radius:0 8px 8px 0;margin-top:8px}
+  .skill .rule .k{font-weight:700;color:var(--brand-sub);margin-right:5px}
+  pre.tree{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+           background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
+           overflow-x:auto;line-height:1.75;margin:0}
+  .runhead{border-top:2px solid var(--line);padding-top:26px;margin-top:6px}
+
   .foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
         font-size:12px;color:var(--muted);line-height:1.8}
   .foot code{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;
@@ -163,6 +219,183 @@
 </style>
 </head>
 <body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">SKI AX 과제 · Talent AX실 · HR AI</div>
+    <h1>의료비 판독 AI <small>Lv.5 팀 에이전트</small></h1>
+    <p class="one">접수된 의료비 청구 건을 판독해 <b>지급 / 보완 / 예외심사</b> 중 어디로 갈지 가르고, 각 갈래의 서류를 초안까지 만들어 사람 앞에 놓는다.</p>
+    <div class="lvpath">
+      <span class="lv">Lv4 핵심 업무 · <b>의료비 지원 운영</b></span> ›
+      <span class="lv on">Lv5 워크플로우 · <b>의료비 청구 건 판독·지급 판정</b></span> ›
+      <span class="lv">Lv6 태스크 <b>7개</b> = 스킬 7개</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">7<em>개</em></div>
+        <div class="l">Lv6 스킬 · 1인 1스킬</div></div>
+      <div class="stat"><div class="n">6<em>개</em></div>
+        <div class="l">AI 태스크 (자동+증강) · ATF③</div></div>
+      <div class="stat"><div class="n">1<em>곳</em></div>
+        <div class="l">사람이 확인하는 자리</div></div>
+      <div class="stat"><div class="n">1<em>+</em>0</div>
+        <div class="l">갈림길 + 루프백 · ATF④</div></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section class="sec">
+  <div class="sec-head"><span class="no">①</span>
+    <h2>구조 — Lv4 › Lv5 › Lv6</h2>
+    <span class="hint">이 Lv5 에이전트는 아래 Lv6 스킬들로 이루어집니다</span></div>
+  <div class="panel"><div class="lane-scroll"><svg viewBox="0 0 1150 300" width="1150" height="300" role="img" aria-label="Lv4 Lv5 Lv6 계층 구조도">
+<rect x="14" y="10" width="1122" height="46" rx="10" fill="#F7F5F2" stroke="#E3DFDA"/>
+<text x="30" y="30" font-size="10.5" font-weight="700" fill="#6E6E6E">Lv4 · 핵심 업무</text>
+<text x="30" y="47" font-size="14" font-weight="700" fill="#1A1A1A">의료비 지원 운영</text>
+<rect x="295.0" y="72" width="560" height="62" rx="12" fill="#1A1A1A"/>
+<text x="311.0" y="92" font-size="10.5" font-weight="700" fill="#F47725">Lv5 · 워크플로우 — 이 에이전트가 묶는 단위</text>
+<text x="575.0" y="118" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">의료비 청구 건 판독·지급 판정</text>
+<path d="M575.0 134 L575.0 150 L89.0 150 L89.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M575.0 134 L575.0 150 L251.0 150 L251.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M575.0 134 L575.0 150 L413.0 150 L413.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M575.0 134 L575.0 150 L575.0 150 L575.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M575.0 134 L575.0 150 L737.0 150 L737.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M575.0 134 L575.0 150 L899.0 150 L899.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M575.0 134 L575.0 150 L1061.0 150 L1061.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<rect x="14" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.8"/>
+<path d="M14 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F1F8F3"/>
+<text x="25" y="188" font-size="10" font-weight="700" fill="#1E7A46">Lv6 · 자동</text>
+<text x="25" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">증빙서류판독</text>
+<text x="25" y="236" font-size="10.5" fill="#6E6E6E">Skill화 높음</text>
+<text x="25" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
+<rect x="176" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.8"/>
+<path d="M176 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F1F8F3"/>
+<text x="187" y="188" font-size="10" font-weight="700" fill="#1E7A46">Lv6 · 자동</text>
+<text x="187" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">신청서생성</text>
+<text x="187" y="236" font-size="10.5" fill="#6E6E6E">Skill화 높음</text>
+<text x="187" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
+<rect x="338" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#F47725" stroke-width="1.8"/>
+<path d="M338 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FFF6F0"/>
+<text x="349" y="188" font-size="10" font-weight="700" fill="#F47725">Lv6 · 증강</text>
+<text x="349" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">지급기준대조</text>
+<text x="349" y="236" font-size="10.5" fill="#6E6E6E">Skill화 중간</text>
+<text x="349" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
+<text x="475" y="188" text-anchor="end" font-size="10" font-weight="700" fill="#F47725">◆</text>
+<rect x="500" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.8"/>
+<path d="M500 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F1F8F3"/>
+<text x="511" y="188" font-size="10" font-weight="700" fill="#1E7A46">Lv6 · 자동</text>
+<text x="511" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">자동지급상신</text>
+<text x="511" y="236" font-size="10.5" fill="#6E6E6E">Skill화 높음</text>
+<text x="511" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
+<rect x="662" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#F47725" stroke-width="1.8"/>
+<path d="M662 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FFF6F0"/>
+<text x="673" y="188" font-size="10" font-weight="700" fill="#F47725">Lv6 · 증강</text>
+<text x="673" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">보완요청작성</text>
+<text x="673" y="236" font-size="10.5" fill="#6E6E6E">Skill화 중간</text>
+<text x="673" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
+<rect x="824" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#F47725" stroke-width="1.8"/>
+<path d="M824 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FFF6F0"/>
+<text x="835" y="188" font-size="10" font-weight="700" fill="#F47725">Lv6 · 증강</text>
+<text x="835" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">예외심사요청</text>
+<text x="835" y="236" font-size="10.5" fill="#6E6E6E">Skill화 낮음</text>
+<text x="835" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 담당</text>
+<rect x="986" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#EA002C" stroke-width="1.8"/>
+<path d="M986 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FDF2F4"/>
+<text x="997" y="188" font-size="10" font-weight="700" fill="#EA002C">Lv6 · 사람고유</text>
+<text x="997" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">지급승인</text>
+<text x="997" y="236" font-size="10.5" fill="#6E6E6E">Skill화 낮음</text>
+<text x="997" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 복리후생 팀장</text>
+<text x="575.0" y="290" text-anchor="middle" font-size="10.5" fill="#6E6E6E">한 사람이 만든 Lv6 스킬 하나가 카드 하나 · 테두리 색 = Human 여부 · ◆ 갈림길 · ↩ 루프백</text>
+</svg></div></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">②</span>
+    <h2>실행 흐름 설계도</h2>
+    <span class="hint">아래 실행이 이 지도를 따라갑니다</span></div>
+  <div class="panel">
+    <div class="lane-scroll"><svg viewBox="0 0 1198 326" width="1198" height="326" role="img" aria-label="실행 흐름 설계도">
+<rect x="0" y="44" width="1198" height="66" rx="8" fill="#F1F8F3"/>
+<text x="12" y="82" font-size="11" font-weight="700" fill="#1E7A46">자동</text>
+<rect x="0" y="120" width="1198" height="66" rx="8" fill="#FFF6F0"/>
+<text x="12" y="158" font-size="11" font-weight="700" fill="#F47725">증강</text>
+<rect x="0" y="196" width="1198" height="66" rx="8" fill="#FDF2F4"/>
+<text x="12" y="234" font-size="11" font-weight="700" fill="#EA002C">사람고유</text>
+<text x="92" y="53" font-size="10.5" font-weight="700" fill="#1A1A1A">● 시작</text>
+<text x="1098" y="205" text-anchor="end" font-size="10.5" font-weight="700" fill="#1A1A1A">■ 종료</text>
+<defs><marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#E3DFDA"/></marker><marker id="al" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#5B4FCF"/></marker></defs>
+<path d="M210 82 H225.0 V82 H240" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M358 82 H373.0 V158 H388" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M506 158 H521.0 V82 H536" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M506 158 H521.0 V158 H684" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M506 158 H521.0 V158 H832" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M654 82 H669.0 V234 H980" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M950 158 H965.0 V234 H980" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="92" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.6"/>
+<text x="151.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">1. 증빙서류판독</text>
+<text x="151.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E">높음</text>
+<rect x="240" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.6"/>
+<text x="299.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">2. 신청서생성</text>
+<text x="299.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E">높음</text>
+<rect x="388" y="136" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#F47725" stroke-width="1.6"/>
+<text x="447.0" y="156" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">3. 지급기준대조</text>
+<text x="447.0" y="171" text-anchor="middle" font-size="10" fill="#6E6E6E">◆ 갈림길</text>
+<rect x="536" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.6"/>
+<text x="595.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">4. 자동지급상신</text>
+<text x="595.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E">높음</text>
+<rect x="684" y="136" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#F47725" stroke-width="1.6"/>
+<text x="743.0" y="156" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">5. 보완요청작성</text>
+<text x="743.0" y="171" text-anchor="middle" font-size="10" fill="#6E6E6E">중간</text>
+<rect x="832" y="136" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#F47725" stroke-width="1.6"/>
+<text x="891.0" y="156" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">6. 예외심사요청</text>
+<text x="891.0" y="171" text-anchor="middle" font-size="10" fill="#6E6E6E">낮음</text>
+<rect x="980" y="212" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#EA002C" stroke-width="2.4"/>
+<text x="1039.0" y="232" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">7. 지급승인</text>
+<text x="1039.0" y="247" text-anchor="middle" font-size="10" fill="#6E6E6E">⛔ 멈춤</text>
+<text x="447.0" y="298" text-anchor="middle" font-size="10" fill="#F47725">◆ 기준 충족 -&gt; 자동지급상신; 증빙 미비 -&gt; 보완요청작성; 기준 모호·한도 초과 -&gt; 예외심사요청</text>
+</svg></div>
+    <div class="legend"><span class="item"><span class="sw" style="background:#F1F8F3;border:1px solid #1E7A46"></span>자동</span><span class="item"><span class="sw" style="background:#FFF6F0;border:1px solid #F47725"></span>증강</span><span class="item"><span class="sw" style="background:#FDF2F4;border:1px solid #EA002C"></span>사람고유</span><span class="item"><span class="sw" style="border:1px dashed #5B4FCF"></span>↩ 루프백</span><span class="item" style="color:#F47725">◆ 갈림길</span></div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">③</span>
+    <h2>Lv6 스킬 7개 — 만든 사람과 판단 기준</h2></div>
+  <div class="skill-grid"><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">1. 증빙서류판독</div><div class="io"><b>입력</b> 의료비청구건판독·지급판정입력 → <b>출력</b> 증빙서류판독결과</div><div class="io"><b>읽기</b> 청구접수대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">2. 신청서생성</div><div class="io"><b>입력</b> 증빙서류판독결과 → <b>출력</b> 신청서생성결과</div><div class="io"><b>쓰기</b> 신청서초안.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">3. 지급기준대조</div><div class="io"><b>입력</b> 신청서생성결과 → <b>출력</b> 지급기준대조결과</div><div class="io"><b>읽기</b> 지급기준표.csv</div><div class="rule"><span class="k">갈림길</span>기준 충족 -&gt; 자동지급상신; 증빙 미비 -&gt; 보완요청작성; 기준 모호·한도 초과 -&gt; 예외심사요청</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">4. 자동지급상신</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 자동지급상신결과</div><div class="io"><b>쓰기</b> 지급대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">5. 보완요청작성</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 보완요청작성결과</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">6. 예외심사요청</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 예외심사요청결과</div><div class="io"><b>쓰기</b> 예외심사대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 팀장</span><span class="tag human">Lv6 · 사람고유</span><div class="sname">7. 지급승인</div><div class="io"><b>입력</b> 자동지급상신결과, 예외심사요청결과 → <b>출력</b> 지급승인결과</div></div></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">④</span>
+    <h2>폴더 트리</h2>
+    <span class="hint">교육생이 받는 팩의 실제 모양</span></div>
+  <div class="panel"><pre class="tree">medical-expense-agent/
+├─ README.md          처음 보는 사람을 위한 사용 안내
+├─ agent-plan.md      팀 목적과 실행 흐름의 원본 (SSOT)
+├─ AGENTS.md          역할 · 하는 일 · 하지 않는 일
+├─ CONTRACT.md        표·기록자·순서·정지 지점의 합의
+│
+├─ skills/depth/
+│   ├─ 증빙서류판독/    SKILL.md · 자동
+│   ├─ 신청서생성/    SKILL.md · 자동
+│   ├─ 지급기준대조/    SKILL.md · 증강
+│   ├─ 자동지급상신/    SKILL.md · 자동
+│   ├─ 보완요청작성/    SKILL.md · 증강
+│   ├─ 예외심사요청/    SKILL.md · 증강
+│   └─ 지급승인/    SKILL.md · 사람고유
+│
+├─ data/              사람이 넣는 원본
+└─ out/               에이전트가 만드는 결과 (run.py 실행 시)</pre></div>
+</section>
+
+<section class="sec runhead">
+  <div class="sec-head"><span class="no">⑤</span>
+    <h2>실행 — 아래에서 직접 돌려 보십시오</h2>
+    <span class="hint">▶ 실행 · 사람고유 지점에서 멈춥니다</span></div>
+</section>
+</main>
+
+
 <div class="app">
 
 <div class="top">
@@ -224,6 +457,102 @@
 </div>
 </main>
 </div>
+
+<script type="application/json" id="agent-data">
+{
+ "schema": "agent-summary/v0.2",
+ "source": "SKI AX 과제 · Talent AX실 · HR AI",
+ "agent": {
+  "name": "의료비 판독 AI",
+  "level": "Lv.5",
+  "one_liner": "접수된 의료비 청구 건을 판독해 **지급 / 보완 / 예외심사** 중 어디로 갈지 가르고, 각 갈래의 서류를 초안까지 만들어 사람 앞에 놓는다."
+ },
+ "levels": {
+  "lv4": "의료비 지원 운영",
+  "lv5": "의료비 청구 건 판독·지급 판정",
+  "lv6": [
+   {
+    "name": "증빙서류판독",
+    "human": "자동",
+    "owner": "복리후생 담당",
+    "skillability": "높음",
+    "next": [
+     "신청서생성"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "신청서생성",
+    "human": "자동",
+    "owner": "복리후생 담당",
+    "skillability": "높음",
+    "next": [
+     "지급기준대조"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "지급기준대조",
+    "human": "증강",
+    "owner": "복리후생 담당",
+    "skillability": "중간",
+    "next": [
+     "자동지급상신",
+     "보완요청작성",
+     "예외심사요청"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "자동지급상신",
+    "human": "자동",
+    "owner": "복리후생 담당",
+    "skillability": "높음",
+    "next": [
+     "지급승인"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "보완요청작성",
+    "human": "증강",
+    "owner": "복리후생 담당",
+    "skillability": "중간",
+    "next": [],
+    "loop_to": ""
+   },
+   {
+    "name": "예외심사요청",
+    "human": "증강",
+    "owner": "복리후생 담당",
+    "skillability": "낮음",
+    "next": [
+     "지급승인"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "지급승인",
+    "human": "사람고유",
+    "owner": "복리후생 팀장",
+    "skillability": "낮음",
+    "next": [],
+    "loop_to": ""
+   }
+  ]
+ },
+ "stats": {
+  "skills": 7,
+  "ai_tasks": 6,
+  "human_points": 1,
+  "forks": 1,
+  "loops": 0,
+  "steps": 7
+ },
+ "verdict": "팀 에이전트 · 갈림길",
+ "summary": "경로 A(자동지급) 6건 · 경로 B(보완) 1건 · 경로 C(예외심사) 4건 = 총 11건 · 사람 확인 없이 나간 것 없음"
+}
+</script>
 
 <div class="dock" id="dock">
   <div class="track"><div class="fill" id="fill"></div></div>

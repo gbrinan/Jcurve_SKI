@@ -132,6 +132,25 @@ TR.done("경로 A 6건 · B 1건 · C 4건").save(OUT)
 Colors come from `DESIGN.md` — the mockup never carries its own palette.
 Buttons on a halt step are rendered disabled on purpose: the pack has no execution code.
 
+### What the page contains
+
+One page, two halves. The summary comes first because an audience needs to know what
+this is before watching it run.
+
+| # | Section | Built from |
+|---|---|---|
+| — | Hero: agent name, one-liner, **Lv4 › Lv5 › Lv6 path**, four stats | `agent-plan.md` §1–2, skill count |
+| ① | **구조 — Lv4 › Lv5 › Lv6** — the Lv4 band, the Lv5 box (what this agent packages), and a card per Lv6 skill with owner and Human 여부 | SKILL.md frontmatter |
+| ② | **실행 흐름 설계도** — swimlanes by Human 여부, forward arrows, dashed loopback with its exit condition, the ◆ condition spelled out | `next` / `when` / `loop_to` / `loop_exit` |
+| ③ | **Lv6 스킬 카드** — inputs → outputs, reads/writes, the judgment rule | SKILL.md frontmatter |
+| ④ | **폴더 트리** | the pack's actual layout |
+| ⑤ | **실행** — the playback below | `out/trace.json` |
+
+Lanes and card borders are colored by **Human 여부** (자동 / 증강 / 사람고유), because that
+is what our packs actually carry at this stage. Do not color by environment tags
+(MCP·조회 and friends) — those live in the wireframe stage and are not in the pack. A
+diagram painted with information we do not have is a diagram that lies.
+
 ### The mockup plays back
 
 The generated page is not a static screenshot. It runs:

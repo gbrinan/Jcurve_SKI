@@ -4,13 +4,20 @@
 사용: python3 check/make_mockup.py <팩 경로>   → <팩>/agent-mockup.html
 
 읽는 것:
-  · <팩>/out/trace.json   — run.py가 남긴 실행 기록. 화면의 **모든 숫자가 여기서 온다.**
-  · <팩>/skills/*/*/SKILL.md — 진행 레일에 쓸 순서·Human 여부·루프백
+  · <팩>/out/trace.json   — run.py가 남긴 실행 기록. 실행 구간의 **모든 숫자가 여기서 온다.**
+  · <팩>/skills/*/*/SKILL.md — 계층·순서·Human 여부·갈림길·루프백
+  · <팩>/agent-plan.md    — Lv4/Lv5 이름, 한 줄 소개, 하는 일/하지 않는 일
   · DESIGN.md             — 색 토큰. 목업이 팔레트를 따로 갖지 않게 한다 (SSOT)
 
+만드는 것은 한 장이고 두 부분이다:
+  앞 — 요약·설계도 (이름 / 한 줄 / Lv4›Lv5›Lv6 계층 / 실행 흐름 / 스킬 카드 / 폴더 트리)
+  뒤 — 실행 (▶ 누르면 한 단계씩. 사람고유 지점에서 멈춘다)
+
 trace.json이 없으면 만들지 않는다. 실행하지 않은 화면은 지어낸 화면이다.
+페이지 끝에 `#agent-data` JSON을 심어 둔다 — 다시 만들거나 다른 도구가 읽을 때 쓰는 SSOT다.
 """
 import html
+import json
 import re
 import sys
 from pathlib import Path
@@ -65,6 +72,43 @@ def tokens():
     for k, v in FALLBACK.items():
         t.setdefault(k, v)
     return t
+
+
+def plan_facts(pack):
+    """agent-plan.md에서 이름·한 줄 소개·하는 일/안 하는 일을 읽는다. 없으면 빈 값."""
+    f = pack / "agent-plan.md"
+    txt = f.read_text(encoding="utf-8") if f.is_file() else ""
+    g = lambda pat: (re.search(pat, txt, re.M) or [None, ""])[1].strip()
+    one = g(r"^- 한 문장:\s*(.+)$")
+    if one:                                   # 여러 줄로 이어진 한 문장을 잇는다
+        m = re.search(r"^- 한 문장:\s*(.+(?:\n  +\S.*)*)$", txt, re.M)
+        one = re.sub(r"\s*\n\s+", " ", m.group(1)).strip() if m else one
+    return {"one": one,
+            "does": g(r"^- 하는 일:\s*(.+)$"),
+            "not": g(r"^- 하지 않는 일:\s*(.+)$"),
+            "lv4": g(r"^- Lv4:\s*(.+)$"),
+            "lv5": g(r"^- Lv5:\s*(.+)$")}
+
+
+def order_of(sk):
+    """위상 정렬된 스킬 이름 순서 — 구조도·흐름도·레일이 같은 순서를 쓴다."""
+    nx = {n: [x.strip() for x in re.split(r"[|,]", m.get("next", "")) if x.strip()
+              and x.strip() != "null"] for n, m in sk.items()}
+    indeg = {n: 0 for n in sk}
+    for v in nx.values():
+        for x in v:
+            if x in indeg:
+                indeg[x] += 1
+    q, out = [n for n in sk if indeg[n] == 0], []
+    while q:
+        n = q.pop(0); out.append(n)
+        for m_ in nx.get(n, []):
+            if m_ in indeg:
+                indeg[m_] -= 1
+                if indeg[m_] == 0:
+                    q.append(m_)
+    out += [n for n in sk if n not in out]
+    return out, nx
 
 
 def skills(pack):
@@ -132,6 +176,171 @@ def rail(sk, tr):
             '<span class="arrow">›</span>\n  ' + "\n  ".join(out)
             + '\n  <span class="arrow">›</span>'
               '<span class="cap end" id="cap-end">■ 종료</span>')
+
+
+# Human 여부별 색 — 우리 팩이 실제로 가진 값이다. 환경 태그(MCP·조회 등)는 이 단계에
+# 없으므로 그것으로 칠하지 않는다. 없는 정보로 칠하면 그림이 거짓말을 한다.
+LANES = [("자동", "auto"), ("증강", "aug"), ("사람고유", "human")]
+LANE_FILL = {"자동": ("#F1F8F3", "ok"), "증강": ("#FFF6F0", "brand-sub"),
+             "사람고유": ("#FDF2F4", "brand")}
+
+
+def hierarchy_svg(sk, facts, tk):
+    """Lv4 › Lv5 › Lv6 계층. 이 도구가 무엇을 어느 층에서 묶는지가 한눈에 보여야 한다."""
+    order, _ = order_of(sk)
+    n = len(order)
+    CW, GAP = 150, 12
+    total = n * CW + (n - 1) * GAP
+    # 카드가 많으면 폭을 늘린다. 고정 폭이면 마지막 카드가 잘린다 (화면에서 실제로 잘렸다).
+    W = max(980, total + 28)
+    x0 = max(14, (W - total) / 2)
+    H = 300
+    o = [f'<svg viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img"'
+         f' aria-label="Lv4 Lv5 Lv6 계층 구조도">']
+    # Lv4 밴드
+    o.append(f'<rect x="14" y="10" width="{W-28}" height="46" rx="10" '
+             f'fill="{tk["bg-soft"]}" stroke="{tk["line"]}"/>')
+    o.append(f'<text x="30" y="30" font-size="10.5" font-weight="700" '
+             f'fill="{tk["muted"]}">Lv4 · 핵심 업무</text>')
+    o.append(f'<text x="30" y="47" font-size="14" font-weight="700" '
+             f'fill="{tk["text"]}">{e(facts["lv4"] or "(미정)")}</text>')
+    # Lv5 박스 — 이번에 만드는 것
+    bw = min(560, W - 120)
+    bx = (W - bw) / 2
+    o.append(f'<rect x="{bx}" y="72" width="{bw}" height="62" rx="12" fill="{tk["text"]}"/>')
+    o.append(f'<text x="{bx+16}" y="92" font-size="10.5" font-weight="700" '
+             f'fill="{tk["brand-sub"]}">Lv5 · 워크플로우 — 이 에이전트가 묶는 단위</text>')
+    o.append(f'<text x="{W/2}" y="118" text-anchor="middle" font-size="16" font-weight="800" '
+             f'fill="#fff">{e(facts["lv5"] or "(미정)")}</text>')
+    # 연결선
+    for i, name in enumerate(order):
+        cx = x0 + i * (CW + GAP) + CW / 2
+        o.append(f'<path d="M{W/2} 134 L{W/2} 150 L{cx} 150 L{cx} 168" '
+                 f'stroke="{tk["line"]}" stroke-width="1.6" fill="none"/>')
+    # Lv6 카드
+    for i, name in enumerate(order):
+        m = sk[name]
+        hv = m.get("human", "")
+        fill, tok = LANE_FILL.get(hv, (tk["bg-soft"], "line"))
+        stroke = tk.get(tok, tk["line"])
+        x = x0 + i * (CW + GAP)
+        o.append(f'<rect x="{x}" y="168" width="{CW}" height="104" rx="10" '
+                 f'fill="{tk["bg"]}" stroke="{stroke}" stroke-width="1.8"/>')
+        o.append(f'<path d="M{x} 178 a10 10 0 0 1 10 -10 h{CW-20} a10 10 0 0 1 10 10 v16 h-{CW} z" '
+                 f'fill="{fill}"/>')
+        o.append(f'<text x="{x+11}" y="188" font-size="10" font-weight="700" '
+                 f'fill="{stroke}">Lv6 · {e(hv or "(미정)")}</text>')
+        label = name if len(name) <= 9 else name[:9] + "…"
+        o.append(f'<text x="{x+11}" y="217" font-size="12.5" font-weight="700" '
+                 f'fill="{tk["text"]}">{e(label)}</text>')
+        o.append(f'<text x="{x+11}" y="236" font-size="10.5" '
+                 f'fill="{tk["muted"]}">Skill화 {e(m.get("skillability", "(미정)"))}</text>')
+        own = m.get("owner", "")
+        if own:
+            o.append(f'<text x="{x+11}" y="254" font-size="10.5" font-weight="700" '
+                     f'fill="{tk["muted"]}">👤 {e(own)}</text>')
+        if m.get("loop_to"):
+            o.append(f'<text x="{x+CW-13}" y="188" text-anchor="end" font-size="10" '
+                     f'font-weight="700" fill="{tk["loop"]}">↩</text>')
+        nxs = [z for z in re.split(r"[|,]", m.get("next", "")) if z.strip() and z.strip() != "null"]
+        if len(nxs) > 1:
+            o.append(f'<text x="{x+CW-13}" y="188" text-anchor="end" font-size="10" '
+                     f'font-weight="700" fill="{tk["brand-sub"]}">◆</text>')
+    o.append(f'<text x="{W/2}" y="290" text-anchor="middle" font-size="10.5" '
+             f'fill="{tk["muted"]}">한 사람이 만든 Lv6 스킬 하나가 카드 하나 · '
+             f'테두리 색 = Human 여부 · ◆ 갈림길 · ↩ 루프백</text>')
+    o.append("</svg>")
+    return "\n".join(o)
+
+
+def flow_svg(sk, tr, tk):
+    """실행 흐름 설계도 — Human 여부 레인. 갈림길과 루프백이 눈에 보여야 한다."""
+    order, nx = order_of(sk)
+    lanes = [l for l, _ in LANES if any(sk[n].get("human") == l for n in order)]
+    LY, LH = 44, 76
+    # 7~8노드가 한 화면에 들어가도록 조인다. 넘치면 .lane-scroll이 받아준다.
+    CW, GAP = 118, 30
+    x0 = 92
+    W = max(1040, x0 + len(order) * (CW + GAP) + 70)
+    H = LY + len(lanes) * LH + 54
+    y_of = {l: LY + i * LH for i, l in enumerate(lanes)}
+    pos = {}
+    for i, n in enumerate(order):
+        pos[n] = (x0 + i * (CW + GAP), y_of.get(sk[n].get("human"), LY) + 16)
+
+    o = [f'<svg viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img"'
+         f' aria-label="실행 흐름 설계도">']
+    for l in lanes:
+        fill, tok = LANE_FILL[l]
+        y = y_of[l]
+        o.append(f'<rect x="0" y="{y}" width="{W}" height="{LH-10}" rx="8" fill="{fill}"/>')
+        o.append(f'<text x="12" y="{y+38}" font-size="11" font-weight="700" '
+                 f'fill="{tk[tok]}">{e(l)}</text>')
+    # 시작·종료
+    fx, fy = pos[order[0]]
+    o.append(f'<text x="{fx}" y="{fy-7}" font-size="10.5" font-weight="700" '
+             f'fill="{tk["text"]}">● 시작</text>')
+    ends = [n for n in order if not nx.get(n)]
+    if ends:
+        ex, ey = pos[ends[-1]]
+        o.append(f'<text x="{ex+CW}" y="{ey-7}" text-anchor="end" font-size="10.5" '
+                 f'font-weight="700" fill="{tk["text"]}">■ 종료</text>')
+    # 화살표 정의
+    o.append(f'<defs><marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="3.5" '
+             f'orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="{tk["line"]}"/></marker>'
+             f'<marker id="al" markerWidth="7" markerHeight="7" refX="6" refY="3.5" '
+             f'orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="{tk["loop"]}"/></marker></defs>')
+    # 앞으로 가는 화살표
+    for n in order:
+        ax, ay = pos[n]
+        for m_ in nx.get(n, []):
+            if m_ not in pos:
+                continue
+            bx, by = pos[m_]
+            mid = ax + CW + GAP / 2
+            o.append(f'<path d="M{ax+CW} {ay+22} H{mid} V{by+22} H{bx}" fill="none" '
+                     f'stroke="{tk["line"]}" stroke-width="1.6" marker-end="url(#a)"/>')
+    # 루프백
+    for n in order:
+        dst = (sk[n].get("loop_to") or "").strip()
+        if dst and dst in pos:
+            ax, ay = pos[n]; bx, by = pos[dst]
+            top = min(ay, by) - 20
+            o.append(f'<path d="M{ax+CW/2} {ay} V{top} H{bx+CW/2} V{by}" fill="none" '
+                     f'stroke="{tk["loop"]}" stroke-width="1.6" stroke-dasharray="5 4" '
+                     f'marker-end="url(#al)"/>')
+            lab = (sk[n].get("loop_exit") or "재작업")
+            lab = lab if len(lab) <= 20 else lab[:20] + "…"
+            lx = min(max((ax + bx) / 2 + CW / 2, 90), W - 90)
+            o.append(f'<text x="{lx}" y="{top-6}" text-anchor="middle" '
+                     f'font-size="10" font-weight="700" fill="{tk["loop"]}">↩ {e(lab)}</text>')
+    # 노드
+    for i, n in enumerate(order):
+        x, y = pos[n]
+        m = sk[n]
+        _, tok = LANE_FILL.get(m.get("human"), (None, "line"))
+        stroke = tk.get(tok, tk["line"])
+        forked = len([z for z in re.split(r"[|,]", m.get("next", ""))
+                      if z.strip() and z.strip() != "null"]) > 1
+        o.append(f'<rect x="{x}" y="{y}" width="{CW}" height="44" rx="8" fill="{tk["bg"]}" '
+                 f'stroke="{stroke}" stroke-width="{2.4 if m.get("human")=="사람고유" else 1.6}"/>')
+        head = f'{i+1}. ' + (n if len(n) <= 7 else n[:7] + "…")
+        o.append(f'<text x="{x+CW/2}" y="{y+20}" text-anchor="middle" font-size="11.5" '
+                 f'font-weight="700" fill="{tk["text"]}">{e(head)}</text>')
+        sub = "◆ 갈림길" if forked else ("⛔ 멈춤" if m.get("human") == "사람고유" else
+                                       e(m.get("skillability", "")))
+        o.append(f'<text x="{x+CW/2}" y="{y+35}" text-anchor="middle" font-size="10" '
+                 f'fill="{tk["muted"]}">{sub}</text>')
+    # 갈림길 조건
+    for n in order:
+        w = (sk[n].get("when") or "").strip()
+        if w and len(nx.get(n, [])) > 1:
+            x, y = pos[n]
+            cx = min(max(x + CW / 2, 200), W - 200)
+            o.append(f'<text x="{cx}" y="{H-28}" text-anchor="middle" font-size="10" '
+                     f'fill="{tk["brand-sub"]}">◆ {e(w[:60])}</text>')
+    o.append("</svg>")
+    return "\n".join(o)
 
 
 def table_html(t):
@@ -210,6 +419,50 @@ def step_html(s, sk, idx):
             f'<span class="ms" data-ms=""></span></header>'
             f'<div class="run"><i class="spin"></i>처리 중…</div>'
             f'<div class="body">{"".join(body)}</div></div>')
+
+
+def skill_cards(sk):
+    order, nx = order_of(sk)
+    out = []
+    for i, n in enumerate(order):
+        m = sk[n]
+        hv = m.get("human", "(미정)")
+        cls = HUMAN_CLS.get(hv, "")
+        ins = m.get("inputs", "[]").strip("[]")
+        outs = m.get("outputs", "[]").strip("[]")
+        rule = (m.get("when") or m.get("loop_exit") or "").strip()
+        rk = "갈림길" if m.get("when") else ("루프 탈출" if m.get("loop_exit") else "")
+        reads = m.get("reads", "[]").strip("[]")
+        writes = m.get("writes", "[]").strip("[]")
+        own = m.get("owner", "")
+        out.append(
+            f'<div class="skill">'
+            + (f'<span class="owner">👤 {e(own)}</span>' if own else "")
+            + f'<span class="tag {cls}">Lv6 · {e(hv)}</span>'
+            f'<div class="sname">{i+1}. {e(n)}</div>'
+            f'<div class="io"><b>입력</b> {e(ins or "—")} → <b>출력</b> {e(outs or "—")}</div>'
+            + (f'<div class="io"><b>읽기</b> {e(reads)}</div>' if reads else "")
+            + (f'<div class="io"><b>쓰기</b> {e(writes)}</div>' if writes else "")
+            + (f'<div class="rule"><span class="k">{rk}</span>{e(rule)}</div>' if rule else "")
+            + '</div>')
+    return "".join(out)
+
+
+def folder_tree(pack, sk):
+    order, _ = order_of(sk)
+    lines = [f"{pack.name}/",
+             "├─ README.md          처음 보는 사람을 위한 사용 안내",
+             "├─ agent-plan.md      팀 목적과 실행 흐름의 원본 (SSOT)",
+             "├─ AGENTS.md          역할 · 하는 일 · 하지 않는 일",
+             "├─ CONTRACT.md        표·기록자·순서·정지 지점의 합의",
+             "│", "├─ skills/depth/"]
+    for i, n in enumerate(order):
+        tip = "└─" if i == len(order) - 1 else "├─"
+        hv = sk[n].get("human", "")
+        lines.append(f"│   {tip} {n}/    SKILL.md · {hv}")
+    lines += ["│", "├─ data/              사람이 넣는 원본",
+              "└─ out/               에이전트가 만드는 결과 (run.py 실행 시)"]
+    return e("\n".join(lines))
 
 
 def css(tk):
@@ -291,6 +544,62 @@ def css(tk):
          border:1px solid var(--line);background:var(--bg);color:var(--muted)}}
   button.primary{{background:var(--brand);border-color:var(--brand);color:#fff}}
   .disabled-note{{font-size:12px;color:var(--muted);margin-top:7px}}
+  /* ── 요약·설계도 (실행 앞단) ─────────────────────────────────────── */
+  .hero{{background:var(--text);color:#fff;padding:44px 0 38px}}
+  .hero .wrap{{max-width:1120px;margin:0 auto;padding:0 22px}}
+  .hero .eyebrow{{font-size:11.5px;font-weight:700;letter-spacing:.12em;
+                 color:rgba(255,255,255,.55);margin-bottom:14px}}
+  .hero h1{{font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.02em;
+           line-height:1.15;margin-bottom:4px}}
+  .hero h1 small{{font-size:.36em;font-weight:600;color:var(--brand-sub);margin-left:12px;
+                 letter-spacing:0}}
+  .hero .one{{font-size:clamp(14px,2vw,17px);color:rgba(255,255,255,.8);max-width:680px;
+             margin-top:12px}}
+  .hero .one b{{color:#fff}}
+  .lvpath{{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:20px;
+          font-size:12px;color:rgba(255,255,255,.6)}}
+  .lvpath .lv{{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+              border-radius:999px;padding:4px 12px}}
+  .lvpath .lv b{{color:#fff}}
+  .lvpath .lv.on{{background:var(--brand);border-color:var(--brand);color:#fff}}
+  .stats{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}}
+  .stat{{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+        border-radius:12px;padding:14px 16px}}
+  .stat .n{{font-size:24px;font-weight:700;letter-spacing:-.01em;
+           font-variant-numeric:tabular-nums}}
+  .stat .n em{{font-style:normal;font-size:13px;color:rgba(255,255,255,.55);margin-left:2px}}
+  .stat .l{{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}}
+  @media(max-width:680px){{.stats{{grid-template-columns:repeat(2,1fr)}}}}
+
+  .sec{{margin:0 0 30px}}
+  .sec-head{{display:flex;align-items:baseline;gap:12px;margin-bottom:13px;flex-wrap:wrap}}
+  .sec-head .no{{font-size:12px;font-weight:700;color:var(--brand);background:#FDF2F4;
+                padding:3px 10px;border-radius:6px}}
+  .sec-head h2{{font-size:18px;font-weight:800;letter-spacing:-.01em}}
+  .sec-head .hint{{font-size:12.5px;color:var(--muted)}}
+  .panel{{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:20px}}
+  .lane-scroll{{overflow-x:auto;padding-bottom:4px}}
+  .legend{{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;
+          color:var(--muted)}}
+  .legend .item{{display:flex;align-items:center;gap:6px}}
+  .legend .sw{{width:12px;height:12px;border-radius:3px;display:inline-block}}
+  .skill-grid{{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}}
+  @media(max-width:760px){{.skill-grid{{grid-template-columns:1fr}}}}
+  .skill{{background:var(--bg);border:1px solid var(--line);border-radius:12px;
+         padding:16px 18px;position:relative}}
+  .skill .owner{{position:absolute;top:14px;right:16px;font-size:11.5px;font-weight:700;
+                color:var(--muted);background:var(--bg-soft);padding:3px 9px;border-radius:999px}}
+  .skill .sname{{font-size:14px;font-weight:700;margin:6px 0 6px}}
+  .skill .io{{font-size:12.5px;color:var(--muted);margin-bottom:4px}}
+  .skill .io b{{color:var(--text);font-weight:600}}
+  .skill .rule{{font-size:12.5px;background:var(--bg-soft);border-left:3px solid var(--brand-sub);
+               padding:7px 11px;border-radius:0 8px 8px 0;margin-top:8px}}
+  .skill .rule .k{{font-weight:700;color:var(--brand-sub);margin-right:5px}}
+  pre.tree{{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+           background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
+           overflow-x:auto;line-height:1.75;margin:0}}
+  .runhead{{border-top:2px solid var(--line);padding-top:26px;margin-top:6px}}
+
   .foot{{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
         font-size:12px;color:var(--muted);line-height:1.8}}
   .foot code{{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;
@@ -379,6 +688,12 @@ def main(pack_dir):
         return 2
 
     sk = skills(pack)
+    facts = plan_facts(pack)
+    tk = tokens()
+    order, nxmap = order_of(sk)
+    ai_n = sum(1 for n in order if sk[n].get("human") in ("자동", "증강"))
+    hu_n = sum(1 for n in order if sk[n].get("human") == "사람고유")
+    fork_n = sum(1 for n in order if len(nxmap.get(n, [])) > 1)
     kind = []
     if any(len(re.split(r"[|,]", m.get("next", ""))) > 1 for m in sk.values()
            if m.get("next") and m.get("next") != "null"):
@@ -398,6 +713,95 @@ def main(pack_dir):
                        + (f" ({l['cycles']}회차)" if l.get("cycles") else "")
                        for l in tr.get("loops", []))
 
+    lv4, lv5 = facts["lv4"] or tr.get("lv4", ""), facts["lv5"] or tr.get("lv5", "")
+    legend = "".join(
+        f'<span class="item"><span class="sw" style="background:{LANE_FILL[l][0]};'
+        f'border:1px solid {tk[LANE_FILL[l][1]]}"></span>{l}</span>'
+        for l, _ in LANES if any(sk[n].get("human") == l for n in order))
+    legend += (f'<span class="item"><span class="sw" style="border:1px dashed {tk["loop"]}">'
+               f'</span>↩ 루프백</span>'
+               f'<span class="item" style="color:{tk["brand-sub"]}">◆ 갈림길</span>')
+
+    ssot = json.dumps({
+        "schema": "agent-summary/v0.2",
+        "source": tr.get("source", ""),
+        "agent": {"name": tr["title"], "level": "Lv.5", "one_liner": facts["one"]},
+        "levels": {"lv4": lv4, "lv5": lv5,
+                   "lv6": [{"name": n, "human": sk[n].get("human", ""),
+                            "owner": sk[n].get("owner", ""),
+                            "skillability": sk[n].get("skillability", ""),
+                            "next": nxmap.get(n, []),
+                            "loop_to": sk[n].get("loop_to", "")} for n in order]},
+        "stats": {"skills": len(order), "ai_tasks": ai_n, "human_points": hu_n,
+                  "forks": fork_n, "loops": len(tr.get("loops", [])),
+                  "steps": len([s for s in tr["steps"] if s["kind"] != "loopback"])},
+        "verdict": verdict, "summary": tr.get("summary", ""),
+    }, ensure_ascii=False, indent=1)
+
+    summary = f'''
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">{e(tr.get("source", ""))}</div>
+    <h1>{e(tr["title"])} <small>Lv.5 팀 에이전트</small></h1>
+    <p class="one">{rich(facts["one"]) if facts["one"] else "(agent-plan.md §2에 한 문장이 아직 없습니다)"}</p>
+    <div class="lvpath">
+      <span class="lv">Lv4 핵심 업무 · <b>{e(lv4 or "(미정)")}</b></span> ›
+      <span class="lv on">Lv5 워크플로우 · <b>{e(lv5 or "(미정)")}</b></span> ›
+      <span class="lv">Lv6 태스크 <b>{len(order)}개</b> = 스킬 {len(order)}개</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">{len(order)}<em>개</em></div>
+        <div class="l">Lv6 스킬 · 1인 1스킬</div></div>
+      <div class="stat"><div class="n">{ai_n}<em>개</em></div>
+        <div class="l">AI 태스크 (자동+증강) · ATF③</div></div>
+      <div class="stat"><div class="n">{hu_n}<em>곳</em></div>
+        <div class="l">사람이 확인하는 자리</div></div>
+      <div class="stat"><div class="n">{fork_n}<em>+</em>{len(tr.get("loops", []))}</div>
+        <div class="l">갈림길 + 루프백 · ATF④</div></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section class="sec">
+  <div class="sec-head"><span class="no">①</span>
+    <h2>구조 — Lv4 › Lv5 › Lv6</h2>
+    <span class="hint">이 Lv5 에이전트는 아래 Lv6 스킬들로 이루어집니다</span></div>
+  <div class="panel"><div class="lane-scroll">{hierarchy_svg(sk, {"lv4": lv4, "lv5": lv5}, tk)}</div></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">②</span>
+    <h2>실행 흐름 설계도</h2>
+    <span class="hint">아래 실행이 이 지도를 따라갑니다</span></div>
+  <div class="panel">
+    <div class="lane-scroll">{flow_svg(sk, tr, tk)}</div>
+    <div class="legend">{legend}</div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">③</span>
+    <h2>Lv6 스킬 {len(order)}개 — 만든 사람과 판단 기준</h2></div>
+  <div class="skill-grid">{skill_cards(sk)}</div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">④</span>
+    <h2>폴더 트리</h2>
+    <span class="hint">교육생이 받는 팩의 실제 모양</span></div>
+  <div class="panel"><pre class="tree">{folder_tree(pack, sk)}</pre></div>
+</section>
+
+<section class="sec runhead">
+  <div class="sec-head"><span class="no">⑤</span>
+    <h2>실행 — 아래에서 직접 돌려 보십시오</h2>
+    <span class="hint">▶ 실행 · 사람고유 지점에서 멈춥니다</span></div>
+</section>
+</main>
+'''
+
     doc = f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -410,6 +814,8 @@ def main(pack_dir):
 <style>{css(tokens())}</style>
 </head>
 <body>
+{summary}
+
 <div class="app">
 
 <div class="top">
@@ -445,6 +851,10 @@ def main(pack_dir):
 </div>
 </main>
 </div>
+
+<script type="application/json" id="agent-data">
+{ssot}
+</script>
 
 <div class="dock" id="dock">
   <div class="track"><div class="fill" id="fill"></div></div>
