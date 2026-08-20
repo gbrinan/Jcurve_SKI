@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>워크플로우 설계도 (분기 지원)</title>
+<style>
+  /* 토큰의 SSOT는 ../DESIGN.md */
+  :root {
+    --brand: #EA002C; --brand-sub: #F47725;
+    --bg: #FFFFFF; --bg-soft: #F7F5F2; --text: #1A1A1A;
+    --muted: #6E6E6E; --line: #E3DFDA; --ok: #1E7A46;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg-soft); color: var(--text); padding: 28px 20px 80px;
+         font: 15px/1.6 -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 22px; letter-spacing: -.02em; }
+  h1 small { font-weight: 400; color: var(--muted); font-size: 14px; margin-left: 8px; }
+  .card { background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+          padding: 20px; margin-top: 18px; }
+  .card > h2 { font-size: 14px; color: var(--brand); letter-spacing: .04em; margin-bottom: 12px; }
+  label.row { display: block; margin-bottom: 10px; }
+  label.row span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  input[type=text], select { width: 100%; padding: 7px 9px; border: 1px solid var(--line);
+                             border-radius: 6px; font: inherit; font-size: 14px; background: var(--bg); }
+  input[type=text]:focus, select:focus { outline: 2px solid var(--brand-sub); outline-offset: -1px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600;
+       padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.idx { color: var(--muted); font-size: 12px; padding-top: 12px; width: 26px; }
+  button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 6px;
+           border: 1px solid var(--line); background: var(--bg); cursor: pointer; }
+  button:hover { border-color: var(--brand); color: var(--brand); }
+  button.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+  button.primary:hover { color: #fff; opacity: .9; }
+  button.x { border: none; color: var(--muted); padding: 6px 8px; }
+  button.x:hover { color: var(--brand); }
+  .bar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+  .hint { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .hint b { color: var(--text); }
+  .verdict { margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 14px;
+             background: var(--bg-soft); border: 1px solid var(--line); }
+  .verdict.agent { border-color: var(--ok); background: #F1F8F3; }
+  .verdict.pack { border-color: var(--brand-sub); background: #FFF6F0; }
+  .verdict strong { display: block; margin-bottom: 4px; }
+  pre { background: #1A1A1A; color: #E8E8E8; padding: 14px; border-radius: 8px;
+        font-size: 12px; overflow-x: auto; line-height: 1.5; }
+  .flow { font-size: 13px; line-height: 2; }
+  .flow code { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 4px;
+               padding: 2px 6px; font-size: 12px; }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 999px;
+         border: 1px solid var(--line); color: var(--muted); margin-left: 4px; }
+  .tag.h { border-color: var(--brand); color: var(--brand); }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>워크플로우 설계도 <small>Lv4 › Lv5 › Lv6 · 분기(갈림길) 지원</small></h1>
+
+<div class="card">
+  <h2>LV4 — 핵심 업무</h2>
+  <label class="row"><span>이 팀이 맡은 핵심 업무 하나</span>
+    <input type="text" id="t4" placeholder="예) 의료비 지원 운영"></label>
+</div>
+
+<div class="card">
+  <h2>LV5 — 워크플로우</h2>
+  <p class="hint">Lv4 안의 워크플로우를 적고, <b>이번에 만들 것 하나</b>를 고릅니다.</p>
+  <div id="lv5box"></div>
+  <div class="bar"><button onclick="add5()">+ 워크플로우 추가</button></div>
+</div>
+
+<div class="card">
+  <h2>LV6 — 태스크</h2>
+  <p class="hint">
+    선택한 Lv5를 이루는 태스크를 적습니다.
+    <b>다음 태스크</b> 칸이 이 설계도의 핵심입니다 — 비워 두면 바로 아래 줄로 이어지고,
+    <b>둘 이상 고르면 그 자리가 갈림길</b>이 됩니다. 갈림길이 하나라도 있어야 에이전트가 됩니다.
+  </p>
+  <div class="scroll">
+  <table>
+    <thead><tr>
+      <th></th><th style="min-width:180px">태스크 이름</th><th>Human 여부</th>
+      <th>Skill화 용이성</th><th style="min-width:200px">다음 태스크 (여러 개 = 갈림길)</th><th></th>
+    </tr></thead>
+    <tbody id="lv6box"></tbody>
+  </table>
+  </div>
+  <div class="bar"><button onclick="add6()">+ 태스크 추가</button></div>
+</div>
+
+<div class="card">
+  <h2>지금 이 설계도가 만드는 것</h2>
+  <div id="verdict"></div>
+  <div class="flow" id="flow" style="margin-top:14px"></div>
+</div>
+
+<div class="card">
+  <h2>내보내기</h2>
+  <p class="hint">아래 블록을 <b>설계도 HTML 파일</b>로 저장한 뒤
+    <code>python3 check/adapt_workflow.py &lt;파일&gt; &lt;출력 폴더&gt;</code> 로 팩을 만듭니다.</p>
+  <div class="bar">
+    <button class="primary" onclick="dl()">설계도 HTML 내려받기</button>
+    <button onclick="copyDecl()">선언 블록만 복사</button>
+    <span id="msg" style="font-size:13px;color:var(--ok)"></span>
+  </div>
+  <pre id="out" style="margin-top:12px"></pre>
+</div>
+
+</div>
+
+<script>
+// ── 상태. adapt_workflow.py가 읽는 형식과 이름을 그대로 쓴다.
+//    lv6의 nx가 이번에 추가된 칸이다 — "|"로 구분한 다음 태스크 이름들.
+let lv5=[{n:"의료비 청구 건 판독·지급 판정"}];
+let lv6=[{n:"증빙서류판독",h:"자동",s:"높음",nx:"신청서생성"}];
+let sel=0;
+let tgt=0;
+const HUMANS=["자동","증강","사람고유"], SKILLS=["높음","중간","낮음",""];
+
+function add5(){ lv5.push({n:""}); render(); }
+function add6(){ lv6.push({n:"",h:"자동",s:"",nx:""}); render(); }
+function del5(i){ lv5.splice(i,1); if(sel>=lv5.length) sel=Math.max(0,lv5.length-1); render(); }
+function del6(i){ const gone=lv6[i].n; lv6.splice(i,1);
+  lv6.forEach(t=>{ t.nx=(t.nx||"").split("|").map(s=>s.trim()).filter(s=>s&&s!==gone).join(" | "); });
+  if(tgt>=lv6.length) tgt=Math.max(0,lv6.length-1); render(); }
+
+function render(){
+  // Lv5
+  document.getElementById("lv5box").innerHTML = lv5.map((w,i)=>`
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <input type="radio" name="sel" ${i===sel?"checked":""} onchange="sel=${i};render()" title="이번에 만들 워크플로우">
+      <input type="text" value="${esc(w.n)}" placeholder="예) 의료비 청구 건 판독·지급 판정"
+             oninput="lv5[${i}].n=this.value;paint()">
+      <button class="x" onclick="del5(${i})">✕</button>
+    </div>`).join("");
+
+  // Lv6
+  const opts = n => `<option value=""></option>` + lv6.map(t=>t.n).filter(Boolean)
+      .map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  document.getElementById("lv6box").innerHTML = lv6.map((t,i)=>{
+    const picked=(t.nx||"").split("|").map(s=>s.trim()).filter(Boolean);
+    return `<tr>
+      <td class="idx">${i+1}</td>
+      <td><input type="text" value="${esc(t.n)}" placeholder="태스크 이름"
+                 oninput="rename(${i},this.value)">
+          <label style="font-size:11px;color:var(--muted)">
+            <input type="radio" name="tgt" ${i===tgt?"checked":""} onchange="tgt=${i};paint()"> 이번 제작 대상 ★</label></td>
+      <td><select onchange="lv6[${i}].h=this.value;paint()">
+          ${HUMANS.map(h=>`<option ${t.h===h?"selected":""}>${h}</option>`).join("")}</select></td>
+      <td><select onchange="lv6[${i}].s=this.value;paint()">
+          ${SKILLS.map(s=>`<option value="${s}" ${t.s===s?"selected":""}>${s||"(미정)"}</option>`).join("")}</select></td>
+      <td>${picked.map((p,j)=>`<div style="margin-bottom:4px;display:flex;gap:4px">
+            <select onchange="setNx(${i},${j},this.value)">${opts()}</select>
+            <button class="x" onclick="setNx(${i},${j},'')">✕</button></div>`).join("")}
+          <div style="display:flex;gap:4px">
+            <select onchange="setNx(${i},${picked.length},this.value)">${opts()}</select></div>
+          ${picked.length>1?'<span class="tag h">갈림길</span>':''}</td>
+      <td><button class="x" onclick="del6(${i})">✕</button></td>
+    </tr>`;
+  }).join("");
+  // 고른 값을 select에 반영 (innerHTML 후라 별도로 지정)
+  document.querySelectorAll("#lv6box tr").forEach((tr,i)=>{
+    const picked=(lv6[i].nx||"").split("|").map(s=>s.trim()).filter(Boolean);
+    tr.querySelectorAll("td:nth-child(5) select").forEach((s,j)=>{ s.value = picked[j]||""; });
+  });
+  paint();
+}
+
+function rename(i,v){
+  const old=lv6[i].n; lv6[i].n=v;
+  if(old) lv6.forEach(t=>{ t.nx=(t.nx||"").split("|").map(s=>s.trim()===old?v:s.trim())
+                                  .filter(Boolean).join(" | "); });
+  paint();
+}
+function setNx(i,j,v){
+  const picked=(lv6[i].nx||"").split("|").map(s=>s.trim()).filter(Boolean);
+  if(v) picked[j]=v; else picked.splice(j,1);
+  lv6[i].nx=[...new Set(picked.filter(Boolean))].join(" | ");
+  render();
+}
+const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ── 판정: adapt_workflow.py / run_check.py와 같은 규칙을 화면에서 미리 보여준다.
+function nexts(){
+  const m={};
+  lv6.forEach((t,i)=>{
+    const p=(t.nx||"").split("|").map(s=>s.trim()).filter(Boolean);
+    m[t.n]= p.length ? p : (i+1<lv6.length ? [lv6[i+1].n] : []);   // 비면 다음 줄 (하위호환)
+  });
+  return m;
+}
+function paint(){
+  const named=lv6.filter(t=>t.n);
+  const nx=nexts();
+  const branching = named.some(t=>(nx[t.n]||[]).length>1);
+  const ai = named.filter(t=>t.h==="자동"||t.h==="증강");
+  const humanOnly = named.filter(t=>t.h==="사람고유");
+  const v=document.getElementById("verdict");
+
+  if(named.length===0){ v.className="verdict"; v.innerHTML="태스크를 입력하면 여기서 판정합니다."; }
+  else if(ai.length<3){
+    v.className="verdict pack";
+    v.innerHTML=`<strong>팀 스킬팩 (AI 태스크 ${ai.length}개 — ATF ③다단계성 미충족)</strong>
+      AI에 맡길 태스크(자동·증강)가 ${ai.length}개입니다. 3개 이상이어야 에이전트가 됩니다.
+      태스크를 더 쪼개거나, 이대로 스킬 묶음으로 씁니다.`;
+  } else if(branching){
+    v.className="verdict agent";
+    v.innerHTML=`<strong>팀 에이전트 (갈림길 있음) ✅</strong>
+      AI 태스크 ${ai.length}개 · 사람고유 ${humanOnly.length}개.
+      ATF ③다단계성과 ④순서 가변성을 둘 다 넘었습니다.`;
+  } else {
+    v.className="verdict pack";
+    v.innerHTML=`<strong>팀 스킬팩 (순차 실행)</strong>
+      AI 태스크 ${ai.length}개는 충분한데 갈림길이 없습니다. 순서가 매번 같습니다.
+      <b>“이 태스크 결과에 따라 다음이 갈리는 경우가 정말 없는가”</b>를 한 번 더 보십시오 —
+      갈리는 순간 그대로 에이전트가 됩니다.`;
+  }
+
+  // 흐름
+  const targets=new Set(Object.values(nx).flat());
+  const starts=named.filter(t=>!targets.has(t.n)).map(t=>t.n);
+  const ends=named.filter(t=>(nx[t.n]||[]).length===0).map(t=>t.n);
+  document.getElementById("flow").innerHTML = named.length? `
+    <div>시작: ${starts.map(s=>`<code>${esc(s)}</code>`).join(" ")||"<em>없음(순환 의심)</em>"}
+       ${starts.length>1?'<span class="tag h">시작점이 2개 이상 — 점검기 L3에서 걸립니다</span>':''}</div>
+    ${named.map(t=>{
+      const to=(nx[t.n]||[]);
+      return `<div><code>${esc(t.n)}</code>
+        <span class="tag ${t.h==="사람고유"?"h":""}">${t.h}</span>
+        ${to.length? "→ "+to.map(x=>`<code>${esc(x)}</code>`).join(" 또는 ") : "→ <em>끝</em>"}</div>`;
+    }).join("")}
+    <div style="margin-top:8px;color:var(--muted)">끝점: ${ends.map(e=>esc(e)).join(", ")||"없음"}
+      ${ends.length>1?" — 끝점이 여럿입니다. 점검기는 끝점마다 사람 확인 지점을 요구합니다.":""}</div>` : "";
+
+  document.getElementById("out").textContent = decl();
+}
+
+// ── 내보내기: adapt_workflow.py의 정규식이 읽는 선언 블록 그대로
+function decl(){
+  const j5 = lv5.map(w=>`{n:"${w.n}"}`).join(",");
+  const j6 = lv6.map(t=>`{n:"${t.n}",h:"${t.h}",s:"${t.s||""}",nx:"${t.nx||""}"}`).join(",\n  ");
+  return `let lv5=[${j5}];\nlet lv6=[\n  ${j6}\n];\nlet sel=${sel};\nlet tgt=${tgt};`;
+}
+function page(){
+  return `<!DOCTYPE html>\n<html lang="ko"><head><meta charset="UTF-8">
+<title>${document.getElementById("t4").value} 워크플로우 설계도</title></head>
+<body>\n<h1 id="t4">${document.getElementById("t4").value}</h1>
+<p>Lv5: ${lv5[sel]?lv5[sel].n:""}</p>
+<script>\n${decl()}\n<\/script>\n</body></html>\n`;
+}
+function dl(){
+  const b=new Blob([page()],{type:"text/html"}), a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download=(document.getElementById("t4").value||"워크플로우")+"-설계도.html";
+  a.click(); flash("내려받았습니다");
+}
+function copyDecl(){ navigator.clipboard.writeText(decl()).then(()=>flash("복사했습니다")); }
+function flash(m){ const e=document.getElementById("msg"); e.textContent=m; setTimeout(()=>e.textContent="",2000); }
+
+document.getElementById("t4").addEventListener("input",paint);
+render();
+</script>
+</body>
+</html>
