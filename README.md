@@ -208,6 +208,11 @@ SKI AX 과제 「의료비 판독 AI」(Talent AX실·HR AI)를 그대로 옮긴
 `run.py`를 돌리면 청구 11건이 「지급기준대조」에서 **세 갈래로 갈라져** 서로 다른 파일로 떨어지고,
 사람고유 지점에서 멈춥니다. `agent-mockup.html`이 그 실행 장면을 화면으로 보여줍니다.
 
+**루프백이 있는 예시**: [`examples/sample/quarterly-close-agent/`](examples/sample/quarterly-close-agent/) —
+AX전략 워크샵 **재무본부 회계관리팀**의 실제 산출물(Agent 1~4)에서 옮긴 팩입니다.
+원본 Agent 3이 결산 지연의 주요 원인으로 지목한 **루프백 L4(차이대사)** 를 그대로 담았습니다.
+`run.py`를 돌리면 1회차에 차이가 나 사람에게 갔다가 되돌아와, 2회차에 차이 0으로 루프를 빠져나갑니다.
+
 ---
 
 ## ③ slide-pack — 문서를 슬라이드로
@@ -285,6 +290,7 @@ Activity Coach_SKI/
         ├── team-agent/              ← 스킬 5개 · 갈림길 없음 · E2E 실행됨
         ├── ax-share-agent/          ← 스킬 4개 · run.py로 실제 실행 + 슬라이드
         ├── medical-expense-agent/   ← ★ 갈림길 3갈래 · 실행 화면 목업 · 에이전트 판정
+        ├── quarterly-close-agent/   ← ★ 갈림길 + 루프백 · 디자인캠프 실자료 기반
         └── report-wording-pack/     ← ⚠️ 검수 없는 설계를 수용해 통과한 예시
 ```
 

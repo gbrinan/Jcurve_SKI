@@ -238,15 +238,29 @@ def main(pack_dir):
         check("L3", f"용어 일관: {min(variants)}", len(variants) == 1,
               f"표기 변형 {sorted(variants)}" if len(variants) > 1 else "")
 
-    # 규칙 일관: ±N% 임계값이 문서 간 동일한가
+    # 규칙 일관: ±N% 임계값.
+    # 한 팩에 서로 다른 규칙이 여럿일 수 있다(예: 이상 잔액 ±30%, 주석 설명필요 ±20%).
+    # 그럴 때는 CONTRACT.md의 threshold가 정본이다 — 거기 적힌 값들만 쓸 수 있다.
+    # 계약이 임계값을 말하지 않으면 예전대로 "전부 한 값이어야 한다"로 본다.
+    contract_f = pack / "CONTRACT.md"
+    contract_txt = contract_f.read_text(encoding="utf-8") if contract_f.is_file() else ""
+    m_thr = re.search(r"^threshold:\s*(.+)$", contract_txt, re.M)
+    allowed = set(re.findall(r"±\s*(\d+)\s*%", m_thr.group(1))) if m_thr else set()
+
     thresholds = {src: set(re.findall(r"±\s*(\d+)\s*%", txt))
                   for src, txt in [("agent-plan", plan), ("AGENT", agent_md)] +
                   [(n, b) for n, (_, b, _) in skills.items()]}
     declared = set().union(*thresholds.values())
-    if declared:
+    if declared and allowed:
+        stray = declared - allowed
+        check("L3", "규칙 일관: 임계값 ±% (계약이 정본)", not stray,
+              f"계약(threshold)에 없는 값 {sorted(stray)} — 계약에 적거나 문서를 고치십시오"
+              if stray else "")
+    elif declared:
         conflict = [s for s, v in thresholds.items() if v and v != declared]
         check("L3", "규칙 일관: 임계값 ±%", len(declared) == 1 and not conflict,
-              f"발견된 값 {sorted(declared)}" if len(declared) > 1 else "")
+              f"발견된 값 {sorted(declared)} — 서로 다른 규칙이라면 CONTRACT.md의 "
+              f"threshold에 전부 적으십시오" if len(declared) > 1 else "")
 
     # ── L4 E2E (기계 판정 부분) ──
     if chain:
