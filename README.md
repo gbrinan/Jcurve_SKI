@@ -20,6 +20,26 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 
 ---
 
+## 📦 설치 (교육생용 · 인터넷 없이)
+
+사내망에서 GitHub에 붙지 않아도 됩니다. 폴더를 받아 복사만 하면 됩니다.
+
+```bash
+bash install.sh          # mac / Linux / WSL
+```
+```powershell
+powershell -ExecutionPolicy Bypass -File install.ps1   # Windows
+```
+
+`~/.claude/skills/`에 스킬 2개(`activity-coach`, `slide-pack`)가 들어갑니다.
+**외부 패키지가 필요 없습니다** — 전 스크립트가 파이썬 표준 라이브러리만 씁니다.
+
+설치 스크립트는 마지막에 재무 샘플 팩을 실제로 점검해 보고 통과해야 완료로 알립니다.
+
+자세한 것은 [INSTALL.md](INSTALL.md) — 첫 실습, 값 바꿔 보기, 자주 나오는 문제까지 있습니다.
+
+---
+
 ## 🧭 전체 흐름 — 세션 6에서 7까지
 
 ```
@@ -275,8 +295,13 @@ DESIGN.md의 토큰만 사용하고, template-sk-ci.html 스켈레톤을 써.
 ```
 Activity Coach_SKI/
 ├── README.md            ← 지금 읽고 있는 문서
-├── SKILL.md             ← AI가 읽는 slide-pack 스킬 정의
+├── INSTALL.md           ← 교육생 설치 안내 (인터넷 없이)
+├── install.sh           ← 오프라인 설치 (mac/Linux/WSL)
+├── install.ps1          ← 오프라인 설치 (Windows)
 ├── DESIGN.md            ← SK CI 색·폰트 규칙 (디자인의 원본)
+├── .claude/skills/      ← 설치되는 스킬 정의 (영문)
+│   ├── activity-coach/    ← 팀 스킬들을 하나의 에이전트로 묶기
+│   └── slide-pack/        ← 문서를 발표용 슬라이드로
 ├── prompts/             ← ① 인터뷰 프롬프트 v1·v2 (팀장이 붙여넣는 것)
 ├── check/               ← ② 통합 점검기 (판정 기준 + 어댑터 + 스크립트)
 ├── personas/            ← SK 팀장·실무자 페르소나 인터뷰 (스킬 발굴 근거)
@@ -301,7 +326,7 @@ Activity Coach_SKI/
         └── report-wording-pack/     ← ⚠️ 검수 없는 설계를 수용해 통과한 예시
 ```
 
-**사람은 README만 읽으면 되고, AI는 SKILL.md와 DESIGN.md를 읽습니다.**
+**사람은 README·INSTALL을 읽고, AI는 `.claude/skills/*/SKILL.md`와 DESIGN.md를 읽습니다.**
 
 > ⚠️ 폴더를 새로 추가하면 이 구조도에도 반드시 추가하세요.
 > `run_check.py --self`가 README와 실제 폴더가 어긋나면 실패로 알려줍니다.

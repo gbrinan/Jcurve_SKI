@@ -81,7 +81,7 @@ def main(pack_dir):
     agent_md = (pack / "AGENTS.md").read_text(encoding="utf-8") if (pack / "AGENTS.md").is_file() else ""
 
     # ── L2 맥락 반영 ──
-    plan_tables = set(re.findall(r"[\w가-힣]+\.(?:xlsx|docx|pptx|pdf|csv)", plan))
+    plan_tables = set(re.findall(r"[\w가-힣]+\.(?:xlsx|docx|pptx|pdf|csv|md)", plan))
     for name, (meta, body, p) in skills.items():
         check("L2", f"{name}: 기획서에 언급", name in plan or name in agent_md,
               "agent-plan.md/AGENTS.md 어디에도 없음" if name not in plan + agent_md else "")
@@ -229,7 +229,7 @@ def main(pack_dir):
 
     # 용어 일관: 표 이름 근사 중복(공백/언더스코어 차이) 탐지
     all_text = plan + agent_md + "".join(b for _, b, _ in skills.values())
-    names = set(re.findall(r"[\w가-힣_ ]+\.(?:xlsx|docx|pptx|pdf|csv)", all_text))
+    names = set(re.findall(r"[\w가-힣_ ]+\.(?:xlsx|docx|pptx|pdf|csv|md)", all_text))
     normalized = {}
     for n in names:
         key = n.replace(" ", "").replace("_", "")

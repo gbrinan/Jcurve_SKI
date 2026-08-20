@@ -7,16 +7,28 @@
 다시 계정검증대사로 되돌아온다. 차이가 0이 될 때까지 돈다 — 원본 워크샵이
 결산 지연의 주요 원인으로 지목한 그 자리(L4)다.
 
+입력은 `data/결산데이터.md` 하나다. 표마다 왜 그 값인지가 문장으로 붙어 있어
+교육생이 값을 고쳐가며 흐름이 어디로 갈라지는지 볼 수 있다.
+
 사람고유 지점은 자동으로 넘어가지 않는다. 조정 확정은 사람이 한 것으로 **표시만** 하고,
 그 사실을 화면에 그대로 적는다.
 """
-import csv
 import json
 import sys
 from pathlib import Path
 
 PACK = Path(__file__).resolve().parent
 DATA, OUT = PACK / "data", PACK / "out"
+SRC = DATA / "결산데이터.md"
+
+# mdtable.py는 툴킷(check/)에 있다. 설치 위치가 어디든 찾도록 몇 군데를 본다.
+for cand in (PACK.parents[2] / "check", PACK.parent / "check", PACK / "check"):
+    if (cand / "mdtable.py").is_file():
+        sys.path.insert(0, str(cand))
+        break
+else:
+    sys.exit("mdtable.py를 찾지 못했습니다 — 툴킷의 check/ 폴더가 있어야 합니다.")
+from mdtable import read_table, num   # noqa: E402
 
 이상임계 = 0.30      # agent-plan.md §3 · CONTRACT.md threshold와 같아야 한다
 설명임계 = 0.20
@@ -27,17 +39,23 @@ def step(skill, msg):
     print(f"  [{skill}] {msg}")
 
 
-def load(name):
-    with (DATA / name).open(encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+def load(title):
+    """결산데이터.md 안의 표 하나를 읽는다."""
+    return read_table(SRC, title)
 
 
-def write(name, rows, cols):
+def write(name, rows, cols, note=""):
+    """산출물도 마크다운 표로 쓴다 — 만든 것을 그대로 열어 볼 수 있게."""
     OUT.mkdir(exist_ok=True)
-    with (OUT / name).open("w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=cols)
-        w.writeheader()
-        w.writerows(rows)
+    lines = [f"# {Path(name).stem}", ""]
+    if note:
+        lines += [f"> {note}", ""]
+    lines += ["| " + " | ".join(cols) + " |",
+              "|" + "|".join("---" for _ in cols) + "|"]
+    for r in rows:
+        lines.append("| " + " | ".join(str(r.get(c, "")) for c in cols) + " |")
+    lines.append("")
+    (OUT / name).write_text("\n".join(lines), encoding="utf-8")
     print(f"  → out/{name} ({len(rows)}건)")
 
 
@@ -53,14 +71,14 @@ def 결산일정수립(cal):
     return 대기
 
 
-# ── 2. 원장잔액수집 [자동] → 잔액수집결과.csv ──────────────────────────
+# ── 2. 원장잔액수집 [자동] → 잔액수집결과.md ──────────────────────────
 COLS_잔액 = ["계정코드", "계정명", "당기잔액", "전기잔액", "증감률", "이상여부"]
 
 
 def 원장잔액수집(ledger, subs):
     rows = []
     for a in ledger:
-        전, 당 = int(a["전기잔액"]), int(a["당기잔액"])
+        전, 당 = num(a["전기잔액"]), num(a["당기잔액"])
         if 전 == 0:                                  # 0으로 나누지 않는다
             증감, 이상 = "", "신규계정"
         else:
@@ -76,24 +94,24 @@ def 원장잔액수집(ledger, subs):
     if 미수신:
         step("원장잔액수집", f"⚠️ 계열사 미수신 {len(미수신)}곳: {', '.join(미수신)} "
                             f"— 0으로 채우지 않고 합계에서 제외 (PP-6)")
-    write("잔액수집결과.csv", rows, COLS_잔액)
+    write("잔액수집결과.md", rows, COLS_잔액, "전기 대비 ±30% 초과 또는 부호 반전을 이상으로 표시했습니다.")
     return rows, 미수신
 
 
-# ── 3. 조정분개작성 [증강] → 조정분개장.csv ────────────────────────────
+# ── 3. 조정분개작성 [증강] → 조정분개장.md ────────────────────────────
 COLS_분개 = ["분개번호", "계정코드", "차변", "대변", "사유", "상태"]
-# 에이전트가 아는 사유만 적는다. 모르는 계정은 비워 두고 사람에게 넘긴다.
-사유표 = {"1310": "선급금 신규 계상 — 전기 잔액 없음"}
 
 
-def 조정분개작성(잔액):
+def 조정분개작성(잔액, 사유사전):
+    # 아는 사유만 쓴다. 사전에 없는 계정은 지어내지 않고 사람에게 넘긴다.
+    사유표 = {r["계정코드"]: r["사유"] for r in 사유사전}
     rows, n = [], 0
     for r in 잔액:
         if not r["이상여부"]:
             continue
         n += 1
         사유 = 사유표.get(r["계정코드"], "")
-        차 = abs(int(r["당기잔액"]) - int(r["전기잔액"]))
+        차 = abs(num(r["당기잔액"]) - num(r["전기잔액"]))
         rows.append({"분개번호": f"ADJ-3Q-{n:03d}", "계정코드": r["계정코드"],
                      "차변": 차 if 차 > 0 else 0, "대변": 0,
                      "사유": 사유 or "사유확인필요",
@@ -102,11 +120,11 @@ def 조정분개작성(잔액):
     step("조정분개작성", f"조정분개 초안 {len(rows)}건"
                         + (f" · 사유확인필요 {len(확인필요)}건 (사유를 지어내지 않음)" if 확인필요 else ""))
     step("조정분개작성", "검토·승인(A-A2-1-3-3)은 하지 않음 — 초안까지")
-    write("조정분개장.csv", rows, COLS_분개)
+    write("조정분개장.md", rows, COLS_분개, "초안입니다. 검토·승인은 하지 않았습니다.")
     return rows
 
 
-# ── 4. 주석초안작성 [증강] → 주석초안.csv ──────────────────────────────
+# ── 4. 주석초안작성 [증강] → 주석초안.md ──────────────────────────────
 COLS_주석 = ["주석번호", "주석항목", "전기금액", "당기금액", "증감률", "상태"]
 주석매핑 = {"5": "1010", "7": "1110", "9": "1210", "14": "2110", "18": "4010"}
 
@@ -122,7 +140,7 @@ def 주석초안작성(전기주석, 잔액):
                          "전기금액": n_["전기금액"], "당기금액": "", "증감률": "",
                          "상태": "신규항목"})
             continue
-        전, 당 = int(n_["전기금액"]), abs(int(acc["당기잔액"]))
+        전, 당 = num(n_["전기금액"]), abs(num(acc["당기잔액"]))
         r = (당 - 전) / 전 if 전 else 0
         rows.append({"주석번호": n_["주석번호"], "주석항목": n_["주석항목"],
                      "전기금액": 전, "당기금액": 당, "증감률": f"{r:+.1%}",
@@ -130,7 +148,7 @@ def 주석초안작성(전기주석, 잔액):
     설명 = [r for r in rows if r["상태"] == "설명필요"]
     step("주석초안작성", f"주석 {len(rows)}개 · 설명필요 {len(설명)}건 (전기 대비 ±{설명임계:.0%} 초과)")
     step("주석초안작성", "검토·확정(A-A2-1-4-3)은 하지 않음 — 초안까지")
-    write("주석초안.csv", rows, COLS_주석)
+    write("주석초안.md", rows, COLS_주석, "전기 항목 구조를 그대로 쓰고 당기 숫자만 채웠습니다.")
     return rows
 
 
@@ -146,14 +164,14 @@ def 계정검증대사(잔액, 확인서, 회차, 조정반영=None):
             합.setdefault(c["계정코드"], None)
             continue
         합[c["계정코드"]] = 합.get(c["계정코드"]) or 0
-        합[c["계정코드"]] += int(c["확인잔액"])
+        합[c["계정코드"]] += num(c["확인잔액"])
 
     rows, 차이건 = [], []
     for 코드, 확인 in 합.items():
         acc = by.get(코드)
         if acc is None:
             continue
-        원장 = int(acc["당기잔액"])
+        원장 = num(acc["당기잔액"])
         if 확인 is None:
             rows.append({"계정코드": 코드, "계정명": acc["계정명"], "원장잔액": 원장,
                          "확인잔액": "", "차이": "", "상태": "확인서미수신", "회차": 회차})
@@ -214,15 +232,16 @@ def 결산마감(미수신계열사, 대사, 주석, 분개, 회차):
 
 def main():
     print("분기/반기 결산 에이전트  (재무본부 회계관리팀 · P-A2-1)\n")
-    cal = load("결산캘린더.csv")
-    ledger, subs = load("SAP원장잔액.csv"), load("계열사연결패키지.csv")
-    확인서, 전기주석 = load("외부확인서.csv"), load("전기주석.csv")
-    print(f"입력: SAP원장 {len(ledger)}계정 · 계열사 {len(subs)}곳 · "
+    cal = load("결산캘린더")
+    ledger, subs = load("SAP원장잔액"), load("계열사연결패키지")
+    확인서, 전기주석 = load("외부확인서"), load("전기주석")
+    사유사전 = load("조정사유사전")
+    print(f"입력: {SRC.relative_to(PACK)} — SAP원장 {len(ledger)}계정 · 계열사 {len(subs)}곳 · "
           f"외부확인서 {len(확인서)}건 · 전기주석 {len(전기주석)}개\n")
 
     결산일정수립(cal)
     잔액, 미수신계열사 = 원장잔액수집(ledger, subs)
-    분개 = 조정분개작성(잔액)
+    분개 = 조정분개작성(잔액, 사유사전)
     주석 = 주석초안작성(전기주석, 잔액)
 
     # ── 갈림길 + 루프백 ────────────────────────────────────────────────
@@ -235,13 +254,13 @@ def main():
             break
         if 회차 >= MAX회차:
             step("계정검증대사", f"❌ {MAX회차}회차까지 차이가 남아 멈춥니다 — 사람에게 넘깁니다")
-            write("대사결과.csv", 누적, COLS_대사)
+            write("대사결과.md", 누적, COLS_대사)
             return 1
         print(f"  ◆ 차이 발견? → Yes · 차이분석조정으로 분기")
         조정반영 |= 차이분석조정(차이건, 회차)
         회차 += 1
 
-    write("대사결과.csv", 누적, COLS_대사)
+    write("대사결과.md", 누적, COLS_대사, f"{회차}회차까지의 대사 기록입니다. 회차 칸이 루프백 횟수입니다.")
     결산마감(미수신계열사, 대사, 주석, 분개, 회차)
 
     OUT.mkdir(exist_ok=True)

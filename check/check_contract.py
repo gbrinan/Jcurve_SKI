@@ -135,7 +135,7 @@ def main(pack_dir, run_harness=False):
                 else:
                     finding(RED, name, f"{field}에 계약에 없는 표: {t} — 팀이 계약에 추가할지 결정 필요")
         # 이름은 반드시 문자로 시작한다 — 마크다운 불릿('- ')을 이름으로 삼지 않기 위함
-        for t in set(re.findall(r"[\w가-힣]+(?:[ _\-][\w가-힣]+)*\.(?:xlsx|docx|pptx|pdf|csv)", body)):
+        for t in set(re.findall(r"[\w가-힣]+(?:[ _\-][\w가-힣]+)*\.(?:xlsx|docx|pptx|pdf|csv|md)", body)):
             if t not in c["tables"] and norm(t) in t_canon:
                 finding(YELLOW, name, f"본문의 표 이름 표기가 다름: {t}",
                         (str(path), t, t_canon[norm(t)]))
