@@ -283,14 +283,21 @@ Activity Coach_SKI/
 ├── assets/              ← ③ 슬라이드 테마 뼈대 + 워크플로우 설계도 생성기
 └── examples/            ← 완성 예시 모음
     ├── *.html                   ← 테마별 슬라이드 예시
-    ├── upstream/                ← 세션 3·4 코치 산출물 규격 예시
+    ├── upstream/                ← 상류 산출물 규격 예시
+    │   ├── designcamp/             ← ★ 디자인캠프 종합보고서 4팀분 (분기·루프백의 출처)
+    │   ├── workflow/               ← 워크플로우 설계도 (Lv4-5-6 + 분기 + 루프백)
+    │   ├── wireframe/              ← 세션 4 WFDATA 규격
+    │   └── atf/                    ← 세션 3 ATF 판정 규격
     └── sample/
         ├── agent-plan.md            ← 기획서 입력 예시
         ├── agent-plan-deck.html     ← 슬라이드 출력 예시
         ├── team-agent/              ← 스킬 5개 · 갈림길 없음 · E2E 실행됨
         ├── ax-share-agent/          ← 스킬 4개 · run.py로 실제 실행 + 슬라이드
         ├── medical-expense-agent/   ← ★ 갈림길 3갈래 · 실행 화면 목업 · 에이전트 판정
-        ├── quarterly-close-agent/   ← ★ 갈림길 + 루프백 · 디자인캠프 실자료 기반
+        ├── quarterly-close-agent/   ← ★ 재무 · 갈림길 + 루프백 · 디자인캠프 실자료 기반
+        ├── hr-appraisal-agent/      ← 인사 · 평가 분포 편차 조정 루프
+        ├── monthly-close-agent/     ← 전략기획 · 실적 소명 루프
+        ├── kaizen-review-agent/     ← 운영효율화 · 3갈래 심사 + 보완 루프
         └── report-wording-pack/     ← ⚠️ 검수 없는 설계를 수용해 통과한 예시
 ```
 
