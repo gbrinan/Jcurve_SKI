@@ -142,6 +142,13 @@
   .skill .rule{font-size:12.5px;background:var(--bg-soft);border-left:3px solid var(--brand-sub);
                padding:7px 11px;border-radius:0 8px 8px 0;margin-top:8px}
   .skill .rule .k{font-weight:700;color:var(--brand-sub);margin-right:5px}
+  table.srcmap{min-width:640px}
+  table.srcmap td.mut{color:var(--muted)}
+  table.srcmap tr.hi td{background:#FDF2F4}
+  table.srcmap code{background:var(--bg-soft);border:1px solid var(--line);
+                    border-radius:4px;padding:1px 5px;font-size:12px}
+  .cov{margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .cov b{color:var(--text)}
   pre.tree{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
            background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
            overflow-x:auto;line-height:1.75;margin:0}
@@ -326,12 +333,19 @@
 
 <section class="sec">
   <div class="sec-head"><span class="no">③</span>
+    <h2>원본 대조 — 디자인캠프 Lv3~Lv6가 무엇이 되었나</h2>
+    <span class="hint">원본 문서의 어느 항목이 팩의 어느 파일이 됐는지</span></div>
+  <div class="panel"><div class="scroll"><table class="srcmap"><thead><tr><th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th><th>이 팩의 무엇이 되었나</th></tr></thead><tbody><tr><td>Lv3 업무</td><td>AX전략 공유하기 / Lv5: 계열사 AX전략 팀장에게 공유</td><td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr><tr class="hi"><td>Lv4 프로세스</td><td>계열사 AX전략 팀장에게 공유</td><td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 공유대상자목록정리</td><td><b>Lv6</b></td><td><code>skills/depth/공유대상자목록정리/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 관련회의록첨부</td><td><b>Lv6</b></td><td><code>skills/depth/관련회의록첨부/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 메일본문작성</td><td><b>Lv6</b></td><td><code>skills/depth/메일본문작성/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 메일발송</td><td><b>Lv6</b></td><td><code>skills/depth/메일발송/SKILL.md</code></td></tr><tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td><td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr></tbody></table></div><p class="cov">원본 Lv5 Task <b>4개</b> → 스킬 <b>4개</b> · 원본 ID가 남은 것 <b>0/4</b> <span class="mut">— 나머지는 설계도에 <code>src</code>를 적으면 채워집니다</span></p></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">④</span>
     <h2>Lv6 스킬 4개 — 만든 사람과 판단 기준</h2></div>
   <div class="skill-grid"><div class="skill"><span class="owner">👤 (미정)</span><span class="tag ">Lv6 · (미정)</span><div class="sname">1. 공유대상자목록정리</div><div class="io"><b>입력</b> 공유대상자후보 → <b>출력</b> 공유대상자목록결과</div><div class="io"><b>읽기</b> 공유대상자후보.csv</div><div class="io"><b>쓰기</b> 공유대상자목록.csv</div></div><div class="skill"><span class="owner">👤 (미정)</span><span class="tag ">Lv6 · (미정)</span><div class="sname">2. 관련회의록첨부</div><div class="io"><b>입력</b> 회의록후보, 공유대상자목록결과 → <b>출력</b> 첨부파일목록결과</div><div class="io"><b>읽기</b> 회의록목록.csv</div></div><div class="skill"><span class="owner">👤 (미정)</span><span class="tag ">Lv6 · (미정)</span><div class="sname">3. 메일본문작성</div><div class="io"><b>입력</b> 공유대상자목록결과, 첨부파일목록결과 → <b>출력</b> 메일초안</div></div><div class="skill"><span class="owner">👤 (미정)</span><span class="tag ">Lv6 · (미정)</span><div class="sname">4. 메일발송</div><div class="io"><b>입력</b> 메일초안 → <b>출력</b> 발송대기</div></div></div>
 </section>
 
 <section class="sec">
-  <div class="sec-head"><span class="no">④</span>
+  <div class="sec-head"><span class="no">⑤</span>
     <h2>폴더 트리</h2>
     <span class="hint">교육생이 받는 팩의 실제 모양</span></div>
   <div class="panel"><pre class="tree">ax-share-agent/
@@ -351,7 +365,7 @@
 </section>
 
 <section class="sec runhead">
-  <div class="sec-head"><span class="no">⑤</span>
+  <div class="sec-head"><span class="no">⑥</span>
     <h2>실행 — 아래에서 직접 돌려 보십시오</h2>
     <span class="hint">▶ 실행 · 사람고유 지점에서 멈춥니다</span></div>
 </section>
@@ -415,6 +429,28 @@
   "name": "계열사 AX전략 공유 에이전트",
   "level": "Lv.5",
   "one_liner": ""
+ },
+ "source_map": {
+  "lv3": "",
+  "lv4_process": "",
+  "lv5_tasks": [
+   {
+    "source_id": "",
+    "skill": "공유대상자목록정리"
+   },
+   {
+    "source_id": "",
+    "skill": "관련회의록첨부"
+   },
+   {
+    "source_id": "",
+    "skill": "메일본문작성"
+   },
+   {
+    "source_id": "",
+    "skill": "메일발송"
+   }
+  ]
  },
  "levels": {
   "lv4": "AX전략 공유하기 / Lv5: 계열사 AX전략 팀장에게 공유",

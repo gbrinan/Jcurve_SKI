@@ -45,7 +45,24 @@ AI 태스크(자동+증강) 4개 · 사람고유 3개 · 갈림길 있음(경로
 - 보완요청 — 사람고유. 확인 요청 후 멈춘다.
 - 심의결과통보 — 사람고유. 확인 요청 후 멈춘다.
 
-## 8. 흐름도
+## 8. 원본 대조 (디자인캠프 Lv3~Lv6 → 이 팩)
+
+| 원본 계층 | 원본 항목 | 우리 계층 | 이 팩의 무엇이 되었나 |
+|---|---|---|---|
+| Lv3 업무 | 개선과제 | **Lv4** | 문서에만 — 팩 범위 밖 |
+| Lv4 프로세스 | P-D1-1 개선과제 발굴 및 심의 | **Lv5** | **이 팩 = 에이전트 1개** |
+| Lv5 Task | T-D1-1-1 아이디어접수 | **Lv6** | `skills/depth/아이디어접수/SKILL.md` |
+| Lv5 Task | T-D1-1-2 효과정량화 | **Lv6** | `skills/depth/효과정량화/SKILL.md` |
+| Lv5 Task | T-D1-1-3 적합성심사 | **Lv6** | `skills/depth/적합성심사/SKILL.md` |
+| Lv5 Task | A-D1-1-5-2 즉시실행통보 | **Lv6** | `skills/depth/즉시실행통보/SKILL.md` |
+| Lv5 Task | T-D1-1-4 보완요청 | **Lv6** | `skills/depth/보완요청/SKILL.md` |
+| Lv5 Task | T-D1-1-5 심의상정 | **Lv6** | `skills/depth/심의상정/SKILL.md` |
+| Lv5 Task | A-D1-1-5-2b 심의결과통보 | **Lv6** | `skills/depth/심의결과통보/SKILL.md` |
+| Lv6 Activity | (원본 문서 참조) | 판단기준 | 각 SKILL.md 본문 |
+
+원본 Lv5 Task 7개 → 스킬 7개 (전부 옮김)
+
+## 9. 흐름도
 ```mermaid
 graph TD
   T0["아이디어접수"]
@@ -69,7 +86,7 @@ graph TD
 
 - 마름모 = 갈림길 · 빨간 테두리 = 사람이 직접 판단하는 지점 · 점선 = 루프백(되돌아가기)
 
-## 9. 폴더 트리
+## 10. 폴더 트리
 ```mermaid
 graph TD
   R["📁 팀-agent/"]

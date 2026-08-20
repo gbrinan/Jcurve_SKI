@@ -142,6 +142,13 @@
   .skill .rule{font-size:12.5px;background:var(--bg-soft);border-left:3px solid var(--brand-sub);
                padding:7px 11px;border-radius:0 8px 8px 0;margin-top:8px}
   .skill .rule .k{font-weight:700;color:var(--brand-sub);margin-right:5px}
+  table.srcmap{min-width:640px}
+  table.srcmap td.mut{color:var(--muted)}
+  table.srcmap tr.hi td{background:#FDF2F4}
+  table.srcmap code{background:var(--bg-soft);border:1px solid var(--line);
+                    border-radius:4px;padding:1px 5px;font-size:12px}
+  .cov{margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .cov b{color:var(--text)}
   pre.tree{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
            background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
            overflow-x:auto;line-height:1.75;margin:0}
@@ -359,12 +366,19 @@
 
 <section class="sec">
   <div class="sec-head"><span class="no">③</span>
+    <h2>원본 대조 — 디자인캠프 Lv3~Lv6가 무엇이 되었나</h2>
+    <span class="hint">원본 문서의 어느 항목이 팩의 어느 파일이 됐는지</span></div>
+  <div class="panel"><div class="scroll"><table class="srcmap"><thead><tr><th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th><th>이 팩의 무엇이 되었나</th></tr></thead><tbody><tr><td>Lv3 업무</td><td>평가·보상</td><td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr><tr class="hi"><td>Lv4 프로세스</td><td>P-B2-1 연간 성과평가 운영</td><td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr><tr><td>Lv5 Task</td><td><code>T-B2-1-1</code> 평가계획수립</td><td><b>Lv6</b></td><td><code>skills/depth/평가계획수립/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-B2-1-2</code> 자기평가취합</td><td><b>Lv6</b></td><td><code>skills/depth/자기평가취합/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-B2-1-3</code> 리더평가입력점검</td><td><b>Lv6</b></td><td><code>skills/depth/리더평가입력점검/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-B2-1-4</code> 평가정합성검증</td><td><b>Lv6</b></td><td><code>skills/depth/평가정합성검증/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>A-B2-1-4-3</code> 이상조직조정요청</td><td><b>Lv6</b></td><td><code>skills/depth/이상조직조정요청/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-B2-1-5</code> 등급확정통보</td><td><b>Lv6</b></td><td><code>skills/depth/등급확정통보/SKILL.md</code></td></tr><tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td><td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr></tbody></table></div><p class="cov">원본 Lv5 Task <b>6개</b> → 스킬 <b>6개</b> · 원본 ID가 남은 것 <b>6/6</b></p></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">④</span>
     <h2>Lv6 스킬 6개 — 만든 사람과 판단 기준</h2></div>
   <div class="skill-grid"><div class="skill"><span class="owner">👤 (미정)</span><span class="tag auto">Lv6 · 자동</span><div class="sname">1. 평가계획수립</div><div class="io"><b>입력</b> 연간성과평가운영입력 → <b>출력</b> 평가계획수립결과</div></div><div class="skill"><span class="owner">👤 (미정)</span><span class="tag auto">Lv6 · 자동</span><div class="sname">2. 자기평가취합</div><div class="io"><b>입력</b> 평가계획수립결과 → <b>출력</b> 자기평가취합결과</div></div><div class="skill"><span class="owner">👤 (미정)</span><span class="tag aug">Lv6 · 증강</span><div class="sname">3. 리더평가입력점검</div><div class="io"><b>입력</b> 자기평가취합결과 → <b>출력</b> 리더평가입력점검결과</div></div><div class="skill"><span class="owner">👤 (미정)</span><span class="tag aug">Lv6 · 증강</span><div class="sname">4. 평가정합성검증</div><div class="io"><b>입력</b> 리더평가입력점검결과 → <b>출력</b> 평가정합성검증결과</div><div class="rule"><span class="k">갈림길</span>분포 이상 있음? Yes -&gt; 이상조직조정요청; No -&gt; 등급확정통보</div></div><div class="skill"><span class="owner">👤 (미정)</span><span class="tag human">Lv6 · 사람고유</span><div class="sname">5. 이상조직조정요청</div><div class="io"><b>입력</b> 평가정합성검증결과 → <b>출력</b> 이상조직조정요청결과</div><div class="rule"><span class="k">루프 탈출</span>조정 후 재검증한다. 분포가 가이드라인 안에 들어오면 반복이 끝난다</div></div><div class="skill"><span class="owner">👤 (미정)</span><span class="tag human">Lv6 · 사람고유</span><div class="sname">6. 등급확정통보</div><div class="io"><b>입력</b> 평가정합성검증결과 → <b>출력</b> 등급확정통보결과</div></div></div>
 </section>
 
 <section class="sec">
-  <div class="sec-head"><span class="no">④</span>
+  <div class="sec-head"><span class="no">⑤</span>
     <h2>폴더 트리</h2>
     <span class="hint">교육생이 받는 팩의 실제 모양</span></div>
   <div class="panel"><pre class="tree">hr-appraisal-agent/
@@ -386,7 +400,7 @@
 </section>
 
 <section class="sec runhead">
-  <div class="sec-head"><span class="no">⑤</span>
+  <div class="sec-head"><span class="no">⑥</span>
     <h2>실행 — 아래에서 직접 돌려 보십시오</h2>
     <span class="hint">▶ 실행 · 사람고유 지점에서 멈춥니다</span></div>
 </section>
@@ -468,6 +482,36 @@
   "name": "연간 성과평가 운영",
   "level": "Lv.5",
   "one_liner": "(미정 — 인터뷰 Q2)"
+ },
+ "source_map": {
+  "lv3": "평가·보상",
+  "lv4_process": "P-B2-1 연간 성과평가 운영",
+  "lv5_tasks": [
+   {
+    "source_id": "T-B2-1-1",
+    "skill": "평가계획수립"
+   },
+   {
+    "source_id": "T-B2-1-2",
+    "skill": "자기평가취합"
+   },
+   {
+    "source_id": "T-B2-1-3",
+    "skill": "리더평가입력점검"
+   },
+   {
+    "source_id": "T-B2-1-4",
+    "skill": "평가정합성검증"
+   },
+   {
+    "source_id": "A-B2-1-4-3",
+    "skill": "이상조직조정요청"
+   },
+   {
+    "source_id": "T-B2-1-5",
+    "skill": "등급확정통보"
+   }
+  ]
  },
  "levels": {
   "lv4": "평가·보상",

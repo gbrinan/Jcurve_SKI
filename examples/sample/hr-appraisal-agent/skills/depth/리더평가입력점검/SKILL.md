@@ -2,6 +2,7 @@
 name: 리더평가입력점검
 owner: (미정)
 quadrant: depth
+source_id: T-B2-1-3
 human: 증강
 skillability: 중간
 inputs: [자기평가취합결과]

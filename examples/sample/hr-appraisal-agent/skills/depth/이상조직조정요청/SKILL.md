@@ -2,6 +2,7 @@
 name: 이상조직조정요청
 owner: (미정)
 quadrant: depth
+source_id: A-B2-1-4-3
 human: 사람고유
 skillability: 낮음
 inputs: [평가정합성검증결과]

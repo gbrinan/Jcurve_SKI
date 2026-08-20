@@ -33,10 +33,18 @@ def parse(path):
             continue
         nx = re.search(r'nx:"([^"]*)"', ent)
         w = re.search(r'w:"([^"]*)"', ent)     # 갈림길 조건 (원본 흐름도의 ◆ 문장)
+        src = re.search(r'src:"([^"]*)"', ent)  # 원본 문서의 ID (T-A2-1-1 등)
         lv6.append({"n": m.group(1), "h": m.group(2), "s": m.group(3),
                     "nx": nx.group(1) if nx else None,
-                    "w": w.group(1) if w else ""})
-    return dict(lv4=lv4, lv5=lv5, sel=sel, lv6=lv6, tgt=tgt)
+                    "w": w.group(1) if w else "",
+                    "src": src.group(1) if src else ""})
+    # 원본 계층 정보 — 있으면 대조표를 만들 수 있고, 없으면 (미정)으로 남는다
+    srcmap = {}
+    for k in ("srcLv3", "srcLv4", "srcLv5"):
+        m2 = re.search(rf'{k}\s*=\s*"([^"]*)"', t)
+        if m2:
+            srcmap[k] = m2.group(1)
+    return dict(lv4=lv4, lv5=lv5, sel=sel, lv6=lv6, tgt=tgt, src=srcmap)
 
 
 def slug(s):
@@ -135,6 +143,7 @@ def main(html, out_dir):
                      "  (검수 없이 내보내기로 정했다면 DECISIONS.md에 그 결정을 기록한다)", ""]
         fm = ["---", f"name: {name}", "owner: (미정)", "quadrant: depth",
               f"human: {t['h']}", f"skillability: {t['s'] or '미완료'}",
+              f"source_id: {t.get('src') or '(미정)'}",
               f"inputs: [{', '.join(ins)}]",
               f"outputs: [{name}결과]", "reads: []", "writes: []",
               f"next: {nxt}"]
@@ -205,7 +214,20 @@ def main(html, out_dir):
     if not human_only:
         plan.append("- 사람고유 태스크가 없다. 위 끝점이 유일한 검수 지점이다.")
 
-    plan += ["", "## 8. 흐름도", "```mermaid", "graph TD"]
+    # 원본 대조 — 디자인캠프 계층이 이 팩의 무엇이 되었는지. 없으면 (미정)으로 남긴다.
+    s = d.get("src", {})
+    plan += ["", "## 8. 원본 대조 (디자인캠프 Lv3~Lv6 → 이 팩)", "",
+             "| 원본 계층 | 원본 항목 | 우리 계층 | 이 팩의 무엇이 되었나 |",
+             "|---|---|---|---|",
+             f"| Lv3 업무 | {s.get('srcLv3') or '(미정)'} | **Lv4** | 문서에만 — 팩 범위 밖 |",
+             f"| Lv4 프로세스 | {s.get('srcLv4') or '(미정)'} | **Lv5** | **이 팩 = 에이전트 1개** |"]
+    for i, t_ in enumerate(tasks):
+        plan.append(f"| Lv5 Task | {t_.get('src') or '(미정)'} {t_['n']} | **Lv6** | "
+                    f"`skills/depth/{names[i]}/SKILL.md` |")
+    plan += [f"| Lv6 Activity | (원본 문서 참조) | 판단기준 | 각 SKILL.md 본문 |", "",
+             f"원본 Lv5 Task {len(tasks)}개 → 스킬 {len(tasks)}개 "
+             f"({'전부 옮김' if all(t_.get('src') for t_ in tasks) else '원본 ID 일부 (미정)'})", "",
+             "## 9. 흐름도", "```mermaid", "graph TD"]
     ids = {n: f"T{i}" for i, n in enumerate(names)}
     for i, t in enumerate(tasks):
         n = names[i]
@@ -222,7 +244,7 @@ def main(html, out_dir):
             plan.append(f'  {ids[names[i]]} -.->|"↩ {tasks[i].get("w") or "재작업"}"| {ids[b]}')
     plan += ["```", "",
              "- 마름모 = 갈림길 · 빨간 테두리 = 사람이 직접 판단하는 지점 · 점선 = 루프백(되돌아가기)", "",
-             "## 9. 폴더 트리", "```mermaid", "graph TD", '  R["📁 팀-agent/"]',
+             "## 10. 폴더 트리", "```mermaid", "graph TD", '  R["📁 팀-agent/"]',
              '  R --> A["README.md"]', '  R --> B["agent-plan.md · SSOT"]',
              '  R --> C["AGENTS.md"]', '  R --> D["CONTRACT.md"]',
              '  R --> S["📁 skills/depth/"]', '  R --> T["📁 data/"]']

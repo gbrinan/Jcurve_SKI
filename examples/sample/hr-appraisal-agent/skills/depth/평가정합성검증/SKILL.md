@@ -2,6 +2,7 @@
 name: 평가정합성검증
 owner: (미정)
 quadrant: depth
+source_id: T-B2-1-4
 human: 증강
 skillability: 중간
 inputs: [리더평가입력점검결과]

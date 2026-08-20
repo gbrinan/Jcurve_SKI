@@ -2,6 +2,7 @@
 name: 자기평가취합
 owner: (미정)
 quadrant: depth
+source_id: T-B2-1-2
 human: 자동
 skillability: 높음
 inputs: [평가계획수립결과]

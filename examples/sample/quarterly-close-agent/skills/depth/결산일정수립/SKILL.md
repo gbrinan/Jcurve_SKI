@@ -2,6 +2,7 @@
 name: 결산일정수립
 owner: 결산담당
 quadrant: depth
+source_id: T-A2-1-1
 human: 증강
 skillability: 중간
 inputs: [분기/반기결산입력]

@@ -2,6 +2,7 @@
 name: 주석초안작성
 owner: 결산담당
 quadrant: depth
+source_id: T-A2-1-4
 human: 증강
 skillability: 중간
 inputs: [조정분개작성결과]

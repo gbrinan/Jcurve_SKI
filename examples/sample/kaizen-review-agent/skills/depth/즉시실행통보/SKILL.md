@@ -2,6 +2,7 @@
 name: 즉시실행통보
 owner: (미정)
 quadrant: depth
+source_id: A-D1-1-5-2
 human: 사람고유
 skillability: 낮음
 inputs: [적합성심사결과]

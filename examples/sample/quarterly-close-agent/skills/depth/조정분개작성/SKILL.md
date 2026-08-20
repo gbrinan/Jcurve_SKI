@@ -2,6 +2,7 @@
 name: 조정분개작성
 owner: 결산담당
 quadrant: depth
+source_id: T-A2-1-3
 human: 증강
 skillability: 중간
 inputs: [원장잔액수집결과]

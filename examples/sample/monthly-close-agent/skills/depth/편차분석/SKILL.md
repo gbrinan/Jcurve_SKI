@@ -2,6 +2,7 @@
 name: 편차분석
 owner: (미정)
 quadrant: depth
+source_id: T-C2-1-2
 human: 자동
 skillability: 높음
 inputs: [사업부실적취합결과]

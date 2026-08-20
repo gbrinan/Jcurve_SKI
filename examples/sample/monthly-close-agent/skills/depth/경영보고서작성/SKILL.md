@@ -2,6 +2,7 @@
 name: 경영보고서작성
 owner: (미정)
 quadrant: depth
+source_id: T-C2-1-4
 human: 증강
 skillability: 중간
 inputs: [편차분석결과]

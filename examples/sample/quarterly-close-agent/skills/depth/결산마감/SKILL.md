@@ -2,6 +2,7 @@
 name: 결산마감
 owner: 회계관리팀장
 quadrant: depth
+source_id: T-A2-1-6
 human: 사람고유
 skillability: 낮음
 inputs: [계정검증대사결과]

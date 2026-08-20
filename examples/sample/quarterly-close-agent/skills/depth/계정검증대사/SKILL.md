@@ -2,6 +2,7 @@
 name: 계정검증대사
 owner: 결산담당
 quadrant: depth
+source_id: T-A2-1-5
 human: 증강
 skillability: 중간
 inputs: [주석초안작성결과, 차이분석조정결과]

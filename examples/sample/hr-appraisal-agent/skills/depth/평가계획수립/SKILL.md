@@ -2,6 +2,7 @@
 name: 평가계획수립
 owner: (미정)
 quadrant: depth
+source_id: T-B2-1-1
 human: 자동
 skillability: 높음
 inputs: [연간성과평가운영입력]

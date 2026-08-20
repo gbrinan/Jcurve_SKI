@@ -2,6 +2,7 @@
 name: 효과정량화
 owner: (미정)
 quadrant: depth
+source_id: T-D1-1-2
 human: 자동
 skillability: 높음
 inputs: [아이디어접수결과]

@@ -2,6 +2,7 @@
 name: 적합성심사
 owner: (미정)
 quadrant: depth
+source_id: T-D1-1-3
 human: 증강
 skillability: 중간
 inputs: [효과정량화결과]

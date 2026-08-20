@@ -2,6 +2,7 @@
 name: 심의결과통보
 owner: (미정)
 quadrant: depth
+source_id: A-D1-1-5-2b
 human: 사람고유
 skillability: 낮음
 inputs: [심의상정결과]

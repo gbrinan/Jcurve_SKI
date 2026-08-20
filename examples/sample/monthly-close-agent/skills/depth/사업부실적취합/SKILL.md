@@ -2,6 +2,7 @@
 name: 사업부실적취합
 owner: (미정)
 quadrant: depth
+source_id: T-C2-1-1
 human: 자동
 skillability: 높음
 inputs: [월간실적마감및경영보고입력]

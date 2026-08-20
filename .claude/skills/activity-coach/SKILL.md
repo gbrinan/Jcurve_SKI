@@ -168,9 +168,10 @@ this is before watching it run.
 | — | Hero: agent name, one-liner, **Lv4 › Lv5 › Lv6 path**, four stats | `agent-plan.md` §1–2, skill count |
 | ① | **구조 — Lv4 › Lv5 › Lv6** — the Lv4 band, the Lv5 box (what this agent packages), and a card per Lv6 skill with owner and Human 여부 | SKILL.md frontmatter |
 | ② | **실행 흐름 설계도** — swimlanes by Human 여부, forward arrows, dashed loopback with its exit condition, the ◆ condition spelled out | `next` / `when` / `loop_to` / `loop_exit` |
-| ③ | **Lv6 스킬 카드** — inputs → outputs, reads/writes, the judgment rule | SKILL.md frontmatter |
-| ④ | **폴더 트리** | the pack's actual layout |
-| ⑤ | **실행** — the playback below | `out/trace.json` |
+| ③ | **원본 대조** — which design-camp item became which file | `source_id` + `agent-plan.md` §8 |
+| ④ | **Lv6 스킬 카드** — inputs → outputs, reads/writes, the judgment rule | SKILL.md frontmatter |
+| ⑤ | **폴더 트리** | the pack's actual layout |
+| ⑥ | **실행** — the playback below | `out/trace.json` |
 
 Lanes and card borders are colored by **Human 여부** (자동 / 증강 / 사람고유), because that
 is what our packs actually carry at this stage. Do not color by environment tags
@@ -216,6 +217,32 @@ Two honesty rules the generator keeps:
 | `data/` | L1 fails. |
 | `DECISIONS.md` | Optional — but required to accept a risk as ⚠️. |
 
+## Tracing back to the source hierarchy
+
+The design-camp documents number everything — `P-A2-1` for the process, `T-A2-1-1` for
+each task, `A-A2-1-5-3` for an activity. Those ids used to die at the workflow design,
+the same way forks and loopbacks did. Carry them:
+
+```
+// in the design HTML
+let srcLv3="별도/연결 결산관리";
+let srcLv4="P-A2-1 분기/반기 결산";
+let lv6=[{src:"T-A2-1-1", n:"결산일정수립", h:"증강", ...}]
+```
+
+The adapter writes `source_id:` into each skill and a comparison table into
+`agent-plan.md` §8. The mockup renders it as section ③:
+
+| 원본 계층 | 원본 항목 | 우리 계층 | 이 팩의 무엇이 되었나 |
+|---|---|---|---|
+| Lv3 업무 | 별도/연결 결산관리 | **Lv4** | 문서에만 — 팩 범위 밖 |
+| Lv4 프로세스 | `P-A2-1` 분기/반기 결산 | **Lv5** | **이 팩 = 에이전트 1개** |
+| Lv5 Task | `T-A2-1-1` 결산일정수립 | **Lv6** | `skills/depth/결산일정수립/SKILL.md` |
+| Lv6 Activity | 원본 문서 참조 | 판단기준 | 각 SKILL.md 본문 |
+
+It closes with a coverage line — `원본 ID가 남은 것 6/6`. A pack with no source document
+shows `0/N` and says so rather than leaving the reader to guess.
+
 ## Skill frontmatter fields
 
 ```yaml
@@ -224,6 +251,7 @@ owner: 결산담당
 quadrant: depth              # depth | breadth | coil
 human: 증강                   # 자동 | 증강 | 사람고유
 skillability: 중간            # 높음 | 중간 | 낮음
+source_id: T-A2-1-5          # the design-camp id this skill came from
 inputs: [주석초안작성결과]
 outputs: [계정검증대사결과]
 reads: [외부확인서.md]

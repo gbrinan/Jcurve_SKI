@@ -2,6 +2,7 @@
 name: 등급확정통보
 owner: (미정)
 quadrant: depth
+source_id: T-B2-1-5
 human: 사람고유
 skillability: 낮음
 inputs: [평가정합성검증결과]

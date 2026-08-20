@@ -2,6 +2,7 @@
 name: 아이디어접수
 owner: (미정)
 quadrant: depth
+source_id: T-D1-1-1
 human: 자동
 skillability: 높음
 inputs: [개선과제발굴및심의입력]

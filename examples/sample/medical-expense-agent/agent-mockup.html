@@ -142,6 +142,13 @@
   .skill .rule{font-size:12.5px;background:var(--bg-soft);border-left:3px solid var(--brand-sub);
                padding:7px 11px;border-radius:0 8px 8px 0;margin-top:8px}
   .skill .rule .k{font-weight:700;color:var(--brand-sub);margin-right:5px}
+  table.srcmap{min-width:640px}
+  table.srcmap td.mut{color:var(--muted)}
+  table.srcmap tr.hi td{background:#FDF2F4}
+  table.srcmap code{background:var(--bg-soft);border:1px solid var(--line);
+                    border-radius:4px;padding:1px 5px;font-size:12px}
+  .cov{margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .cov b{color:var(--text)}
   pre.tree{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
            background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
            overflow-x:auto;line-height:1.75;margin:0}
@@ -368,12 +375,19 @@
 
 <section class="sec">
   <div class="sec-head"><span class="no">③</span>
+    <h2>원본 대조 — 디자인캠프 Lv3~Lv6가 무엇이 되었나</h2>
+    <span class="hint">원본 문서의 어느 항목이 팩의 어느 파일이 됐는지</span></div>
+  <div class="panel"><div class="scroll"><table class="srcmap"><thead><tr><th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th><th>이 팩의 무엇이 되었나</th></tr></thead><tbody><tr><td>Lv3 업무</td><td>의료비 지원 운영</td><td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr><tr class="hi"><td>Lv4 프로세스</td><td>의료비 청구 건 판독·지급 판정</td><td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 증빙서류판독</td><td><b>Lv6</b></td><td><code>skills/depth/증빙서류판독/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 신청서생성</td><td><b>Lv6</b></td><td><code>skills/depth/신청서생성/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 지급기준대조</td><td><b>Lv6</b></td><td><code>skills/depth/지급기준대조/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 자동지급상신</td><td><b>Lv6</b></td><td><code>skills/depth/자동지급상신/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 보완요청작성</td><td><b>Lv6</b></td><td><code>skills/depth/보완요청작성/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 예외심사요청</td><td><b>Lv6</b></td><td><code>skills/depth/예외심사요청/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 지급승인</td><td><b>Lv6</b></td><td><code>skills/depth/지급승인/SKILL.md</code></td></tr><tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td><td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr></tbody></table></div><p class="cov">원본 Lv5 Task <b>7개</b> → 스킬 <b>7개</b> · 원본 ID가 남은 것 <b>0/7</b> <span class="mut">— 나머지는 설계도에 <code>src</code>를 적으면 채워집니다</span></p></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">④</span>
     <h2>Lv6 스킬 7개 — 만든 사람과 판단 기준</h2></div>
   <div class="skill-grid"><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">1. 증빙서류판독</div><div class="io"><b>입력</b> 의료비청구건판독·지급판정입력 → <b>출력</b> 증빙서류판독결과</div><div class="io"><b>읽기</b> 청구접수대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">2. 신청서생성</div><div class="io"><b>입력</b> 증빙서류판독결과 → <b>출력</b> 신청서생성결과</div><div class="io"><b>쓰기</b> 신청서초안.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">3. 지급기준대조</div><div class="io"><b>입력</b> 신청서생성결과 → <b>출력</b> 지급기준대조결과</div><div class="io"><b>읽기</b> 지급기준표.csv</div><div class="rule"><span class="k">갈림길</span>기준 충족 -&gt; 자동지급상신; 증빙 미비 -&gt; 보완요청작성; 기준 모호·한도 초과 -&gt; 예외심사요청</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">4. 자동지급상신</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 자동지급상신결과</div><div class="io"><b>쓰기</b> 지급대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">5. 보완요청작성</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 보완요청작성결과</div></div><div class="skill"><span class="owner">👤 복리후생 담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">6. 예외심사요청</div><div class="io"><b>입력</b> 지급기준대조결과 → <b>출력</b> 예외심사요청결과</div><div class="io"><b>쓰기</b> 예외심사대장.csv</div></div><div class="skill"><span class="owner">👤 복리후생 팀장</span><span class="tag human">Lv6 · 사람고유</span><div class="sname">7. 지급승인</div><div class="io"><b>입력</b> 자동지급상신결과, 예외심사요청결과 → <b>출력</b> 지급승인결과</div></div></div>
 </section>
 
 <section class="sec">
-  <div class="sec-head"><span class="no">④</span>
+  <div class="sec-head"><span class="no">⑤</span>
     <h2>폴더 트리</h2>
     <span class="hint">교육생이 받는 팩의 실제 모양</span></div>
   <div class="panel"><pre class="tree">medical-expense-agent/
@@ -396,7 +410,7 @@
 </section>
 
 <section class="sec runhead">
-  <div class="sec-head"><span class="no">⑤</span>
+  <div class="sec-head"><span class="no">⑥</span>
     <h2>실행 — 아래에서 직접 돌려 보십시오</h2>
     <span class="hint">▶ 실행 · 사람고유 지점에서 멈춥니다</span></div>
 </section>
@@ -472,6 +486,40 @@
   "name": "의료비 판독 AI",
   "level": "Lv.5",
   "one_liner": "접수된 의료비 청구 건을 판독해 **지급 / 보완 / 예외심사** 중 어디로 갈지 가르고, 각 갈래의 서류를 초안까지 만들어 사람 앞에 놓는다."
+ },
+ "source_map": {
+  "lv3": "",
+  "lv4_process": "",
+  "lv5_tasks": [
+   {
+    "source_id": "",
+    "skill": "증빙서류판독"
+   },
+   {
+    "source_id": "",
+    "skill": "신청서생성"
+   },
+   {
+    "source_id": "",
+    "skill": "지급기준대조"
+   },
+   {
+    "source_id": "",
+    "skill": "자동지급상신"
+   },
+   {
+    "source_id": "",
+    "skill": "보완요청작성"
+   },
+   {
+    "source_id": "",
+    "skill": "예외심사요청"
+   },
+   {
+    "source_id": "",
+    "skill": "지급승인"
+   }
+  ]
  },
  "levels": {
   "lv4": "의료비 지원 운영",

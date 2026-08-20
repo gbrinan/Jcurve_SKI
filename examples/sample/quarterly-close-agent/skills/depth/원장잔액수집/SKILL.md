@@ -2,6 +2,7 @@
 name: 원장잔액수집
 owner: 결산담당
 quadrant: depth
+source_id: T-A2-1-2
 human: 자동
 skillability: 높음
 inputs: [결산일정수립결과]

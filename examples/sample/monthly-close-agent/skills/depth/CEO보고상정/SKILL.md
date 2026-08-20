@@ -2,6 +2,7 @@
 name: CEO보고상정
 owner: (미정)
 quadrant: depth
+source_id: T-C2-1-5
 human: 사람고유
 skillability: 낮음
 inputs: [경영보고서작성결과]
