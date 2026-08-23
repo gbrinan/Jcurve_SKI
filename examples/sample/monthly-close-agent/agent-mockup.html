@@ -226,9 +226,33 @@
                border:1px solid var(--line);border-radius:6px;padding:5px 9px}
   .dock .clock b{color:var(--text)}
 
+  /* ── 실행 콘솔 — 터미널풍 로그 스트림 ─────────────────────────────── */
+  .con{position:fixed;left:0;right:0;bottom:0;z-index:19;pointer-events:none;
+       display:flex;justify-content:center}
+  .con .box{pointer-events:auto;width:min(1120px,calc(100% - 24px));
+            margin-bottom:64px;max-height:0;overflow:hidden;
+            transition:max-height .3s ease;border-radius:10px 10px 0 0;
+            background:#0B1220;color:#C9D4E5;border:1px solid #1E2A3F;border-bottom:0;
+            font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+            box-shadow:0 -4px 18px rgba(0,0,0,.25)}
+  .con.open .box{max-height:180px}
+  .con .hd{display:flex;gap:8px;align-items:center;padding:7px 12px;
+           border-bottom:1px solid #1E2A3F;color:#7C8DA6;font-size:11px}
+  .con .hd .led{width:7px;height:7px;border-radius:50%;background:#22C55E;flex:none}
+  .con.idle .hd .led{background:#475569}
+  .con.wait .hd .led{background:#F59E0B}
+  .con .hd .led.live{animation:pulse 1s ease-in-out infinite}
+  .con .sc{max-height:132px;overflow-y:auto;padding:8px 12px 10px;line-height:1.75}
+  .con .ln{white-space:pre-wrap}
+  .con .ln .t{color:#54627A;margin-right:8px}
+  .con .ln.ok{color:#7BD98F} .con .ln.hl{color:#F3B95F} .con .ln.lp{color:#9D93E8}
+  .con .cur{display:inline-block;width:7px;height:13px;background:#C9D4E5;
+            vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
   @media (prefers-reduced-motion:reduce){
     body.play .st,.dock .fill{transition:none}
-    .spin,.rail .n.now .dot{animation:none}
+    .spin,.rail .n.now .dot,.con .cur,.con .hd .led{animation:none}
   }
 </style>
 </head>
@@ -559,6 +583,14 @@
 }
 </script>
 
+<div class="con idle" id="con">
+  <div class="box">
+    <div class="hd"><span class="led" id="led"></span>
+      실행 로그 <span style="margin-left:auto">시뮬레이션 — 실제 실행 기록이 아닙니다</span></div>
+    <div class="sc" id="consc"><div class="ln"><span class="t">--:--.-</span>대기 중 <span class="cur"></span></div></div>
+  </div>
+</div>
+
 <div class="dock" id="dock">
   <div class="track"><div class="fill" id="fill"></div></div>
   <div class="row">
@@ -597,6 +629,24 @@
 
   const bare = n => (n || '').replace(/^\s*\d+[.)]\s*/, '').trim();   // "5. 계정검증대사" → "계정검증대사"
   const railFor = n => rail.filter(r => bare(r.dataset.skill) === bare(n));
+
+  // ── 실행 콘솔 — 로그가 흐르면 "돌고 있다"가 눈에 보인다. 내용은 단계 이름뿐,
+  //    숫자는 지어내지 않는다. 헤더에 시뮬레이션임을 상시 표기.
+  const con = document.getElementById('con'), consc = document.getElementById('consc');
+  const led = document.getElementById('led');
+  const stamp = () => { const s = elapsed / 1000;
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + (s % 60).toFixed(1).padStart(4, '0'); };
+  function logLine(txt, cls) {
+    consc.querySelectorAll('.cur').forEach(x => x.parentElement.remove());
+    const d = document.createElement('div'); d.className = 'ln' + (cls ? ' ' + cls : '');
+    const t = document.createElement('span'); t.className = 't'; t.textContent = stamp();
+    d.appendChild(t); d.appendChild(document.createTextNode(txt));
+    const c = document.createElement('div'); c.className = 'ln';
+    c.innerHTML = '<span class="cur"></span>';
+    consc.appendChild(d); consc.appendChild(c);
+    consc.scrollTop = consc.scrollHeight;
+  }
+  function conLive(on) { led.classList.toggle('live', on); }
 
   function showClock() { clock.textContent = (elapsed / 1000).toFixed(1); }
   function clockOn() { t0 = Date.now(); clearInterval(tick2);
@@ -638,19 +688,30 @@
     s.classList.add('shown', 'now', 'working');       // 먼저 "처리 중"을 보여준다
     railFor(s.dataset.skill).forEach(r => r.classList.add('lit', 'now'));
     s.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    const dur = WORK / SPEEDS[spd];
+    // 처리 시간을 단계마다 다르게 — 일정하면 녹화처럼 보인다.
+    const dur = WORK * (0.6 + Math.random() * 1.1) / SPEEDS[spd];
+    const nm = bare(s.dataset.skill);
+    con.classList.add('open'); con.classList.remove('idle', 'wait'); conLive(true);
+    if (s.dataset.kind === 'loopback') logLine('↩ ' + nm + ' — 되돌아감 (루프백)', 'lp');
+    else logLine('▸ ' + nm + ' 시작 — SKILL.md 명세 확인');
+    setTimeout(() => { if (s.classList.contains('working'))
+      logLine('  · 입력 읽는 중 — data/ 표 대조'); }, dur * 0.45);
     clearTimeout(work);
     work = setTimeout(() => {                          // 그 다음 결과로 바뀐다
       s.classList.remove('working');
-      const ms = s.querySelector('.ms');
-      if (ms) { ms.textContent = (0.08 + Math.random() * 0.35).toFixed(2) + 's';
-                ms.classList.add('on'); }
+      const ms = s.querySelector('.ms'), msv = (0.08 + Math.random() * 0.35).toFixed(2) + 's';
+      if (ms) { ms.textContent = msv; ms.classList.add('on'); }
       s.querySelectorAll('.br .cnt:not(.none)').forEach(countUp);
+      logLine('✓ ' + nm + ' 완료 (' + msv + ')', 'ok');
       i++;
       if (s.dataset.kind === 'halt' && i < steps.length) {
-        waiting = true; held = s; s.classList.add('waiting'); stop(); paint(); return;
+        waiting = true; held = s; s.classList.add('waiting');
+        logLine('⏸ ' + nm + ' — 사람 확인 대기. 승인 전에는 진행하지 않음', 'hl');
+        con.classList.add('wait'); conLive(false);
+        stop(); paint(); return;
       }
-      if (i >= steps.length) { capE.classList.add('on'); stop(); }
+      if (i >= steps.length) { capE.classList.add('on'); stop();
+        logLine('■ 완료 — ' + steps.length + '단계 종료', 'ok'); conLive(false); }
       paint();
       if (done) done();
     }, dur);
@@ -658,7 +719,7 @@
 
   function tick() { reveal(() => { if (playing && !waiting) schedule(); }); }
   function schedule() { clearTimeout(timer); timer = setTimeout(tick, DELAY / SPEEDS[spd]); }
-  function stop() { playing = false; clearTimeout(timer); clockOff(); }
+  function stop() { playing = false; clearTimeout(timer); clockOff(); conLive(false); }
 
   function play() {
     if (waiting) return;
@@ -673,6 +734,9 @@
       x.querySelectorAll('.br .cnt').forEach(c => {
         if (c.dataset.n) c.firstChild.nodeValue = c.dataset.n; }); });
     rail.forEach(r => r.classList.remove('lit', 'now'));
+    consc.innerHTML = '<div class="ln"><span class="t">00:00.0</span>대기 중 ' +
+                      '<span class="cur"></span></div>';
+    con.classList.add('idle'); con.classList.remove('open', 'wait');
     document.body.classList.add('play');
     window.scrollTo({ top: 0, behavior: 'smooth' }); paint();
   }
@@ -682,6 +746,7 @@
       x.classList.remove('now', 'waiting', 'working'); });
     rail.forEach(r => r.classList.add('lit'));
     capS.classList.add('on'); capE.classList.add('on');
+    con.classList.remove('open', 'wait');
     paint();
   }
 
@@ -703,6 +768,8 @@
                         r.classList.toggle('lit', passed.has(bare(r.dataset.skill))); });
     railFor(name).forEach(r => r.classList.add('now'));
     steps[at].classList.add('now');
+    con.classList.add('open'); con.classList.remove('idle', 'wait');
+    logLine('⏩ ' + bare(name) + ' 까지 건너뜀');
     i = at + 1; capS.classList.add('on');
     capE.classList.toggle('on', i >= steps.length);
     steps[at].scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -710,6 +777,8 @@
   }
   function proceed() {     // 사람 확인 버튼
     if (!waiting) return;
+    logLine('▶ 사람 확인 완료 — 다음 단계로', 'ok');
+    con.classList.remove('wait');
     waiting = false; held = null;
     steps.forEach(x => x.classList.remove('waiting'));
     paint(); play();
