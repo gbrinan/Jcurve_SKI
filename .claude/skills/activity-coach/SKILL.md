@@ -265,6 +265,33 @@ loop_exit: 차이가 0이 되면      # without this the loop is infinite → �
 `when` missing on a fork is ⚠️, not ❌ — copy the ◆ line from the source flow.
 `loop_exit` missing is ❌.
 
+## Exporting the pack as invocable skills
+
+A pack's SKILL.md files are specs, not Claude Code skills — they lack `description` /
+`allowed-tools` / `user-invocable`. To make them callable:
+
+```bash
+python3 check/export_skills.py <pack>              # → <pack>/export/skills/
+python3 check/export_skills.py <pack> --install    # → ~/.claude/skills/ directly
+```
+
+What comes out:
+
+- **One skill per Lv6 task** — `/결산일정수립` runs that task's spec on the data.
+- **One team-agent skill for the Lv5** — `/분기-반기-결산` has Claude walk the
+  contract's chain, judge each fork by its `when` condition against the actual data,
+  loop back until the exit condition holds, and **stop at every halt point** to ask
+  the user before proceeding. This is the piece Python could not do: the judgment
+  rules are prose, and Claude can read prose.
+
+Honesty carries over: descriptions are assembled only from sentences already in the
+pack, `(미정)` stays `(미정)`, and a 사람고유 task exports with a refusal block —
+it prepares material and stops, never approves or sends.
+
+Verified end to end in a headless session: exported skills are discovered, a task
+skill executes its spec against `data/` and writes real output, and the team skill
+walks the chain. Restart Claude Code after installing so the skills load.
+
 ## Rules that hold everywhere
 
 - **Do not invent.** No table name, no threshold, no reason. Write `(미정)` and say so.

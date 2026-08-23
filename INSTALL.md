@@ -84,7 +84,17 @@ python3 run.py
 
 값을 고치고 `python3 run.py`를 다시 돌리면 흐름이 어디로 갈라지는지 바로 보입니다.
 
-## 5. 점검기 직접 돌려보기
+## 5. 팀 에이전트를 스킬로 만들어 부르기
+
+```bash
+cd ~/.claude/skills/activity-coach
+python3 check/export_skills.py examples/sample/quarterly-close-agent --install
+```
+
+Claude Code를 새로 열면 `/분기-반기-결산`(팀 에이전트)과 태스크 스킬 7개가 목록에 뜹니다.
+"분기/반기 결산 실행해줘"라고 하면 체인대로 돌고, **사람 확인 지점에서 멈춥니다.**
+
+## 6. 점검기 직접 돌려보기
 
 ```bash
 cd ~/.claude/skills/activity-coach
