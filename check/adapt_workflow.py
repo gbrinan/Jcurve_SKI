@@ -33,7 +33,9 @@ def parse(path):
             continue
         nx = re.search(r'nx:"([^"]*)"', ent)
         w = re.search(r'w:"([^"]*)"', ent)     # 갈림길 조건 (원본 흐름도의 ◆ 문장)
-        src = re.search(r'src:"([^"]*)"', ent)  # 원본 문서의 ID (T-A2-1-1 등)
+        # 원본 문서의 ID (T-A2-1-1 등). 원본에 없는 신설 태스크는 src:"신규"라고
+        # 적는다 — 목업 대조표와 export된 에이전트에 🆕로 표시되어 숨겨지지 않는다.
+        src = re.search(r'src:"([^"]*)"', ent)
         lv6.append({"n": m.group(1), "h": m.group(2), "s": m.group(3),
                     "nx": nx.group(1) if nx else None,
                     "w": w.group(1) if w else "",

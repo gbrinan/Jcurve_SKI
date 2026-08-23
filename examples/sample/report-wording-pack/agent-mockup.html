@@ -149,6 +149,9 @@
                     border-radius:4px;padding:1px 5px;font-size:12px}
   .cov{margin-top:10px;font-size:12.5px;color:var(--muted)}
   .cov b{color:var(--text)}
+  .newtag{display:inline-block;font-size:11px;font-weight:700;color:var(--warn);
+          border:1px solid var(--warn);border-radius:99px;padding:1px 8px;margin-right:4px}
+  tr.newrow td{background:color-mix(in srgb,var(--warn) 7%,transparent)}
   pre.tree{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
            background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
            overflow-x:auto;line-height:1.75;margin:0}
@@ -352,7 +355,7 @@
   <div class="sec-head"><span class="no">③</span>
     <h2>원본 대조 — 디자인캠프 Lv3~Lv6가 무엇이 되었나</h2>
     <span class="hint">원본 문서의 어느 항목이 팩의 어느 파일이 됐는지</span></div>
-  <div class="panel"><div class="scroll"><table class="srcmap"><thead><tr><th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th><th>이 팩의 무엇이 되었나</th></tr></thead><tbody><tr><td>Lv3 업무</td><td>전사 경영전략실 송부 정기보고서 작성(본부장 Monthly, CEO Weekly 등)</td><td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr><tr class="hi"><td>Lv4 프로세스</td><td>정확하고 간결한 내용 정리</td><td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 내용의맥락파악</td><td><b>Lv6</b></td><td><code>skills/depth/내용의맥락파악/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 보고사항으로적절한지에대한판단</td><td><b>Lv6</b></td><td><code>skills/depth/보고사항으로적절한지에대한판단/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 워딩</td><td><b>Lv6</b></td><td><code>skills/depth/워딩/SKILL.md</code></td></tr><tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td><td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr></tbody></table></div><p class="cov">원본 Lv5 Task <b>3개</b> → 스킬 <b>3개</b> · 원본 ID가 남은 것 <b>0/3</b> <span class="mut">— 나머지는 설계도에 <code>src</code>를 적으면 채워집니다</span></p></div>
+  <div class="panel"><div class="scroll"><table class="srcmap"><thead><tr><th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th><th>이 팩의 무엇이 되었나</th></tr></thead><tbody><tr><td>Lv3 업무</td><td>전사 경영전략실 송부 정기보고서 작성(본부장 Monthly, CEO Weekly 등)</td><td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr><tr class="hi"><td>Lv4 프로세스</td><td>정확하고 간결한 내용 정리</td><td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 내용의맥락파악</td><td><b>Lv6</b></td><td><code>skills/depth/내용의맥락파악/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 보고사항으로적절한지에대한판단</td><td><b>Lv6</b></td><td><code>skills/depth/보고사항으로적절한지에대한판단/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><span class="mut">(ID 미정)</span> 워딩</td><td><b>Lv6</b></td><td><code>skills/depth/워딩/SKILL.md</code></td></tr><tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td><td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr></tbody></table></div><p class="cov">스킬 <b>3개</b> = 원본 대응 <b>0</b> + ID 미정 <b>3</b> <span class="mut">— 미정은 설계도에 <code>src</code>를 적으면 채워지고, 원본에 없는 태스크는 <code>src:"신규"</code>로 표시합니다</span></p></div>
 </section>
 
 <section class="sec">
@@ -448,15 +451,18 @@
   "lv5_tasks": [
    {
     "source_id": "",
-    "skill": "내용의맥락파악"
+    "skill": "내용의맥락파악",
+    "new": false
    },
    {
     "source_id": "",
-    "skill": "보고사항으로적절한지에대한판단"
+    "skill": "보고사항으로적절한지에대한판단",
+    "new": false
    },
    {
     "source_id": "",
-    "skill": "워딩"
+    "skill": "워딩",
+    "new": false
    }
   ]
  },

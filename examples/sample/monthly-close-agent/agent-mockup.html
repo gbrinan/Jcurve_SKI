@@ -149,6 +149,9 @@
                     border-radius:4px;padding:1px 5px;font-size:12px}
   .cov{margin-top:10px;font-size:12.5px;color:var(--muted)}
   .cov b{color:var(--text)}
+  .newtag{display:inline-block;font-size:11px;font-weight:700;color:var(--warn);
+          border:1px solid var(--warn);border-radius:99px;padding:1px 8px;margin-right:4px}
+  tr.newrow td{background:color-mix(in srgb,var(--warn) 7%,transparent)}
   pre.tree{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
            background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
            overflow-x:auto;line-height:1.75;margin:0}
@@ -381,7 +384,7 @@
   <div class="sec-head"><span class="no">③</span>
     <h2>원본 대조 — 디자인캠프 Lv3~Lv6가 무엇이 되었나</h2>
     <span class="hint">원본 문서의 어느 항목이 팩의 어느 파일이 됐는지</span></div>
-  <div class="panel"><div class="scroll"><table class="srcmap"><thead><tr><th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th><th>이 팩의 무엇이 되었나</th></tr></thead><tbody><tr><td>Lv3 업무</td><td>실적관리</td><td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr><tr class="hi"><td>Lv4 프로세스</td><td>P-C2-1 월간 실적 마감 및 경영보고</td><td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-1</code> 사업부실적취합</td><td><b>Lv6</b></td><td><code>skills/depth/사업부실적취합/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-2</code> 편차분석</td><td><b>Lv6</b></td><td><code>skills/depth/편차분석/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-3</code> 소명요청검토</td><td><b>Lv6</b></td><td><code>skills/depth/소명요청검토/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-4</code> 경영보고서작성</td><td><b>Lv6</b></td><td><code>skills/depth/경영보고서작성/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-5</code> CEO보고상정</td><td><b>Lv6</b></td><td><code>skills/depth/CEO보고상정/SKILL.md</code></td></tr><tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td><td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr></tbody></table></div><p class="cov">원본 Lv5 Task <b>5개</b> → 스킬 <b>5개</b> · 원본 ID가 남은 것 <b>5/5</b></p></div>
+  <div class="panel"><div class="scroll"><table class="srcmap"><thead><tr><th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th><th>이 팩의 무엇이 되었나</th></tr></thead><tbody><tr><td>Lv3 업무</td><td>실적관리</td><td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr><tr class="hi"><td>Lv4 프로세스</td><td>P-C2-1 월간 실적 마감 및 경영보고</td><td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-1</code> 사업부실적취합</td><td><b>Lv6</b></td><td><code>skills/depth/사업부실적취합/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-2</code> 편차분석</td><td><b>Lv6</b></td><td><code>skills/depth/편차분석/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-3</code> 소명요청검토</td><td><b>Lv6</b></td><td><code>skills/depth/소명요청검토/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-4</code> 경영보고서작성</td><td><b>Lv6</b></td><td><code>skills/depth/경영보고서작성/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C2-1-5</code> CEO보고상정</td><td><b>Lv6</b></td><td><code>skills/depth/CEO보고상정/SKILL.md</code></td></tr><tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td><td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr></tbody></table></div><p class="cov">스킬 <b>5개</b> = 원본 대응 <b>5</b></p></div>
 </section>
 
 <section class="sec">
@@ -497,23 +500,28 @@
   "lv5_tasks": [
    {
     "source_id": "T-C2-1-1",
-    "skill": "사업부실적취합"
+    "skill": "사업부실적취합",
+    "new": false
    },
    {
     "source_id": "T-C2-1-2",
-    "skill": "편차분석"
+    "skill": "편차분석",
+    "new": false
    },
    {
     "source_id": "T-C2-1-3",
-    "skill": "소명요청검토"
+    "skill": "소명요청검토",
+    "new": false
    },
    {
     "source_id": "T-C2-1-4",
-    "skill": "경영보고서작성"
+    "skill": "경영보고서작성",
+    "new": false
    },
    {
     "source_id": "T-C2-1-5",
-    "skill": "CEO보고상정"
+    "skill": "CEO보고상정",
+    "new": false
    }
   ]
  },

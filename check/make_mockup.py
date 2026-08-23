@@ -440,9 +440,13 @@ def source_map(pack, sk):
     rows = []
     for n in order:
         sid = (sk[n].get("source_id") or "").strip()
-        rows.append((sid, n))
-    known = sum(1 for s, _ in rows if s and not s.startswith("("))
-    return {"lv3": lv3, "lv4p": lv4p, "rows": rows, "known": known, "total": len(rows)}
+        kind = ("new" if sid in ("신규", "new", "NEW")
+                else "src" if sid and not sid.startswith("(") else "unknown")
+        rows.append((sid, n, kind))
+    known = sum(1 for _, _, k in rows if k == "src")
+    new = sum(1 for _, _, k in rows if k == "new")
+    return {"lv3": lv3, "lv4p": lv4p, "rows": rows,
+            "known": known, "new": new, "total": len(rows)}
 
 
 def source_table(sm, facts):
@@ -453,17 +457,27 @@ def source_table(sm, facts):
         f'<td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr>',
         f'<tr class="hi"><td>Lv4 프로세스</td><td>{e(sm["lv4p"] or facts["lv5"] or "(미정)")}</td>'
         f'<td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr>']
-    for sid, n in sm["rows"]:
-        sid_html = (f'<code>{e(sid)}</code> ' if sid and not sid.startswith("(")
+    for sid, n, kind in sm["rows"]:
+        if kind == "new":     # 원본에 없던 스킬 — 숨기지 않고 신설임을 드러낸다
+            body.append(f'<tr class="newrow"><td>—</td>'
+                        f'<td><span class="newtag">🆕 원본에 없음</span> {e(n)}</td>'
+                        f'<td><b>Lv6</b></td>'
+                        f'<td><code>skills/depth/{e(n)}/SKILL.md</code>'
+                        f' <span class="mut">— 이 팩에서 신설</span></td></tr>')
+            continue
+        sid_html = (f'<code>{e(sid)}</code> ' if kind == "src"
                     else '<span class="mut">(ID 미정)</span> ')
         body.append(f'<tr><td>Lv5 Task</td><td>{sid_html}{e(n)}</td><td><b>Lv6</b></td>'
                     f'<td><code>skills/depth/{e(n)}/SKILL.md</code></td></tr>')
     body.append('<tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td>'
                 '<td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr>')
-    cov = (f'원본 Lv5 Task <b>{sm["total"]}개</b> → 스킬 <b>{sm["total"]}개</b> · '
-           f'원본 ID가 남은 것 <b>{sm["known"]}/{sm["total"]}</b>'
-           + ("" if sm["known"] == sm["total"] else
-              ' <span class="mut">— 나머지는 설계도에 <code>src</code>를 적으면 채워집니다</span>'))
+    cov = (f'스킬 <b>{sm["total"]}개</b> = 원본 대응 <b>{sm["known"]}</b>'
+           + (f' + 🆕 신설 <b>{sm["new"]}</b>' if sm["new"] else '')
+           + (f' + ID 미정 <b>{sm["total"] - sm["known"] - sm["new"]}</b>'
+              if sm["total"] - sm["known"] - sm["new"] else '')
+           + ((' <span class="mut">— 미정은 설계도에 <code>src</code>를 적으면 채워지고, '
+               '원본에 없는 태스크는 <code>src:"신규"</code>로 표시합니다</span>')
+              if sm["total"] - sm["known"] - sm["new"] else ''))
     return (f'<div class="scroll"><table class="srcmap"><thead><tr>'
             f'<th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th>'
             f'<th>이 팩의 무엇이 되었나</th></tr></thead>'
@@ -659,6 +673,9 @@ def css(tk):
                     border-radius:4px;padding:1px 5px;font-size:12px}}
   .cov{{margin-top:10px;font-size:12.5px;color:var(--muted)}}
   .cov b{{color:var(--text)}}
+  .newtag{{display:inline-block;font-size:11px;font-weight:700;color:var(--warn);
+          border:1px solid var(--warn);border-radius:99px;padding:1px 8px;margin-right:4px}}
+  tr.newrow td{{background:color-mix(in srgb,var(--warn) 7%,transparent)}}
   pre.tree{{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
            background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
            overflow-x:auto;line-height:1.75;margin:0}}
@@ -819,8 +836,9 @@ def main(pack_dir):
         "agent": {"name": tr["title"], "level": "Lv.5", "one_liner": facts["one"]},
         "source_map": {"lv3": source_map(pack, sk)["lv3"],
                        "lv4_process": source_map(pack, sk)["lv4p"],
-                       "lv5_tasks": [{"source_id": s, "skill": n}
-                                     for s, n in source_map(pack, sk)["rows"]]},
+                       "lv5_tasks": [{"source_id": s, "skill": n,
+                                      "new": k == "new"}
+                                     for s, n, k in source_map(pack, sk)["rows"]]},
         "levels": {"lv4": lv4, "lv5": lv5,
                    "lv6": [{"name": n, "human": sk[n].get("human", ""),
                             "owner": sk[n].get("owner", ""),

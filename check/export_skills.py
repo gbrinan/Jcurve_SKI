@@ -105,6 +105,11 @@ def export_task_skill(name, meta, body, facts, dest):
             + f"입력: {ins or '(미정)'} → 출력: {outs or '(미정)'}. "
             + ("사람고유 태스크 — 목록·근거만 만들고 사람 확인을 기다린다. "
                if human == "사람고유" else "")
+            + (f"원본 Task {meta['source_id']}. "
+               if meta.get("source_id") and not meta["source_id"].startswith("(")
+               and meta["source_id"] not in ("신규", "new", "NEW")
+               else "원본에 없던 신설 태스크. "
+               if meta.get("source_id") in ("신규", "new", "NEW") else "")
             + f"'{name}' 또는 '{name} 해줘'라고 하면 이 스킬을 쓴다.")
 
     guard = []
@@ -191,6 +196,25 @@ def export_team_skill(pack, sk, facts, dest):
         h = mt.get("human", "(미정)")
         body.append(f"- `{slug(n)}/` — {h}"
                     + (f" · {rule_of(bd)}" if rule_of(bd) else ""))
+    # 원본 대응 — 어느 스킬이 디자인캠프 원본에서 왔고, 무엇이 신설인지 숨기지 않는다.
+    body += ["", "## 원본 대응 (디자인캠프 → 이 에이전트)", "",
+             f"- 원본 Lv3 업무 → 우리 Lv4: {facts['lv4'] or '(미정)'}",
+             f"- 원본 Lv4 프로세스 → 우리 Lv5(이 에이전트): {facts['lv5'] or '(미정)'}",
+             "- 원본 Lv5 Task → 우리 Lv6 스킬:"]
+    n_src = n_new = 0
+    for n, (mt, _) in sk.items():
+        sid = (mt.get("source_id") or "").strip()
+        if sid in ("신규", "new", "NEW"):
+            body.append(f"  - {n} — 🆕 **원본에 없음, 이 팩에서 신설**"); n_new += 1
+        elif sid and not sid.startswith("("):
+            body.append(f"  - {n} ← `{sid}`"); n_src += 1
+        else:
+            body.append(f"  - {n} — (원본 ID 미정)")
+    body += [f"- 요약: 원본 대응 {n_src}개"
+             + (f" · 신설 {n_new}개" if n_new else "")
+             + (f" · ID 미정 {len(sk) - n_src - n_new}개"
+                if len(sk) - n_src - n_new else ""),
+             "  사용자가 계층을 물으면 이 대응을 그대로 답한다. 지어내지 않는다."]
     body += ["", "## 산출물",
              "각 태스크의 outputs를 **현재 작업 폴더의 `out/`** 아래 마크다운 표로 남긴다.",
              "다른 위치(홈, 임시 폴더, 스킬 폴더)에 만들지 않는다. `out/`이 없으면 만든다.",
