@@ -48,6 +48,7 @@ Copy-Item (Join-Path $Here "check")   $ac -Recurse -Force
 Copy-Item (Join-Path $Here "assets")  $ac -Recurse -Force
 Copy-Item (Join-Path $Here "assets")  $sp -Recurse -Force
 Copy-Item (Join-Path $Here "DESIGN.md") $sp -Force
+Copy-Item (Join-Path $Here "DESIGN.md") $ac -Force   # 목업이 색 토큰을 여기서 읽는다
 New-Item -ItemType Directory -Force -Path (Join-Path $ac "examples") | Out-Null
 Copy-Item (Join-Path $Here "examples\sample") (Join-Path $ac "examples") -Recurse -Force
 
@@ -60,6 +61,15 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  [OK] 통합 점검기 정상 (재무 샘플 팩 통과)" -ForegroundColor Green
 } else {
     Write-Host "  [X] 통합 점검기가 샘플 팩을 통과시키지 못했습니다. 복사가 덜 된 것 같습니다." -ForegroundColor Red
+    exit 1
+}
+# 목업까지 만들어 본다 - 점검기만으로는 색 토큰 누락 같은 것을 못 잡는다.
+& $py.Source (Join-Path $ac "check\orchestrate.py") $sample *> $null
+& $py.Source (Join-Path $ac "check\make_mockup.py") $sample *> $null
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "  [OK] 목업 생성 정상 (계약 흐름 -> 화면)" -ForegroundColor Green
+} else {
+    Write-Host "  [X] 목업을 만들지 못했습니다." -ForegroundColor Red
     exit 1
 }
 

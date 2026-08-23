@@ -43,16 +43,27 @@ cp -R "$HERE/check"   "$DEST/activity-coach/"
 cp -R "$HERE/assets"  "$DEST/activity-coach/"
 cp -R "$HERE/assets"  "$DEST/slide-pack/"
 cp    "$HERE/DESIGN.md" "$DEST/slide-pack/"
+cp    "$HERE/DESIGN.md" "$DEST/activity-coach/"   # 목업이 색 토큰을 여기서 읽는다
 mkdir -p "$DEST/activity-coach/examples"
 cp -R "$HERE/examples/sample" "$DEST/activity-coach/examples/"
 
 echo
 echo "동작 확인"
-if python3 "$DEST/activity-coach/check/run_check.py" \
-     "$DEST/activity-coach/examples/sample/quarterly-close-agent" >/dev/null 2>&1; then
+SAMPLE="$DEST/activity-coach/examples/sample/quarterly-close-agent"
+if python3 "$DEST/activity-coach/check/run_check.py" "$SAMPLE" >/dev/null 2>&1; then
   echo "  ✅ 통합 점검기 정상 (재무 샘플 팩 통과)"
 else
   echo "  ❌ 통합 점검기가 샘플 팩을 통과시키지 못했습니다. 복사가 덜 된 것 같습니다."
+  exit 1
+fi
+# 목업까지 만들어 본다. 점검기만 돌려서는 색 토큰 누락 같은 것을 못 잡는다(실측).
+if python3 "$DEST/activity-coach/check/orchestrate.py" "$SAMPLE" >/dev/null 2>&1 \
+   && python3 "$DEST/activity-coach/check/make_mockup.py" "$SAMPLE" >/dev/null 2>&1; then
+  echo "  ✅ 목업 생성 정상 (계약 흐름 → 화면)"
+  python3 "$SAMPLE/run.py" >/dev/null 2>&1 && \
+    python3 "$DEST/activity-coach/check/make_mockup.py" "$SAMPLE" >/dev/null 2>&1
+else
+  echo "  ❌ 목업을 만들지 못했습니다."
   exit 1
 fi
 

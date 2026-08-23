@@ -27,8 +27,11 @@ from trace import load as load_trace   # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# DESIGN.md에 없지만 목업에만 필요한 것 — 없으면 여기 기본값을 쓴다.
-FALLBACK = {"loop": "#5B4FCF", "warn": "#B26A00"}
+# DESIGN.md를 못 찾아도 화면은 나와야 한다. 토큰 하나가 비면 KeyError로 죽었다(설치본에서 실측).
+# DESIGN.md가 있으면 그쪽 값이 이깁니다 — 여기 값은 최후의 안전망이다.
+FALLBACK = {"brand": "#EA002C", "brand-sub": "#F47725", "bg": "#FFFFFF",
+            "bg-soft": "#F7F5F2", "text": "#1A1A1A", "muted": "#6E6E6E",
+            "line": "#E3DFDA", "ok": "#1E7A46", "warn": "#B26A00", "loop": "#5B4FCF"}
 HUMAN_CLS = {"자동": "auto", "증강": "aug", "사람고유": "human"}
 
 
@@ -62,8 +65,14 @@ def money(s, col=""):
 
 
 def tokens():
-    """DESIGN.md의 토큰 표에서 색을 읽는다 — 목업이 팔레트를 복제하지 않도록."""
-    md = ROOT / "DESIGN.md"
+    """DESIGN.md의 토큰 표에서 색을 읽는다 — 목업이 팔레트를 복제하지 않도록.
+
+    설치 위치에 따라 DESIGN.md가 어디 있을지 다르므로 몇 군데를 본다.
+    끝내 못 찾으면 FALLBACK으로 간다 — 색이 조금 다를 뿐, 화면은 나온다.
+    """
+    md = next((c for c in (ROOT / "DESIGN.md", ROOT.parent / "DESIGN.md",
+                           ROOT / "assets" / "DESIGN.md") if c.is_file()),
+              ROOT / "DESIGN.md")
     t = {}
     if md.is_file():
         for name, val in re.findall(r"`--([a-z-]+)`\s*\|\s*`(#[0-9A-Fa-f]{3,8})`",
