@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>월간 수주·여신 심사 에이전트 — 실행 화면</title>
+<!-- 이 파일은 check/make_mockup.py 가 out/trace.json 에서 생성했습니다.
+     손으로 고치지 마십시오 — run.py를 다시 돌리고 이 스크립트를 다시 실행하십시오.
+     색 토큰의 SSOT는 DESIGN.md 입니다. -->
+<style>
+  :root { --brand:#EA002C; --brand-sub:#F47725; --bg:#FFFFFF; --bg-soft:#F7F5F2; --text:#1A1A1A; --muted:#6E6E6E; --line:#E3DFDA; --ok:#1E7A46; --warn:#B26A00; --loop:#5B4FCF; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg-soft);color:var(--text);
+       font:15px/1.6 -apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+  .app{max-width:1120px;margin:0 auto;background:var(--bg);min-height:100vh;
+       border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  .top{display:flex;align-items:center;gap:12px;padding:14px 22px;
+       border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+  .mark{width:30px;height:30px;border-radius:8px;background:var(--brand);color:#fff;
+        display:grid;place-items:center;font-size:14px;font-weight:700;flex:none}
+  .top h1{font-size:15px;letter-spacing:-.01em}
+  .top .sub{font-size:12px;color:var(--muted)}
+  .pill{margin-left:auto;font-size:11px;border:1px solid var(--line);border-radius:999px;
+        padding:3px 10px;color:var(--muted)}
+  .rail{display:flex;gap:6px;padding:12px 22px;overflow-x:auto;align-items:center;
+        border-bottom:1px solid var(--line);background:var(--bg-soft);
+        position:sticky;top:59px;z-index:4}
+  .rail .n{flex:none;font-size:12px;padding:5px 11px;border-radius:999px;white-space:nowrap;
+           border:1px solid var(--line);background:var(--bg);color:var(--muted)}
+  .rail .n.done{border-color:var(--ok);color:var(--ok)}
+  .rail .n.fork{border-color:var(--brand-sub);color:var(--brand-sub);font-weight:600}
+  .rail .n.halt{border-color:var(--brand);color:var(--brand);font-weight:600}
+  .rail .n.loop{border-color:var(--loop);color:var(--loop);font-weight:600}
+  .rail .arrow{flex:none;color:var(--line);font-size:12px}
+  main{padding:20px 22px 60px}
+  .log{display:flex;flex-direction:column;gap:14px}
+  .card{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .card>header{display:flex;align-items:center;gap:9px;padding:10px 14px;font-size:13px;
+                background:var(--bg-soft);border-bottom:1px solid var(--line)}
+  .card.fork-card{border-color:var(--brand-sub)}
+  .card.halt{border-color:var(--brand)}
+  .card.halt>header{background:#FDF2F4;border-color:var(--brand);color:var(--brand)}
+  .tag{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);
+       color:var(--muted)}
+  .tag.auto{border-color:var(--ok);color:var(--ok)}
+  .tag.aug{border-color:var(--brand-sub);color:var(--brand-sub)}
+  .tag.human{border-color:var(--brand);color:var(--brand)}
+  .tag.fork{border-color:var(--brand-sub);color:var(--brand-sub)}
+  .cycle{font-size:11px;border:1px solid var(--loop);color:var(--loop);border-radius:999px;
+         padding:1px 8px;font-weight:600}
+  .body{padding:13px 14px;font-size:14px}
+  .body p+p{margin-top:6px}
+  .files{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+  .file{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:3px 9px;
+        color:var(--muted)}
+  .file b{color:var(--text);font-weight:600}
+  .warn{background:#FFF6F0;border:1px solid var(--brand-sub);border-radius:8px;
+        padding:10px 12px;font-size:13px;margin-top:10px}
+  .branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+            gap:10px;margin-top:11px}
+  .br{border:1px solid var(--line);border-radius:8px;padding:11px 12px}
+  .br.taken{border-color:var(--brand-sub);background:#FFF9F5}
+  .br .cond{font-size:11px;color:var(--brand-sub);font-weight:600;margin-bottom:3px}
+  .br .to{font-size:13px;font-weight:600}
+  .br .cnt{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:5px}
+  .br .cnt.none{color:var(--muted);font-weight:400}
+  .br .cnt span{font-size:12px;font-weight:400;color:var(--muted);margin-left:3px}
+  .loopback{text-align:center;font-size:12px;color:var(--loop);padding:7px;font-weight:600;
+            border:1px dashed var(--loop);border-radius:8px;background:#F8F7FE}
+  .scroll{overflow-x:auto;margin-top:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+  th{text-align:left;font-size:11px;color:var(--muted);font-weight:600;padding:6px 9px;
+     border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.diff td{background:#FFF6F0}
+  tr.na td{color:var(--muted)}
+  tbody tr:last-child td{border-bottom:none}
+  .chk{list-style:none;margin-top:10px;font-size:13px}
+  .chk li{padding:5px 0;border-bottom:1px solid var(--line)}
+  .chk li:last-child{border-bottom:none}
+  .actions{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
+  button{font:inherit;font-size:13px;padding:8px 16px;border-radius:7px;cursor:not-allowed;
+         border:1px solid var(--line);background:var(--bg);color:var(--muted)}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .disabled-note{font-size:12px;color:var(--muted);margin-top:7px}
+  /* 계약 흐름 기록임을 화면이 먼저 말한다 — 숫자가 없는 이유 */
+  .modebar{max-width:1120px;margin:0 auto;padding:12px 22px;font-size:13px;
+           display:flex;gap:10px;align-items:flex-start;
+           background:#F8F7FE;border-bottom:1px solid var(--loop);color:var(--loop)}
+  .modebar b{color:var(--text)}
+  .modebar .ic{font-size:15px;line-height:1.3}
+
+  /* ── 요약·설계도 (실행 앞단) ─────────────────────────────────────── */
+  .hero{background:var(--text);color:#fff;padding:44px 0 38px}
+  .hero .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+  .hero .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.12em;
+                 color:rgba(255,255,255,.55);margin-bottom:14px}
+  .hero h1{font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.02em;
+           line-height:1.15;margin-bottom:4px}
+  .hero h1 small{font-size:.36em;font-weight:600;color:var(--brand-sub);margin-left:12px;
+                 letter-spacing:0}
+  .hero .one{font-size:clamp(14px,2vw,17px);color:rgba(255,255,255,.8);max-width:680px;
+             margin-top:12px}
+  .hero .one b{color:#fff}
+  .lvpath{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:20px;
+          font-size:12px;color:rgba(255,255,255,.6)}
+  .lvpath .lv{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+              border-radius:999px;padding:4px 12px}
+  .lvpath .lv b{color:#fff}
+  .lvpath .lv.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+  .stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+        border-radius:12px;padding:14px 16px}
+  .stat .n{font-size:24px;font-weight:700;letter-spacing:-.01em;
+           font-variant-numeric:tabular-nums}
+  .stat .n em{font-style:normal;font-size:13px;color:rgba(255,255,255,.55);margin-left:2px}
+  .stat .l{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+  @media(max-width:680px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  .sec{margin:0 0 30px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:13px;flex-wrap:wrap}
+  .sec-head .no{font-size:12px;font-weight:700;color:var(--brand);background:#FDF2F4;
+                padding:3px 10px;border-radius:6px}
+  .sec-head h2{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .sec-head .hint{font-size:12.5px;color:var(--muted)}
+  .panel{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .lane-scroll{overflow-x:auto;padding-bottom:4px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;
+          color:var(--muted)}
+  .legend .item{display:flex;align-items:center;gap:6px}
+  .legend .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .skill-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:760px){.skill-grid{grid-template-columns:1fr}}
+  .skill{background:var(--bg);border:1px solid var(--line);border-radius:12px;
+         padding:16px 18px;position:relative}
+  .skill .owner{position:absolute;top:14px;right:16px;font-size:11.5px;font-weight:700;
+                color:var(--muted);background:var(--bg-soft);padding:3px 9px;border-radius:999px}
+  .skill .sname{font-size:14px;font-weight:700;margin:6px 0 6px}
+  .skill .io{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+  .skill .io b{color:var(--text);font-weight:600}
+  .skill .rule{font-size:12.5px;background:var(--bg-soft);border-left:3px solid var(--brand-sub);
+               padding:7px 11px;border-radius:0 8px 8px 0;margin-top:8px}
+  .skill .rule .k{font-weight:700;color:var(--brand-sub);margin-right:5px}
+  table.srcmap{min-width:640px}
+  table.srcmap td.mut{color:var(--muted)}
+  table.srcmap tr.hi td{background:#FDF2F4}
+  table.srcmap code{background:var(--bg-soft);border:1px solid var(--line);
+                    border-radius:4px;padding:1px 5px;font-size:12px}
+  .cov{margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .cov b{color:var(--text)}
+  .newtag{display:inline-block;font-size:11px;font-weight:700;color:var(--warn);
+          border:1px solid var(--warn);border-radius:99px;padding:1px 8px;margin-right:4px}
+  tr.newrow td{background:color-mix(in srgb,var(--warn) 7%,transparent)}
+  pre.tree{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+           background:#0F172A;color:#E2E8F0;padding:16px 18px;border-radius:10px;
+           overflow-x:auto;line-height:1.75;margin:0}
+  .runhead{border-top:2px solid var(--line);padding-top:26px;margin-top:6px}
+
+  .foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
+        font-size:12px;color:var(--muted);line-height:1.8}
+  .foot code{background:var(--bg-soft);border:1px solid var(--line);border-radius:4px;
+             padding:1px 5px}
+
+  /* ── 재생 ─────────────────────────────────────────────────────────── */
+  body.play .st{opacity:0;transform:translateY(6px);
+                 transition:opacity .28s ease,transform .28s ease}
+  body.play .st.shown{opacity:1;transform:none}
+  body.play .st:not(.shown){pointer-events:none;height:0;margin:0;overflow:hidden;border:0}
+  .st.now{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-sub) 28%,transparent)}
+  .rail .n{opacity:.35;transition:opacity .2s ease}
+  body:not(.play) .rail .n,
+  .rail .n.lit{opacity:1}
+  .rail .n.now{outline:2px solid var(--brand-sub);outline-offset:2px}
+
+  .waitbar{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-top:11px;
+           padding:10px 12px;border-radius:8px;font-size:13px;
+           background:#FDF2F4;border:1px solid var(--brand);color:var(--brand)}
+  body.play .st.waiting .waitbar{display:flex}
+  .waitbar .go{margin-left:auto;cursor:pointer;background:var(--brand);color:#fff;
+               border-color:var(--brand);font-size:12px;padding:6px 12px}
+  .st.waiting{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+
+  /* ── 하단 진행 바 ─────────────────────────────────────────────────── */
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);
+        border-top:1px solid var(--line);box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+  .dock .track{height:4px;background:var(--bg-soft)}
+  .dock .fill{height:100%;width:0;background:var(--brand);transition:width .3s ease}
+  .dock.waiting .fill{background:var(--brand-sub)}
+  .dock.done .fill{background:var(--ok)}
+  .dock .row{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:10px;
+             padding:9px 22px;flex-wrap:wrap}
+  .dock .pct{font-size:16px;font-weight:700;letter-spacing:-.02em;
+             font-variant-numeric:tabular-nums;min-width:52px}
+  .dock .what{font-size:13px;color:var(--muted);flex:1;min-width:160px;
+              overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dock .what b{color:var(--text)}
+  .dock button{cursor:pointer;font-size:12px;padding:6px 12px}
+  .dock button:hover{border-color:var(--brand);color:var(--brand)}
+  .dock button.primary:hover{color:#fff;opacity:.9}
+  .dock .keys{font-size:11px;color:var(--muted);width:100%}
+  main{padding-bottom:120px}
+  /* 노드 상태 점 · 시작/종료 캡 */
+  .rail .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.35;
+             display:inline-block;margin-right:6px;vertical-align:1px}
+  .rail .n.lit .dot{opacity:1}
+  .rail .n.now .dot{animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.25}}
+  .rail .cap{flex:none;font-size:11px;color:var(--muted);opacity:.4;
+             transition:opacity .2s ease,color .2s ease}
+  .rail .cap.on{opacity:1;color:var(--text);font-weight:600}
+  body:not(.play) .rail .cap{opacity:1}
+  body.play .rail .n{cursor:pointer}
+
+  /* 처리 중 */
+  .st .run{display:none;align-items:center;gap:8px;padding:11px 14px;font-size:13px;
+           color:var(--muted);border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .st.working .run{display:flex}
+  .st.working .body{display:none}
+  .spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);
+        border-top-color:var(--brand-sub);animation:spin .7s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .st .ms{margin-left:auto;font-size:11px;color:var(--muted);
+          font-variant-numeric:tabular-nums;opacity:0;transition:opacity .2s ease}
+  .st .ms.on{opacity:1}
+  .st.loopback.working{opacity:.6}
+
+  .dock .clock{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;
+               border:1px solid var(--line);border-radius:6px;padding:5px 9px}
+  .dock .clock b{color:var(--text)}
+
+  /* ── 실행 콘솔 — 터미널풍 로그 스트림 ─────────────────────────────── */
+  .con{position:fixed;left:0;right:0;bottom:0;z-index:19;pointer-events:none;
+       display:flex;justify-content:center}
+  .con .box{pointer-events:auto;width:min(1120px,calc(100% - 24px));
+            margin-bottom:64px;max-height:0;overflow:hidden;
+            transition:max-height .3s ease;border-radius:10px 10px 0 0;
+            background:#0B1220;color:#C9D4E5;border:1px solid #1E2A3F;border-bottom:0;
+            font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12px;
+            box-shadow:0 -4px 18px rgba(0,0,0,.25)}
+  .con.open .box{max-height:180px}
+  .con .hd{display:flex;gap:8px;align-items:center;padding:7px 12px;
+           border-bottom:1px solid #1E2A3F;color:#7C8DA6;font-size:11px}
+  .con .hd .led{width:7px;height:7px;border-radius:50%;background:#22C55E;flex:none}
+  .con.idle .hd .led{background:#475569}
+  .con.wait .hd .led{background:#F59E0B}
+  .con .hd .led.live{animation:pulse 1s ease-in-out infinite}
+  .con .sc{max-height:132px;overflow-y:auto;padding:8px 12px 10px;line-height:1.75}
+  .con .ln{white-space:pre-wrap}
+  .con .ln .t{color:#54627A;margin-right:8px}
+  .con .ln.ok{color:#7BD98F} .con .ln.hl{color:#F3B95F} .con .ln.lp{color:#9D93E8}
+  .con .cur{display:inline-block;width:7px;height:13px;background:#C9D4E5;
+            vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  @media (prefers-reduced-motion:reduce){
+    body.play .st,.dock .fill{transition:none}
+    .spin,.rail .n.now .dot,.con .cur,.con .hd .led{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">AX전략 워크샵 · 영업본부 석유제품영업팀 · P-C3-1</div>
+    <h1>월간 수주·여신 심사 에이전트 <small>Lv.5 팀 에이전트</small></h1>
+    <p class="one">이번 달 주문을 모아 제품별 공급가능량과 거래처별 여신 한도에 맞는지 점검하고, 한도를 넘는 거래처를 찾아 조정 대상으로 올린다. 수주 확정과 출하 지시는 하지 않는다.</p>
+    <div class="lvpath">
+      <span class="lv">Lv4 핵심 업무 · <b>석유제품 영업</b></span> ›
+      <span class="lv on">Lv5 워크플로우 · <b>월간 수주·여신 심사</b></span> ›
+      <span class="lv">Lv6 태스크 <b>6개</b> = 스킬 6개</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">6<em>개</em></div>
+        <div class="l">Lv6 스킬 · 1인 1스킬</div></div>
+      <div class="stat"><div class="n">4<em>개</em></div>
+        <div class="l">AI 태스크 (자동+증강) · ATF③</div></div>
+      <div class="stat"><div class="n">2<em>곳</em></div>
+        <div class="l">사람이 확인하는 자리</div></div>
+      <div class="stat"><div class="n">1<em>+</em>1</div>
+        <div class="l">갈림길 + 루프백 · ATF④</div></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section class="sec">
+  <div class="sec-head"><span class="no">①</span>
+    <h2>구조 — Lv4 › Lv5 › Lv6</h2>
+    <span class="hint">이 Lv5 에이전트는 아래 Lv6 스킬들로 이루어집니다</span></div>
+  <div class="panel"><div class="lane-scroll"><svg viewBox="0 0 988 300" width="988" height="300" role="img" aria-label="Lv4 Lv5 Lv6 계층 구조도">
+<rect x="14" y="10" width="960" height="46" rx="10" fill="#F7F5F2" stroke="#E3DFDA"/>
+<text x="30" y="30" font-size="10.5" font-weight="700" fill="#6E6E6E">Lv4 · 핵심 업무</text>
+<text x="30" y="47" font-size="14" font-weight="700" fill="#1A1A1A">석유제품 영업</text>
+<rect x="214.0" y="72" width="560" height="62" rx="12" fill="#1A1A1A"/>
+<text x="230.0" y="92" font-size="10.5" font-weight="700" fill="#F47725">Lv5 · 워크플로우 — 이 에이전트가 묶는 단위</text>
+<text x="494.0" y="118" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">월간 수주·여신 심사</text>
+<path d="M494.0 134 L494.0 150 L89.0 150 L89.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M494.0 134 L494.0 150 L251.0 150 L251.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M494.0 134 L494.0 150 L413.0 150 L413.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M494.0 134 L494.0 150 L575.0 150 L575.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M494.0 134 L494.0 150 L737.0 150 L737.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<path d="M494.0 134 L494.0 150 L899.0 150 L899.0 168" stroke="#E3DFDA" stroke-width="1.6" fill="none"/>
+<rect x="14" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.8"/>
+<path d="M14 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F1F8F3"/>
+<text x="25" y="188" font-size="10" font-weight="700" fill="#1E7A46">Lv6 · 자동</text>
+<text x="25" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">판매계획확인</text>
+<text x="25" y="236" font-size="10.5" fill="#6E6E6E">Skill화 높음</text>
+<text x="25" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 영업기획담당</text>
+<rect x="176" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.8"/>
+<path d="M176 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#F1F8F3"/>
+<text x="187" y="188" font-size="10" font-weight="700" fill="#1E7A46">Lv6 · 자동</text>
+<text x="187" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">주문접수취합</text>
+<text x="187" y="236" font-size="10.5" fill="#6E6E6E">Skill화 높음</text>
+<text x="187" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 영업지원담당</text>
+<rect x="338" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#F47725" stroke-width="1.8"/>
+<path d="M338 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FFF6F0"/>
+<text x="349" y="188" font-size="10" font-weight="700" fill="#F47725">Lv6 · 증강</text>
+<text x="349" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">공급가능확인</text>
+<text x="349" y="236" font-size="10.5" fill="#6E6E6E">Skill화 중간</text>
+<text x="349" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 수급담당</text>
+<rect x="500" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#F47725" stroke-width="1.8"/>
+<path d="M500 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FFF6F0"/>
+<text x="511" y="188" font-size="10" font-weight="700" fill="#F47725">Lv6 · 증강</text>
+<text x="511" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">여신한도점검</text>
+<text x="511" y="236" font-size="10.5" fill="#6E6E6E">Skill화 중간</text>
+<text x="511" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 여신담당</text>
+<text x="637" y="188" text-anchor="end" font-size="10" font-weight="700" fill="#F47725">◆</text>
+<rect x="662" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#EA002C" stroke-width="1.8"/>
+<path d="M662 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FDF2F4"/>
+<text x="673" y="188" font-size="10" font-weight="700" fill="#EA002C">Lv6 · 사람고유</text>
+<text x="673" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">여신조정요청</text>
+<text x="673" y="236" font-size="10.5" fill="#6E6E6E">Skill화 낮음</text>
+<text x="673" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 영업담당</text>
+<text x="799" y="188" text-anchor="end" font-size="10" font-weight="700" fill="#5B4FCF">↩</text>
+<rect x="824" y="168" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#EA002C" stroke-width="1.8"/>
+<path d="M824 178 a10 10 0 0 1 10 -10 h130 a10 10 0 0 1 10 10 v16 h-150 z" fill="#FDF2F4"/>
+<text x="835" y="188" font-size="10" font-weight="700" fill="#EA002C">Lv6 · 사람고유</text>
+<text x="835" y="217" font-size="12.5" font-weight="700" fill="#1A1A1A">수주확정품의</text>
+<text x="835" y="236" font-size="10.5" fill="#6E6E6E">Skill화 낮음</text>
+<text x="835" y="254" font-size="10.5" font-weight="700" fill="#6E6E6E">👤 영업본부장</text>
+<text x="494.0" y="290" text-anchor="middle" font-size="10.5" fill="#6E6E6E">한 사람이 만든 Lv6 스킬 하나가 카드 하나 · 테두리 색 = Human 여부 · ◆ 갈림길 · ↩ 루프백</text>
+</svg></div></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">②</span>
+    <h2>실행 흐름 설계도</h2>
+    <span class="hint">아래 실행이 이 지도를 따라갑니다</span></div>
+  <div class="panel">
+    <div class="lane-scroll"><svg viewBox="0 0 1050 326" width="1050" height="326" role="img" aria-label="실행 흐름 설계도">
+<rect x="0" y="44" width="1050" height="66" rx="8" fill="#F1F8F3"/>
+<text x="12" y="82" font-size="11" font-weight="700" fill="#1E7A46">자동</text>
+<rect x="0" y="120" width="1050" height="66" rx="8" fill="#FFF6F0"/>
+<text x="12" y="158" font-size="11" font-weight="700" fill="#F47725">증강</text>
+<rect x="0" y="196" width="1050" height="66" rx="8" fill="#FDF2F4"/>
+<text x="12" y="234" font-size="11" font-weight="700" fill="#EA002C">사람고유</text>
+<text x="92" y="53" font-size="10.5" font-weight="700" fill="#1A1A1A">● 시작</text>
+<text x="950" y="205" text-anchor="end" font-size="10.5" font-weight="700" fill="#1A1A1A">■ 종료</text>
+<defs><marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#E3DFDA"/></marker><marker id="al" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#5B4FCF"/></marker></defs>
+<path d="M210 82 H225.0 V82 H240" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M358 82 H373.0 V158 H388" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M506 158 H521.0 V158 H536" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M654 158 H669.0 V234 H684" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M654 158 H669.0 V234 H832" fill="none" stroke="#E3DFDA" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M743.0 212 V116 H447.0 V136" fill="none" stroke="#5B4FCF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#al)"/>
+<text x="595.0" y="110" text-anchor="middle" font-size="10" font-weight="700" fill="#5B4FCF">↩ 조정 후 재점검한다. 한도초과가 0이…</text>
+<rect x="92" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.6"/>
+<text x="151.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">1. 판매계획확인</text>
+<text x="151.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E">높음</text>
+<rect x="240" y="60" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#1E7A46" stroke-width="1.6"/>
+<text x="299.0" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">2. 주문접수취합</text>
+<text x="299.0" y="95" text-anchor="middle" font-size="10" fill="#6E6E6E">높음</text>
+<rect x="388" y="136" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#F47725" stroke-width="1.6"/>
+<text x="447.0" y="156" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">3. 공급가능확인</text>
+<text x="447.0" y="171" text-anchor="middle" font-size="10" fill="#6E6E6E">중간</text>
+<rect x="536" y="136" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#F47725" stroke-width="1.6"/>
+<text x="595.0" y="156" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">4. 여신한도점검</text>
+<text x="595.0" y="171" text-anchor="middle" font-size="10" fill="#6E6E6E">◆ 갈림길</text>
+<rect x="684" y="212" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#EA002C" stroke-width="2.4"/>
+<text x="743.0" y="232" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">5. 여신조정요청</text>
+<text x="743.0" y="247" text-anchor="middle" font-size="10" fill="#6E6E6E">⛔ 멈춤</text>
+<rect x="832" y="212" width="118" height="44" rx="8" fill="#FFFFFF" stroke="#EA002C" stroke-width="2.4"/>
+<text x="891.0" y="232" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1A1A">6. 수주확정품의</text>
+<text x="891.0" y="247" text-anchor="middle" font-size="10" fill="#6E6E6E">⛔ 멈춤</text>
+<text x="595.0" y="298" text-anchor="middle" font-size="10" fill="#F47725">◆ 한도 초과 있음? Yes -&gt; 여신조정요청; No -&gt; 수주확정품의</text>
+</svg></div>
+    <div class="legend"><span class="item"><span class="sw" style="background:#F1F8F3;border:1px solid #1E7A46"></span>자동</span><span class="item"><span class="sw" style="background:#FFF6F0;border:1px solid #F47725"></span>증강</span><span class="item"><span class="sw" style="background:#FDF2F4;border:1px solid #EA002C"></span>사람고유</span><span class="item"><span class="sw" style="border:1px dashed #5B4FCF"></span>↩ 루프백</span><span class="item" style="color:#F47725">◆ 갈림길</span></div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">③</span>
+    <h2>원본 대조 — 디자인캠프 Lv3~Lv6가 무엇이 되었나</h2>
+    <span class="hint">원본 문서의 어느 항목이 팩의 어느 파일이 됐는지</span></div>
+  <div class="panel"><div class="scroll"><table class="srcmap"><thead><tr><th>원본 계층 (디자인캠프)</th><th>원본 항목</th><th>우리 계층</th><th>이 팩의 무엇이 되었나</th></tr></thead><tbody><tr><td>Lv3 업무</td><td>석유제품 영업</td><td><b>Lv4</b></td><td class="mut">문서에만 — 팩 범위 밖</td></tr><tr class="hi"><td>Lv4 프로세스</td><td>P-C3-1 월간 수주·여신 심사</td><td><b>Lv5</b></td><td><b>이 팩 = 에이전트 1개</b></td></tr><tr><td>Lv5 Task</td><td><code>T-C3-1-1</code> 판매계획확인</td><td><b>Lv6</b></td><td><code>skills/depth/판매계획확인/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C3-1-2</code> 주문접수취합</td><td><b>Lv6</b></td><td><code>skills/depth/주문접수취합/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C3-1-3</code> 공급가능확인</td><td><b>Lv6</b></td><td><code>skills/depth/공급가능확인/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C3-1-4</code> 여신한도점검</td><td><b>Lv6</b></td><td><code>skills/depth/여신한도점검/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>A-C3-1-4-2</code> 여신조정요청</td><td><b>Lv6</b></td><td><code>skills/depth/여신조정요청/SKILL.md</code></td></tr><tr><td>Lv5 Task</td><td><code>T-C3-1-5</code> 수주확정품의</td><td><b>Lv6</b></td><td><code>skills/depth/수주확정품의/SKILL.md</code></td></tr><tr><td>Lv6 Activity</td><td class="mut">원본 문서 참조</td><td>판단기준</td><td class="mut">각 SKILL.md 본문</td></tr></tbody></table></div><p class="cov">스킬 <b>6개</b> = 원본 대응 <b>6</b></p></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">④</span>
+    <h2>Lv6 스킬 6개 — 만든 사람과 판단 기준</h2></div>
+  <div class="skill-grid"><div class="skill"><span class="owner">👤 영업기획담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">1. 판매계획확인</div><div class="io"><b>입력</b> 월간수주여신심사입력 → <b>출력</b> 판매계획확인결과</div><div class="io"><b>읽기</b> 수주데이터.md</div><div class="io"><b>쓰기</b> 판매계획확인결과.md</div></div><div class="skill"><span class="owner">👤 영업지원담당</span><span class="tag auto">Lv6 · 자동</span><div class="sname">2. 주문접수취합</div><div class="io"><b>입력</b> 판매계획확인결과 → <b>출력</b> 주문접수취합결과</div><div class="io"><b>읽기</b> 수주데이터.md</div><div class="io"><b>쓰기</b> 주문취합결과.md</div></div><div class="skill"><span class="owner">👤 수급담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">3. 공급가능확인</div><div class="io"><b>입력</b> 주문접수취합결과, 여신조정요청결과 → <b>출력</b> 공급가능확인결과</div><div class="io"><b>읽기</b> 수주데이터.md</div><div class="io"><b>쓰기</b> 공급가능결과.md</div></div><div class="skill"><span class="owner">👤 여신담당</span><span class="tag aug">Lv6 · 증강</span><div class="sname">4. 여신한도점검</div><div class="io"><b>입력</b> 공급가능확인결과 → <b>출력</b> 여신한도점검결과</div><div class="io"><b>읽기</b> 수주데이터.md</div><div class="io"><b>쓰기</b> 여신점검결과.md</div><div class="rule"><span class="k">갈림길</span>한도 초과 있음? Yes -&gt; 여신조정요청; No -&gt; 수주확정품의</div></div><div class="skill"><span class="owner">👤 영업담당</span><span class="tag human">Lv6 · 사람고유</span><div class="sname">5. 여신조정요청</div><div class="io"><b>입력</b> 여신한도점검결과 → <b>출력</b> 여신조정요청결과</div><div class="rule"><span class="k">루프 탈출</span>조정 후 재점검한다. 한도초과가 0이 되면 반복이 끝난다</div></div><div class="skill"><span class="owner">👤 영업본부장</span><span class="tag human">Lv6 · 사람고유</span><div class="sname">6. 수주확정품의</div><div class="io"><b>입력</b> 여신한도점검결과 → <b>출력</b> 수주확정품의결과</div></div></div>
+</section>
+
+<section class="sec">
+  <div class="sec-head"><span class="no">⑤</span>
+    <h2>폴더 트리</h2>
+    <span class="hint">교육생이 받는 팩의 실제 모양</span></div>
+  <div class="panel"><pre class="tree">sales-order-agent/
+├─ README.md          처음 보는 사람을 위한 사용 안내
+├─ agent-plan.md      팀 목적과 실행 흐름의 원본 (SSOT)
+├─ AGENTS.md          역할 · 하는 일 · 하지 않는 일
+├─ CONTRACT.md        표·기록자·순서·정지 지점의 합의
+│
+├─ skills/depth/
+│   ├─ 판매계획확인/    SKILL.md · 자동
+│   ├─ 주문접수취합/    SKILL.md · 자동
+│   ├─ 공급가능확인/    SKILL.md · 증강
+│   ├─ 여신한도점검/    SKILL.md · 증강
+│   ├─ 여신조정요청/    SKILL.md · 사람고유
+│   └─ 수주확정품의/    SKILL.md · 사람고유
+│
+├─ data/              사람이 넣는 원본
+└─ out/               에이전트가 만드는 결과 (run.py 실행 시)</pre></div>
+</section>
+
+<section class="sec runhead">
+  <div class="sec-head"><span class="no">⑥</span>
+    <h2>실행 — 아래에서 직접 돌려 보십시오</h2>
+    <span class="hint">▶ 실행 · 사람고유 지점에서 멈춥니다</span></div>
+</section>
+</main>
+
+
+<div class="app">
+
+<div class="top">
+  <div class="mark">월</div>
+  <div>
+    <h1>월간 수주·여신 심사 에이전트</h1>
+    <div class="sub">AX전략 워크샵 · 영업본부 석유제품영업팀 · P-C3-1 · Lv5 「월간 수주·여신 심사」</div>
+  </div>
+  <span class="pill">팀 에이전트 · 갈림길+루프백</span>
+</div>
+
+<div class="rail">
+  <span class="cap start" id="cap-start">● 시작</span><span class="arrow">›</span>
+  <span class="n done" data-skill="판매계획확인"><i class="dot"></i>판매계획확인</span>
+  <span class="arrow">›</span>
+  <span class="n done" data-skill="주문접수취합"><i class="dot"></i>주문접수취합</span>
+  <span class="arrow">›</span>
+  <span class="n done" data-skill="공급가능확인"><i class="dot"></i>공급가능확인 ×2</span>
+  <span class="arrow">›</span>
+  <span class="n fork" data-skill="여신한도점검"><i class="dot"></i>◆ 여신한도점검</span>
+  <span class="arrow">›</span>
+  <span class="n loop" data-skill="여신조정요청"><i class="dot"></i>↩ 여신조정요청</span>
+  <span class="arrow">›</span>
+  <span class="n halt" data-skill="수주확정품의"><i class="dot"></i>⛔ 수주확정품의</span>
+  <span class="arrow">›</span><span class="cap end" id="cap-end">■ 종료</span>
+</div>
+
+<main>
+<div class="log">
+
+  <div class="card"><header><b>입력</b><span class="tag">2026년 9월 수주·여신 · data/수주데이터.md</span></header><div class="body"><p>주문 <b>11건</b> · 거래처 <b>6건</b> · 제품 <b>4건</b> · 여신예외승인 <b>1건</b></p></div></div>
+
+  <div class="st card" data-i="0" data-kind="step" data-skill="1. 판매계획확인" data-label="제품 4종의 계획 대비 진척을 확인했습니다. 진척률 80% 미만인 **미달 2종**입니다. 계획을 바꾸지는 "><header><b>1. 판매계획확인</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>제품 4종의 계획 대비 진척을 확인했습니다. 진척률 80% 미만인 <b>미달 2종</b>입니다. 계획을 바꾸지는 않습니다 — 어디가 뒤처졌는지 보이게 만들 뿐입니다.</p><div class="warn">⚠️ 판매계획 미달 2종 — 경유(76.0%), 휘발유(77.5%). 이 스킬은 계획도 주문도 조정하지 않습니다.</div><div class="files"><span class="file">→ out/판매계획확인결과.md <b>4건</b></span></div></div></div>
+
+  <div class="st card" data-i="1" data-kind="step" data-skill="2. 주문접수취합" data-label="주문 11건을 취합했습니다. 집계 대상은 **접수 9건**입니다. 취소·보류 2건은 **집계에서 빼되 지우지"><header><b>2. 주문접수취합</b><span class="tag auto">자동</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>주문 11건을 취합했습니다. 집계 대상은 <b>접수 9건</b>입니다. 취소·보류 2건은 <b>집계에서 빼되 지우지 않습니다</b> — 취소·보류는 접수와 다르고, 그렇다고 사라진 것도 아닙니다.</p><div class="warn">⚠️ 집계 제외 2건 — O-2609-009(취소), O-2609-011(보류). 최종 점검표에 남깁니다.</div><div class="scroll"><table><thead><tr><th>주문번호</th><th>거래처코드</th><th>거래처명</th><th>제품</th><th>주문량</th><th>금액</th><th>상태</th></tr></thead><tbody><tr><td>O-2609-001</td><td>C-101</td><td>한빛에너지</td><td>경유</td><td class="num">700</td><td class="num">1,015,000,000</td><td>접수</td></tr><tr><td>O-2609-002</td><td>C-102</td><td>대성석유</td><td>휘발유</td><td class="num">150</td><td class="num">243,000,000</td><td>접수</td></tr><tr><td>O-2609-003</td><td>C-103</td><td>삼정물류</td><td>경유</td><td class="num">1,200</td><td class="num">1,740,000,000</td><td>접수</td></tr><tr><td>O-2609-004</td><td>C-104</td><td>동해상사</td><td>경유</td><td class="num">200</td><td class="num">290,000,000</td><td>접수</td></tr><tr><td>O-2609-005</td><td>C-105</td><td>광명주유</td><td>등유</td><td class="num">300</td><td class="num">384,000,000</td><td>접수</td></tr><tr><td>O-2609-006</td><td>C-106</td><td>신흥유통</td><td>윤활유</td><td class="num">15</td><td class="num">72,000,000</td><td>접수</td></tr><tr><td>O-2609-007</td><td>C-101</td><td>한빛에너지</td><td>윤활유</td><td class="num">20</td><td class="num">96,000,000</td><td>접수</td></tr><tr><td>O-2609-008</td><td>C-103</td><td>삼정물류</td><td>등유</td><td class="num">400</td><td class="num">512,000,000</td><td>접수</td></tr><tr class="na"><td>O-2609-009</td><td>C-102</td><td>대성석유</td><td>경유</td><td class="num">100</td><td class="num">145,000,000</td><td>취소</td></tr><tr><td>O-2609-010</td><td>C-105</td><td>광명주유</td><td>휘발유</td><td class="num">80</td><td class="num">129,600,000</td><td>접수</td></tr><tr class="na"><td>O-2609-011</td><td>C-105</td><td>광명주유</td><td>경유</td><td class="num">50</td><td class="num">72,500,000</td><td>보류</td></tr></tbody></table></div><div class="files"><span class="file">→ out/주문취합결과.md <b>11건</b></span></div></div></div>
+
+  <div class="st card" data-i="2" data-kind="step" data-skill="3. 공급가능확인" data-label="제품 4종의 공급가능량(가용재고+생산예정)을 주문 합계와 맞췄습니다. **공급 부족 1종**입니다. 부족분을"><header><b>3. 공급가능확인</b><span class="cycle">1회차</span><span class="tag aug">증강</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>제품 4종의 공급가능량(가용재고+생산예정)을 주문 합계와 맞췄습니다. <b>공급 부족 1종</b>입니다. 부족분을 어느 주문에서 뺄지는 <b>정하지 않습니다</b> — 배분은 영업담당이 합니다.</p><div class="warn">⚠️ 공급 부족 — 등유 100kL. 주문을 임의로 줄이지 않고 그대로 두었습니다.</div><div class="scroll"><table><thead><tr><th>제품</th><th>가용재고</th><th>생산예정</th><th>공급가능</th><th>주문합계</th><th>과부족</th><th>판정</th></tr></thead><tbody><tr><td>경유</td><td class="num">1,500</td><td class="num">800</td><td class="num">2,300</td><td class="num">2,100</td><td class="num">200</td><td></td></tr><tr><td>휘발유</td><td class="num">200</td><td class="num">100</td><td class="num">300</td><td class="num">230</td><td class="num">70</td><td></td></tr><tr class="diff"><td>등유</td><td class="num">400</td><td class="num">200</td><td class="num">600</td><td class="num">700</td><td class="num">-100</td><td>부족</td></tr><tr><td>윤활유</td><td class="num">50</td><td class="num">0</td><td class="num">50</td><td class="num">35</td><td class="num">15</td><td></td></tr></tbody></table></div><div class="files"><span class="file">→ out/공급가능결과.md <b>4건</b></span></div></div></div>
+
+  <div class="st card fork-card" data-i="3" data-kind="fork" data-skill="4. 여신한도점검" data-label="거래처 6곳의 현재여신 + 신규주문을 한도와 맞췄습니다. **한도초과 1곳**입니다. 예외승인 1곳은 승인 "><header><b>4. 여신한도점검</b><span class="cycle">1회차</span><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>거래처 6곳의 현재여신 + 신규주문을 한도와 맞췄습니다. <b>한도초과 1곳</b>입니다. 예외승인 1곳은 승인 기록이 있어 초과로 세지 않습니다 — <b>승인 기록이 있는 것과 없는 것은 다릅니다.</b></p><div class="warn">⚠️ 여신 예외승인 적용 1곳 — 신흥유통: 담보 추가 제공 확인 — 2026-08-30 영업본부장 승인. 승인 근거를 최종 점검표에 남깁니다.</div><div class="branches"><div class="br taken"><div class="cond">한도 초과 있음? → Yes</div><div class="to">→ 여신조정요청</div><div class="cnt">1<span>건</span></div></div><div class="br"><div class="cond">한도 초과 있음? → No</div><div class="to">→ 수주확정품의</div><div class="cnt none">—</div></div></div><div class="scroll"><table><thead><tr><th>거래처코드</th><th>거래처명</th><th>여신한도</th><th>현재여신</th><th>신규주문</th><th>합계</th><th>여유</th><th>판정</th></tr></thead><tbody><tr><td>C-101</td><td>한빛에너지</td><td class="num">3,000,000,000</td><td class="num">1,850,000,000</td><td class="num">1,111,000,000</td><td class="num">2,961,000,000</td><td class="num">39,000,000</td><td></td></tr><tr><td>C-102</td><td>대성석유</td><td class="num">2,000,000,000</td><td class="num">1,720,000,000</td><td class="num">243,000,000</td><td class="num">1,963,000,000</td><td class="num">37,000,000</td><td></td></tr><tr><td>C-103</td><td>삼정물류</td><td class="num">5,000,000,000</td><td class="num">2,100,000,000</td><td class="num">2,252,000,000</td><td class="num">4,352,000,000</td><td class="num">648,000,000</td><td></td></tr><tr class="diff"><td>C-104</td><td>동해상사</td><td class="num">1,500,000,000</td><td class="num">1,430,000,000</td><td class="num">290,000,000</td><td class="num">1,720,000,000</td><td class="num">-220,000,000</td><td>한도초과</td></tr><tr><td>C-105</td><td>광명주유</td><td class="num">800,000,000</td><td class="num">250,000,000</td><td class="num">513,600,000</td><td class="num">763,600,000</td><td class="num">36,400,000</td><td></td></tr><tr class="na"><td>C-106</td><td>신흥유통</td><td class="num">1,200,000,000</td><td class="num">1,180,000,000</td><td class="num">72,000,000</td><td class="num">1,252,000,000</td><td class="num">-52,000,000</td><td>예외승인</td></tr></tbody></table></div><div class="files"><span class="file">→ out/여신점검결과.md <b>6건</b></span></div></div></div>
+
+  <div class="st card halt" data-i="4" data-kind="halt" data-skill="5. 여신조정요청" data-label="한도초과 1곳의 목록과 근거만 만들었습니다. **어느 주문을 얼마나 줄일지는 정하지 않았습니다.** 조정은 "><header><b>5. 여신조정요청</b><span class="cycle">1회차</span><span class="tag human">사람고유</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>한도초과 1곳의 목록과 근거만 만들었습니다. <b>어느 주문을 얼마나 줄일지는 정하지 않았습니다.</b> 조정은 영업담당이 합니다.</p><div class="warn">⚠️ 영업담당 조정 대기. 조정이 확정되면 공급가능확인으로 되돌아가 다시 맞춰봅니다.</div><ul class="chk"><li>☐ 동해상사(C-104) — 한도 1,500,000,000 vs 합계 1,720,000,000 = 초과 220,000,000 (여유 70,000,000)</li></ul><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
+
+  <div class="st loopback" data-i="5" data-kind="loopback" data-skill="공급가능확인">↩ 공급가능확인로 되돌아감 &nbsp;·&nbsp; 탈출 조건: 한도초과가 0이 되면</div>
+
+  <div class="st card" data-i="6" data-kind="step" data-skill="3. 공급가능확인" data-label="제품 4종의 공급가능량(가용재고+생산예정)을 주문 합계와 맞췄습니다. **공급 부족 1종**입니다. 부족분을"><header><b>3. 공급가능확인</b><span class="cycle">2회차</span><span class="tag aug">증강</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>제품 4종의 공급가능량(가용재고+생산예정)을 주문 합계와 맞췄습니다. <b>공급 부족 1종</b>입니다. 부족분을 어느 주문에서 뺄지는 <b>정하지 않습니다</b> — 배분은 영업담당이 합니다.</p><div class="warn">⚠️ 공급 부족 — 등유 100kL. 주문을 임의로 줄이지 않고 그대로 두었습니다.</div><div class="scroll"><table><thead><tr><th>제품</th><th>가용재고</th><th>생산예정</th><th>공급가능</th><th>주문합계</th><th>과부족</th><th>판정</th></tr></thead><tbody><tr><td>경유</td><td class="num">1,500</td><td class="num">800</td><td class="num">2,300</td><td class="num">1,948</td><td class="num">352</td><td></td></tr><tr><td>휘발유</td><td class="num">200</td><td class="num">100</td><td class="num">300</td><td class="num">230</td><td class="num">70</td><td></td></tr><tr class="diff"><td>등유</td><td class="num">400</td><td class="num">200</td><td class="num">600</td><td class="num">700</td><td class="num">-100</td><td>부족</td></tr><tr><td>윤활유</td><td class="num">50</td><td class="num">0</td><td class="num">50</td><td class="num">35</td><td class="num">15</td><td></td></tr></tbody></table></div><div class="files"><span class="file">→ out/공급가능결과.md <b>4건</b></span></div></div></div>
+
+  <div class="st card fork-card" data-i="7" data-kind="fork" data-skill="4. 여신한도점검" data-label="거래처 6곳의 현재여신 + 신규주문을 한도와 맞췄습니다. **한도초과 0곳**입니다. 예외승인 1곳은 승인 "><header><b>4. 여신한도점검</b><span class="cycle">2회차</span><span class="tag aug">증강</span><span class="tag fork">◆ 갈림길</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p>거래처 6곳의 현재여신 + 신규주문을 한도와 맞췄습니다. <b>한도초과 0곳</b>입니다. 예외승인 1곳은 승인 기록이 있어 초과로 세지 않습니다 — <b>승인 기록이 있는 것과 없는 것은 다릅니다.</b></p><div class="warn">⚠️ 여신 예외승인 적용 1곳 — 신흥유통: 담보 추가 제공 확인 — 2026-08-30 영업본부장 승인. 승인 근거를 최종 점검표에 남깁니다.</div><div class="branches"><div class="br"><div class="cond">한도 초과 있음? → Yes</div><div class="to">→ 여신조정요청</div><div class="cnt none">—</div></div><div class="br taken"><div class="cond">한도 초과 있음? → No</div><div class="to">→ 수주확정품의</div><div class="cnt none">—</div></div></div><div class="scroll"><table><thead><tr><th>거래처코드</th><th>거래처명</th><th>여신한도</th><th>현재여신</th><th>신규주문</th><th>합계</th><th>여유</th><th>판정</th></tr></thead><tbody><tr><td>C-101</td><td>한빛에너지</td><td class="num">3,000,000,000</td><td class="num">1,850,000,000</td><td class="num">1,111,000,000</td><td class="num">2,961,000,000</td><td class="num">39,000,000</td><td></td></tr><tr><td>C-102</td><td>대성석유</td><td class="num">2,000,000,000</td><td class="num">1,720,000,000</td><td class="num">243,000,000</td><td class="num">1,963,000,000</td><td class="num">37,000,000</td><td></td></tr><tr><td>C-103</td><td>삼정물류</td><td class="num">5,000,000,000</td><td class="num">2,100,000,000</td><td class="num">2,252,000,000</td><td class="num">4,352,000,000</td><td class="num">648,000,000</td><td></td></tr><tr><td>C-104</td><td>동해상사</td><td class="num">1,500,000,000</td><td class="num">1,430,000,000</td><td class="num">69,600,000</td><td class="num">1,499,600,000</td><td class="num">400,000</td><td></td></tr><tr><td>C-105</td><td>광명주유</td><td class="num">800,000,000</td><td class="num">250,000,000</td><td class="num">513,600,000</td><td class="num">763,600,000</td><td class="num">36,400,000</td><td></td></tr><tr class="na"><td>C-106</td><td>신흥유통</td><td class="num">1,200,000,000</td><td class="num">1,180,000,000</td><td class="num">72,000,000</td><td class="num">1,252,000,000</td><td class="num">-52,000,000</td><td>예외승인</td></tr></tbody></table></div><div class="files"><span class="file">→ out/여신점검결과.md <b>6건</b></span></div></div></div>
+
+  <div class="st card halt" data-i="8" data-kind="halt" data-skill="6. 수주확정품의" data-label="**여기서 멈췄습니다.** 에이전트는 수주를 확정하지 않았고, 출하 지시도 넣지 않았습니다. 여신 점검은 *"><header><b>6. 수주확정품의</b><span class="tag human">사람고유</span><span class="tag human">멈춤</span><span class="ms" data-ms=""></span></header><div class="run"><i class="spin"></i>처리 중…</div><div class="body"><p><b>여기서 멈췄습니다.</b> 에이전트는 수주를 확정하지 않았고, 출하 지시도 넣지 않았습니다. 여신 점검은 <b>2회차</b>만에 한도초과 0에 도달했고, 품의 전 확인할 것 <b>4건</b>이 남았습니다. 기준단가 기준 합계는 4,261,200,000원입니다.</p><ul class="chk"><li>☐ 공급 부족 — 등유 100kL · 배분 미정</li><li>☐ 취소 주문 확인 — O-2609-009 대성석유 경유 100kL</li><li>☐ 보류 주문 확인 — O-2609-011 광명주유 경유 50kL</li><li>☐ 여신 예외승인 재확인 — 신흥유통(C-106)</li></ul><div class="actions"><button class="primary">수주 확정 및 품의 상신</button><button>점검 항목 4건 확인</button><button>영업담당에게 반려</button></div><p class="disabled-note">※ 목업입니다. 이 팩에는 실행 코드가 없습니다 — 버튼은 동작하지 않습니다.</p><div class="files"><span class="file">→ out/수주품의점검표.md</span></div><div class="waitbar">⏸ <b>사람 확인 대기</b> — 확인해야 다음으로 넘어갑니다.<button class="go" type="button">확인하고 계속 ▶</button></div></div></div>
+
+</div>
+
+<div class="foot">
+  루프백 1회 (여신조정) · 최종 2회차에 한도초과 0 · 사람 확인 없이 확정·출하된 것 없음<br>
+  루프백: 여신조정요청 ↩ 공급가능확인 (2회차)<br>
+  이 화면은 <code>python3 run.py</code>의 실제 실행 결과입니다 — 숫자·표는 <code>out/trace.json</code>에서 그대로 가져왔습니다.
+  데이터를 고치고 다시 돌리면 이 화면도 다시 만들어야 합니다:
+  <code>python3 check/make_mockup.py sales-order-agent</code><br>
+  AX전략 워크샵 · 영업본부 석유제품영업팀 · P-C3-1 · 데이터는 실습용 가상 값입니다.
+</div>
+</main>
+</div>
+
+<script type="application/json" id="agent-data">
+{
+ "schema": "agent-summary/v0.2",
+ "source": "AX전략 워크샵 · 영업본부 석유제품영업팀 · P-C3-1",
+ "agent": {
+  "name": "월간 수주·여신 심사 에이전트",
+  "level": "Lv.5",
+  "one_liner": "이번 달 주문을 모아 제품별 공급가능량과 거래처별 여신 한도에 맞는지 점검하고, 한도를 넘는 거래처를 찾아 조정 대상으로 올린다. 수주 확정과 출하 지시는 하지 않는다."
+ },
+ "source_map": {
+  "lv3": "석유제품 영업",
+  "lv4_process": "P-C3-1 월간 수주·여신 심사",
+  "lv5_tasks": [
+   {
+    "source_id": "T-C3-1-1",
+    "skill": "판매계획확인",
+    "new": false
+   },
+   {
+    "source_id": "T-C3-1-2",
+    "skill": "주문접수취합",
+    "new": false
+   },
+   {
+    "source_id": "T-C3-1-3",
+    "skill": "공급가능확인",
+    "new": false
+   },
+   {
+    "source_id": "T-C3-1-4",
+    "skill": "여신한도점검",
+    "new": false
+   },
+   {
+    "source_id": "A-C3-1-4-2",
+    "skill": "여신조정요청",
+    "new": false
+   },
+   {
+    "source_id": "T-C3-1-5",
+    "skill": "수주확정품의",
+    "new": false
+   }
+  ]
+ },
+ "levels": {
+  "lv4": "석유제품 영업",
+  "lv5": "월간 수주·여신 심사",
+  "lv6": [
+   {
+    "name": "판매계획확인",
+    "human": "자동",
+    "owner": "영업기획담당",
+    "skillability": "높음",
+    "next": [
+     "주문접수취합"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "주문접수취합",
+    "human": "자동",
+    "owner": "영업지원담당",
+    "skillability": "높음",
+    "next": [
+     "공급가능확인"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "공급가능확인",
+    "human": "증강",
+    "owner": "수급담당",
+    "skillability": "중간",
+    "next": [
+     "여신한도점검"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "여신한도점검",
+    "human": "증강",
+    "owner": "여신담당",
+    "skillability": "중간",
+    "next": [
+     "여신조정요청",
+     "수주확정품의"
+    ],
+    "loop_to": ""
+   },
+   {
+    "name": "여신조정요청",
+    "human": "사람고유",
+    "owner": "영업담당",
+    "skillability": "낮음",
+    "next": [],
+    "loop_to": "공급가능확인"
+   },
+   {
+    "name": "수주확정품의",
+    "human": "사람고유",
+    "owner": "영업본부장",
+    "skillability": "낮음",
+    "next": [],
+    "loop_to": ""
+   }
+  ]
+ },
+ "stats": {
+  "skills": 6,
+  "ai_tasks": 4,
+  "human_points": 2,
+  "forks": 1,
+  "loops": 1,
+  "steps": 8
+ },
+ "verdict": "팀 에이전트 · 갈림길+루프백",
+ "summary": "루프백 1회 (여신조정) · 최종 2회차에 한도초과 0 · 사람 확인 없이 확정·출하된 것 없음"
+}
+</script>
+
+<div class="con idle" id="con">
+  <div class="box">
+    <div class="hd"><span class="led" id="led"></span>
+      실행 로그 <span style="margin-left:auto">시뮬레이션 — 실제 실행 기록이 아닙니다</span></div>
+    <div class="sc" id="consc"><div class="ln"><span class="t">--:--.-</span>대기 중 <span class="cur"></span></div></div>
+  </div>
+</div>
+
+<div class="dock" id="dock">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="row">
+    <span class="pct" id="pct">0%</span>
+    <span class="clock" id="clock" title="시뮬레이션 시간입니다 — 실제 실행은 1초 미만입니다">
+      ⏱ <b>0.0</b>s</span>
+    <span class="what" id="what">▶ 실행을 누르면 한 단계씩 진행됩니다</span>
+    <button class="primary" id="play" type="button">▶ 실행</button>
+    <button id="next" type="button">다음 단계 ›</button>
+    <button id="speed" type="button">1×</button>
+    <button id="reset" type="button">처음으로</button>
+    <span class="keys">스페이스 재생·일시정지 · → 다음 단계 · R 처음으로 ·
+      레일의 단계를 클릭하면 거기까지 건너뜁니다 ·
+      <b>시간은 시뮬레이션 값</b>입니다 (실제 실행은 1초 미만) ·
+      끝까지 보려면 <b>전체 보기</b>를 누르십시오
+      <button id="all" type="button" style="padding:2px 8px;margin-left:6px">전체 보기</button></span>
+  </div>
+</div>
+
+<script>
+// 재생 컨트롤러 — 데이터는 건드리지 않는다. 이미 그려진 단계를 순서대로 보여줄 뿐이다.
+// 사람고유(halt) 단계에서는 **반드시 멈춘다.** 이 목업이 말하려는 것이 그것이다.
+(function () {
+  const steps = [...document.querySelectorAll('.st')];
+  const rail  = [...document.querySelectorAll('.rail .n')];
+  const fill = document.getElementById('fill'), pct = document.getElementById('pct');
+  const what = document.getElementById('what'), dock = document.getElementById('dock');
+  const bPlay = document.getElementById('play'), bNext = document.getElementById('next');
+  const bSpd = document.getElementById('speed'), bReset = document.getElementById('reset');
+  const bAll = document.getElementById('all');
+  const clock = document.getElementById('clock').querySelector('b');
+  const capS = document.getElementById('cap-start'), capE = document.getElementById('cap-end');
+  const SPEEDS = [1, 2, 4], DELAY = 1100, WORK = 420;
+  let i = 0, timer = null, work = null, tick2 = null;
+  let playing = false, spd = 0, waiting = false, held = null, t0 = 0, elapsed = 0;
+
+  const bare = n => (n || '').replace(/^\s*\d+[.)]\s*/, '').trim();   // "5. 계정검증대사" → "계정검증대사"
+  const railFor = n => rail.filter(r => bare(r.dataset.skill) === bare(n));
+
+  // ── 실행 콘솔 — 로그가 흐르면 "돌고 있다"가 눈에 보인다. 내용은 단계 이름뿐,
+  //    숫자는 지어내지 않는다. 헤더에 시뮬레이션임을 상시 표기.
+  const con = document.getElementById('con'), consc = document.getElementById('consc');
+  const led = document.getElementById('led');
+  const stamp = () => { const s = elapsed / 1000;
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + (s % 60).toFixed(1).padStart(4, '0'); };
+  function logLine(txt, cls) {
+    consc.querySelectorAll('.cur').forEach(x => x.parentElement.remove());
+    const d = document.createElement('div'); d.className = 'ln' + (cls ? ' ' + cls : '');
+    const t = document.createElement('span'); t.className = 't'; t.textContent = stamp();
+    d.appendChild(t); d.appendChild(document.createTextNode(txt));
+    const c = document.createElement('div'); c.className = 'ln';
+    c.innerHTML = '<span class="cur"></span>';
+    consc.appendChild(d); consc.appendChild(c);
+    consc.scrollTop = consc.scrollHeight;
+  }
+  function conLive(on) { led.classList.toggle('live', on); }
+
+  function showClock() { clock.textContent = (elapsed / 1000).toFixed(1); }
+  function clockOn() { t0 = Date.now(); clearInterval(tick2);
+    tick2 = setInterval(() => { elapsed += 100; showClock(); }, 100); }
+  function clockOff() { clearInterval(tick2); tick2 = null; }
+
+  // 숫자를 0에서 세어 올린다 — 방금 계산된 것처럼 보이게.
+  function countUp(el) {
+    const end = parseInt(el.dataset.n ?? el.textContent.replace(/[^0-9]/g, ''), 10);
+    if (!Number.isFinite(end) || end === 0) return;
+    el.dataset.n = end; let v = 0;
+    const st = setInterval(() => {
+      v = Math.min(end, v + Math.max(1, Math.ceil(end / 12)));
+      el.firstChild.nodeValue = v;
+      if (v >= end) clearInterval(st);
+    }, 45);
+  }
+
+  function paint() {
+    const p = Math.round(i / steps.length * 100);
+    fill.style.width = p + '%'; pct.textContent = p + '%';
+    dock.classList.toggle('done', i >= steps.length);
+    dock.classList.toggle('waiting', waiting);
+    bPlay.textContent = playing ? '⏸ 일시정지' : (i >= steps.length ? '↻ 다시' : '▶ 실행');
+    if (i >= steps.length) { what.innerHTML = '<b>완료</b> — 모든 단계가 끝났습니다.'; return; }
+    const s = steps[i];
+    what.innerHTML = waiting
+      ? '⏸ <b>' + bare(held.dataset.skill) + '</b> — 사람 확인 대기. 확인해야 다음으로 갑니다.'
+      : (i === 0 ? '▶ 실행을 누르면 한 단계씩 진행됩니다'
+                 : '다음: <b>' + bare(s.dataset.skill) + '</b>');
+  }
+
+  function reveal(done) {
+    if (i >= steps.length) { stop(); capE.classList.add('on'); paint(); return; }
+    const s = steps[i];
+    steps.forEach(x => x.classList.remove('now'));
+    rail.forEach(r => r.classList.remove('now'));
+    capS.classList.add('on');
+    s.classList.add('shown', 'now', 'working');       // 먼저 "처리 중"을 보여준다
+    railFor(s.dataset.skill).forEach(r => r.classList.add('lit', 'now'));
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // 처리 시간을 단계마다 다르게 — 일정하면 녹화처럼 보인다.
+    const dur = WORK * (0.6 + Math.random() * 1.1) / SPEEDS[spd];
+    const nm = bare(s.dataset.skill);
+    con.classList.add('open'); con.classList.remove('idle', 'wait'); conLive(true);
+    if (s.dataset.kind === 'loopback') logLine('↩ ' + nm + ' — 되돌아감 (루프백)', 'lp');
+    else logLine('▸ ' + nm + ' 시작 — SKILL.md 명세 확인');
+    setTimeout(() => { if (s.classList.contains('working'))
+      logLine('  · 입력 읽는 중 — data/ 표 대조'); }, dur * 0.45);
+    clearTimeout(work);
+    work = setTimeout(() => {                          // 그 다음 결과로 바뀐다
+      s.classList.remove('working');
+      const ms = s.querySelector('.ms'), msv = (0.08 + Math.random() * 0.35).toFixed(2) + 's';
+      if (ms) { ms.textContent = msv; ms.classList.add('on'); }
+      s.querySelectorAll('.br .cnt:not(.none)').forEach(countUp);
+      logLine('✓ ' + nm + ' 완료 (' + msv + ')', 'ok');
+      i++;
+      if (s.dataset.kind === 'halt' && i < steps.length) {
+        waiting = true; held = s; s.classList.add('waiting');
+        logLine('⏸ ' + nm + ' — 사람 확인 대기. 승인 전에는 진행하지 않음', 'hl');
+        con.classList.add('wait'); conLive(false);
+        stop(); paint(); return;
+      }
+      if (i >= steps.length) { capE.classList.add('on'); stop();
+        logLine('■ 완료 — ' + steps.length + '단계 종료', 'ok'); conLive(false); }
+      paint();
+      if (done) done();
+    }, dur);
+  }
+
+  function tick() { reveal(() => { if (playing && !waiting) schedule(); }); }
+  function schedule() { clearTimeout(timer); timer = setTimeout(tick, DELAY / SPEEDS[spd]); }
+  function stop() { playing = false; clearTimeout(timer); clockOff(); conLive(false); }
+
+  function play() {
+    if (waiting) return;
+    if (i >= steps.length) { reset(); setTimeout(play, 350); return; }
+    playing = true; clockOn(); paint(); tick();
+  }
+  function reset() {
+    stop(); clearTimeout(work); waiting = false; held = null; i = 0; elapsed = 0; showClock();
+    capS.classList.remove('on'); capE.classList.remove('on');
+    steps.forEach(x => { x.classList.remove('shown', 'now', 'waiting', 'working');
+      const m = x.querySelector('.ms'); if (m) { m.textContent = ''; m.classList.remove('on'); }
+      x.querySelectorAll('.br .cnt').forEach(c => {
+        if (c.dataset.n) c.firstChild.nodeValue = c.dataset.n; }); });
+    rail.forEach(r => r.classList.remove('lit', 'now'));
+    consc.innerHTML = '<div class="ln"><span class="t">00:00.0</span>대기 중 ' +
+                      '<span class="cur"></span></div>';
+    con.classList.add('idle'); con.classList.remove('open', 'wait');
+    document.body.classList.add('play');
+    window.scrollTo({ top: 0, behavior: 'smooth' }); paint();
+  }
+  function showAll() {
+    stop(); clearTimeout(work); waiting = false; held = null; i = steps.length;
+    steps.forEach(x => { x.classList.add('shown');
+      x.classList.remove('now', 'waiting', 'working'); });
+    rail.forEach(r => r.classList.add('lit'));
+    capS.classList.add('on'); capE.classList.add('on');
+    con.classList.remove('open', 'wait');
+    paint();
+  }
+
+  // 레일을 클릭하면 그 단계까지 건너뛴다 — 데모에서 보고 싶은 대목만 짚어 보여줄 때.
+  function jumpTo(name) {
+    const at = steps.findIndex(s => bare(s.dataset.skill) === bare(name));
+    if (at < 0) return;
+    stop(); clearTimeout(work); waiting = false; held = null;
+    steps.forEach((x, k) => {
+      x.classList.toggle('shown', k <= at);
+      x.classList.remove('now', 'waiting', 'working');
+      const m = x.querySelector('.ms');
+      if (m && k <= at && !m.textContent) {
+        m.textContent = (0.08 + Math.random() * 0.35).toFixed(2) + 's'; m.classList.add('on'); }
+    });
+    // 건너뛴 지점까지의 레일도 함께 켠다 — 지나온 것이 꺼져 있으면 어디까지 왔는지 안 보인다.
+    const passed = new Set(steps.slice(0, at + 1).map(s => bare(s.dataset.skill)));
+    rail.forEach(r => { r.classList.remove('now');
+                        r.classList.toggle('lit', passed.has(bare(r.dataset.skill))); });
+    railFor(name).forEach(r => r.classList.add('now'));
+    steps[at].classList.add('now');
+    con.classList.add('open'); con.classList.remove('idle', 'wait');
+    logLine('⏩ ' + bare(name) + ' 까지 건너뜀');
+    i = at + 1; capS.classList.add('on');
+    capE.classList.toggle('on', i >= steps.length);
+    steps[at].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    paint();
+  }
+  function proceed() {     // 사람 확인 버튼
+    if (!waiting) return;
+    logLine('▶ 사람 확인 완료 — 다음 단계로', 'ok');
+    con.classList.remove('wait');
+    waiting = false; held = null;
+    steps.forEach(x => x.classList.remove('waiting'));
+    paint(); play();
+  }
+
+  bPlay.onclick = () => (playing ? (stop(), paint()) : play());
+  bNext.onclick = () => { if (waiting) return proceed(); stop(); reveal(); };
+  bReset.onclick = reset;
+  bAll.onclick = showAll;
+  bSpd.onclick = () => { spd = (spd + 1) % SPEEDS.length; bSpd.textContent = SPEEDS[spd] + '×';
+                         if (playing) schedule(); };
+  document.querySelectorAll('.waitbar .go').forEach(b => b.onclick = proceed);
+  rail.forEach(r => r.onclick = () => jumpTo(r.dataset.skill));
+  addEventListener('keydown', ev => {
+    if (ev.target.tagName === 'INPUT') return;
+    if (ev.code === 'Space') { ev.preventDefault(); waiting ? proceed() : bPlay.onclick(); }
+    if (ev.key === 'ArrowRight') { ev.preventDefault(); bNext.onclick(); }
+    if (ev.key === 'r' || ev.key === 'R') reset();
+  });
+
+  reset();   // 자바스크립트가 살아 있을 때만 재생 모드로 — 꺼져 있으면 전부 그냥 보인다
+})();
+</script>
+</body>
+</html>
