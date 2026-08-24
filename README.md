@@ -24,6 +24,7 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 - [에이전트 정의](agents/activity-packaging-coach-agent.md)
 - [비식별 가상 구매 독립 실행 예시](examples/activity-packaging-coach-general/)
 - [trace 기반 Activity 실행 목업](examples/activity-packaging-coach-general/results/reference/agent-mockup.html)
+- [생성 에이전트·스킬·즉시 실행 Manifest](examples/activity-packaging-coach-general/results/reference/team-package/MANIFEST.md)
 - [기준 실행과 Luna 5 원본 비교](examples/activity-packaging-coach-general/COMPARISON.md)
 
 정본 스킬은 HR 전용 필드나 외부 템플릿에 의존하지 않습니다. 기준 예시는 `node run.mjs`로 실제 결과와 trace를 재생성하고, Activity 목업 12/12와 발표자료 27/27을 통과합니다. Luna 원본의 1280px 문서 overflow 18/27도 비교 대상으로 보존합니다. 워크숍·발표 프로토타입에는 단일 파일로 시작할 수 있지만, 실제 운영에서는 기존 `check/` 계약 게이트와 실행 패키지를 함께 사용하세요.

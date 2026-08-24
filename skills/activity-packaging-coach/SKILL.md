@@ -89,6 +89,7 @@ Write one package directory containing:
 ```text
 team-package/
 ├── README.md
+├── MANIFEST.md
 ├── agent-plan.md
 ├── AGENTS.md
 ├── CONTRACT.md
@@ -109,6 +110,16 @@ team-package/
 When confirmed schemas and rules support deterministic execution, include a local dry-run runner that regenerates the declared outputs and `trace.json`. When they do not, include a clearly labeled fictional fixture trace and mark production execution blocked; never disguise a playback-only mockup as a live integration.
 
 `README.md` contains only three usage lines and a link to `agent-plan.md`.
+
+`MANIFEST.md` is the human-facing single entry point. Keep it concise and derive it from the package rather than duplicating business prose. Include:
+
+1. Package name, type, purpose, and production-readiness status.
+2. The generated agent definition path and every packaged `SKILL.md` with owner, input, output, and next step.
+3. An exact `Run now` command from the package root, required input location, generated output paths, and the expected fictional result summary.
+4. Every human hold, prohibited external action, and unresolved production blocker.
+5. Direct links to `agent-mockup.html`, `agent-plan-deck.html`, `validation-report.md`, `AGENTS.md`, and `CONTRACT.md`.
+
+If the package is playback-only, replace the run command with an exact mockup-open command and say `실행기 없음`. Never present a fixture command as production activation.
 
 `agent-plan.md` contains exactly these eight sections:
 
@@ -236,6 +247,8 @@ Report:
 - every human stop and next action;
 - missing or unverified items;
 - a counter-rationale explaining when the package should remain a simpler skillpack.
+
+After reporting the package, immediately offer one concrete next action headed `바로 실행해 보기`. Give the exact package directory and command copied from `MANIFEST.md`, state which fictional or approved input it will read, name the files it will create, and warn where human confirmation will stop execution. Also provide the direct mockup link for users who want to inspect before running. Do not ask a generic `실행해 볼까요?`; make the executable proposal specific enough to run without another clarification.
 
 Do not call the package complete while any RED conflict, unresolved human boundary, failed gate, or falsely claimed browser check remains.
 

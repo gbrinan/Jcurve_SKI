@@ -44,7 +44,7 @@
 | Gate | Status | Evidence |
 |---|---|---|
 | L0 contract | PASS | `CONTRACT.md`에 표·열·writer·chain·payload·threshold·halt_at 정본 1개. `normalized-quotes.csv`와 `comparison-table.csv`는 각각 단독 writer 1개. 충돌 0. |
-| L1 structure | PASS | 필수 파일·data/skills 디렉터리 존재. `agent-plan.md` 정확히 1개, 섹션 정확히 8개, `README.md` 정확히 3줄. 3개 packaged skill의 7개 frontmatter 필드와 본문이 모두 비어 있지 않음. |
+| L1 structure | PASS | 필수 파일·data/skills 디렉터리와 `MANIFEST.md` 존재. Manifest의 agent·skill·mockup·deck·validation 링크가 모두 실제 파일을 가리킴. `agent-plan.md` 정확히 1개, 섹션 정확히 8개, `README.md` 정확히 3줄. 3개 packaged skill의 7개 frontmatter 필드와 본문이 모두 비어 있지 않음. |
 | L2 context preservation | PASS | 입력 스킬 3개를 병합/삭제 없이 정확히 한 번 배치. WFDATA의 6개 node 규칙, 6개 예외, `sourcing-analyst`/`buyer` owner, 2개 gate와 purchase-order 금지를 plan·agent·skill에 보존. 모든 read/write 데이터가 plan 3절에 존재. |
 | L3 consistency | PASS | start 1, reachable skill 3/3, cycle 0, orphan 0. `quote_bundle → normalized_quotes → variance_flags → sourcing_review_brief`가 인접 frontmatter와 CONTRACT에서 일치. terminal `human`은 `buyer-confirmation-hold`로 명시. |
 | L4 end to end | PASS | 합성 fixture 3행 모두 normalizer·comparison·brief에 보존. ordinary `Q-NORMAL`은 pass, threshold `Q-REVIEW`와 failed parse `Q-FAILED`는 human review에서 중단. 외부 send/PO/ERP write 0. |
@@ -61,6 +61,14 @@
 - SSOT: HTML 내 embedded trace와 `data/output/trace.json`의 구조·값이 완전히 일치.
 - Independent visual review: 두 개의 독립 read-only 리뷰가 최신 12개 캡처에서 실행 문맥, 현재 rail, CJK, card/dock 가림, 상태 구분을 각각 PASS 판정.
 - Evidence: `evidence/mockup-qa.json`, `evidence/mockup-visual/<viewport>/<state>.png`.
+
+## Immediate execution handoff
+
+- Single entry point: `MANIFEST.md`
+- Exact command: `node run.mjs`
+- Input and four generated outputs are named before execution.
+- The first human stop, prohibited external actions, and production blockers are visible beside the command.
+- Manifest links to the generated agent definition, all three task skills, mockup, deck, validation, and contract; link check PASS.
 
 ## L4 scenario trace
 

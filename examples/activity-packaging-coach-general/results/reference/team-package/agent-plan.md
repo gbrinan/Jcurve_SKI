@@ -50,6 +50,7 @@ Sourcing Operations Lab은 주간 및 수시로 들어오는 공급업체 견적
 ```mermaid
 graph TD
   P[team-package] --> R[README.md]
+  P --> MF[MANIFEST.md]
   P --> AP[agent-plan.md]
   P --> AG[AGENTS.md]
   P --> C[CONTRACT.md]

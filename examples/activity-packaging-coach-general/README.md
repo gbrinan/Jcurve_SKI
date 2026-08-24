@@ -7,7 +7,7 @@
 ## 구성
 
 - `input/`: 승인된 가상 구매 WFDATA, 맥락, task skill 3개
-- `results/reference/team-package/`: `node run.mjs`로 재생성되는 기준 패키지, `trace.json`, 실행 목업, 발표자료
+- `results/reference/team-package/`: `MANIFEST.md`에서 생성 에이전트·스킬·실행 명령을 확인하고 `node run.mjs`로 재생성하는 기준 패키지
 - `results/reference/agent-mockup.html`: 설치 없이 바로 확인하는 Activity 실행 목업, Edge 12/12
 - `results/reference/agent-plan-deck.html`: 기준 발표자료, Edge 27/27
 - `results/luna/`: Luna 5 원본 결과, 독립 Edge 18/27
