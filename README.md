@@ -29,26 +29,60 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 
 정본 스킬은 HR 전용 필드나 외부 템플릿에 의존하지 않습니다. 기준 예시는 `node run.mjs`로 실제 결과와 trace를 재생성하고, Activity 목업 12/12와 발표자료 27/27을 통과합니다. Luna 원본의 1280px 문서 overflow 18/27도 비교 대상으로 보존합니다. 워크숍·발표 프로토타입에는 단일 파일로 시작할 수 있지만, 실제 운영에서는 기존 `check/` 계약 게이트와 실행 패키지를 함께 사용하세요.
 
-> 처음이시라면 아래 "전체 흐름"만 읽으세요. 각 도구의 상세는 그 아래에 있습니다.
+> 처음이시라면 아래 "세 코치 전체 사용법"만 읽으세요. 빨간 노드가 이 저장소의 책임 범위이고, 각 도구의 상세는 그 아래에 있습니다.
 
 ---
 
-## 🧭 전체 흐름 — 세션 6에서 7까지
+## 세 코치 전체 사용법
 
-```
-들어오는 것 (둘 중 하나)
-  · 개인이 각자 쓴 SKILL.md                    → ① 인터뷰로 채운다
-  · 세션 3·4 코치 산출물 / 워크플로우 설계도 HTML → adapt_* 로 팩으로 변환
-      │
-      ├─① prompts/   확인표로 아는 것을 통째 확인, 빈 칸만 질문
-      │               →  agent-plan.md (기획서 = 원본/SSOT) + CONTRACT.md (이름 계약)
-      │
-      ├─② check/     readchk      → DECISIONS.md (이해한 바 + 미결 갈래 하나)
-      │               계약 게이트  → 🟢 통과 → 통합 점검기 → simulate_run 실제 실행
-      │                             🟡 표기 어긋남 → 교정안 → 재검사
-      │                             🔴 충돌 → 팀이 결정 → 재검사
-      │
-      └─③ slide-pack  발표 자료로 만든다        →  ...-deck.html (발표용 SK CI 테마)
+**TL;DR:** [SKI-skills](https://github.com/gbrinan/SKI-skills)의 Moderator가 LV5를 확정하고, [wireframe-coach](https://github.com/gbrinan/wireframe-coach)가 승인된 `tobe.html`·`WFDATA`·업무별 `SKILL.md`를 만들면, 이 저장소의 **Activity Packaging Coach**가 실행 가능한 팀 스킬팩 또는 팀 에이전트, 실행 trace, Activity 목업과 9면 발표자료로 묶습니다.
+
+```mermaid
+flowchart TB
+  U["1. 비식별 업무 요청과 자료<br/>최대 5종"] --> M["2. Wireframe Moderator Coach<br/>LV5 후보와 적합성 판정"]
+  M --> MS["선정 트리 HTML<br/>선정 상태 블록"]
+  MS --> H1{"사람 확인<br/>대상 LV5 확정"}
+
+  H1 --> W["3. Wireframe Coach<br/>판단 기준·예외·책임 설계"]
+  W --> WF["tobe.html + WFDATA<br/>업무별 task SKILL.md"]
+  WF --> H2{"사람 확인<br/>와이어프레임 승인"}
+
+  H2 --> A["4. Activity Packaging Coach<br/>계약·writer·payload·chain 통합"]
+  A --> C{"독립 AI 작업 수와<br/>L0-L4 결과"}
+  C -->|"2개 이하"| SP["team skillpack"]
+  C -->|"3개 이상 + 검증 통과"| TA["team agent"]
+  SP -. "3개 이상 + 검증 통과" .-> TA
+  TA -. "2개 이하" .-> SP
+
+  SP --> PKG["5. team-package/MANIFEST.md<br/>생성 결과의 단일 진입점"]
+  TA --> PKG
+  PKG --> AS["AGENTS.md + task skills<br/>에이전트 정의와 실행 능력"]
+  PKG --> RT["run.mjs + trace.json<br/>로컬 실행과 기록"]
+  PKG --> MX["agent-mockup.html<br/>실행 상태·분기·사람 정지"]
+  PKG --> DK["agent-plan-deck.html<br/>9면 발표자료"]
+
+  RT --> CMD["6. Manifest의 명령 실행<br/>node run.mjs"]
+  CMD --> HH{"사람 책임 지점<br/>자동 진행 금지"}
+  HH --> OUT["결과 파일 확인<br/>근거·미해결 항목·다음 행동"]
+
+  AS --> V["7. 최종 검증<br/>skill validator · L0-L4 · E2E"]
+  MX --> V2["목업 QA<br/>375·768·1280 × 4상태"]
+  DK --> V3["발표 QA<br/>375·768·1280 × 9면"]
+  OUT --> V
+  V --> H3{"사람 최종 판단<br/>외부 행동은 별도 승인"}
+  V2 --> H3
+  V3 --> H3
+
+  classDef coach fill:#10233f,color:#ffffff,stroke:#10233f,stroke-width:2px;
+  classDef current fill:#EA002C,color:#ffffff,stroke:#9f001e,stroke-width:3px;
+  classDef artifact fill:#f7f5f2,color:#20242a,stroke:#6b7280,stroke-width:1px;
+  classDef human fill:#f7dddd,color:#7f1d1d,stroke:#a62a2a,stroke-width:2px;
+  classDef package fill:#e7f3eb,color:#14532d,stroke:#216e46,stroke-width:2px;
+  class M,W,A coach;
+  class A current;
+  class MS,WF,AS,RT,MX,DK,CMD,OUT,V,V2,V3 artifact;
+  class H1,H2,HH,H3 human;
+  class SP,TA,PKG package;
 ```
 
 각 단계는 앞 단계의 산출물을 그대로 입력으로 받습니다. 기획서 하나가 끝까지 따라갑니다.
