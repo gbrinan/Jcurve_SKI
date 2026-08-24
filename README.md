@@ -18,14 +18,15 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 
 ### 일반화 Activity Packaging Coach
 
-승인된 WFDATA와 업무별 `SKILL.md`를 도메인에 관계없이 하나의 검증 가능한 팀 스킬팩 또는 팀 에이전트로 묶는 자기완결 스킬을 추가했습니다.
+승인된 WFDATA와 업무별 `SKILL.md`를 도메인에 관계없이 하나의 검증 가능한 팀 스킬팩 또는 팀 에이전트로 묶고, 같은 trace로 Activity 실행 목업과 발표자료를 만드는 자기완결 스킬을 추가했습니다.
 
 - [일반화 Activity Packaging Coach](skills/activity-packaging-coach/SKILL.md)
 - [에이전트 정의](agents/activity-packaging-coach-agent.md)
 - [비식별 가상 구매 독립 실행 예시](examples/activity-packaging-coach-general/)
+- [trace 기반 Activity 실행 목업](examples/activity-packaging-coach-general/results/reference/agent-mockup.html)
 - [기준 실행과 Luna 5 원본 비교](examples/activity-packaging-coach-general/COMPARISON.md)
 
-정본 스킬은 HR 전용 필드나 외부 템플릿에 의존하지 않습니다. 예시는 같은 단일 스킬과 입력으로 기준 에이전트가 Edge 27/27을 통과하고 Luna 원본은 1280px 문서 overflow로 18/27이 된 차이까지 보존합니다. 워크숍·발표 프로토타입에는 단일 파일로 시작할 수 있지만, 실제 운영에서는 기존 `check/` 계약 게이트와 실행 패키지를 함께 사용하세요.
+정본 스킬은 HR 전용 필드나 외부 템플릿에 의존하지 않습니다. 기준 예시는 `node run.mjs`로 실제 결과와 trace를 재생성하고, Activity 목업 12/12와 발표자료 27/27을 통과합니다. Luna 원본의 1280px 문서 overflow 18/27도 비교 대상으로 보존합니다. 워크숍·발표 프로토타입에는 단일 파일로 시작할 수 있지만, 실제 운영에서는 기존 `check/` 계약 게이트와 실행 패키지를 함께 사용하세요.
 
 > 처음이시라면 아래 "전체 흐름"만 읽으세요. 각 도구의 상세는 그 아래에 있습니다.
 

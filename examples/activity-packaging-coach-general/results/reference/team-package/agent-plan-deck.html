@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>Sourcing Operations Lab · Agent Plan</title>
+  <style>
+    :root {
+      --white: #ffffff;
+      --warm-50: #f7f5f2;
+      --warm-100: #eeeae4;
+      --warm-200: #ded9d2;
+      --navy-900: #10233f;
+      --navy-700: #25476f;
+      --navy-100: #dbe5f0;
+      --red-700: #a62a2a;
+      --red-100: #f7dddd;
+      --ink: #20242a;
+      --muted: #606771;
+      --s1: 4px;
+      --s2: 8px;
+      --s3: 12px;
+      --s4: 16px;
+      --s5: 20px;
+      --s6: 24px;
+      --s8: 32px;
+      --s12: 48px;
+      --type-xs: 10px;
+      --type-sm: 11px;
+      --type-base: 12px;
+      --rail: 92px;
+      --rail-tablet: 76px;
+      --rail-mobile: 46px;
+      --mark: 44px;
+      --mark-mobile: 32px;
+      --dot: 32px;
+      --dot-mobile: 24px;
+      --footer: 48px;
+      --footer-mobile: 40px;
+      --nav-width: 34px;
+      --nav-height: 30px;
+      --nav-mobile-width: 28px;
+      --nav-mobile-height: 24px;
+      --accent: 9px;
+      --accent-mobile: 4px;
+      --motion-fast: 160ms;
+      --focus: 0 0 0 3px var(--white), 0 0 0 5px var(--red-700);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+    body {
+      background: var(--warm-50);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      word-break: keep-all;
+    }
+    button, a { font: inherit; }
+    button:focus-visible, a:focus-visible { outline: none; box-shadow: var(--focus); }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: grid;
+      grid-template-columns: var(--rail) minmax(0, 1fr);
+      background: var(--white);
+    }
+
+    .rail {
+      background: var(--navy-900);
+      color: var(--white);
+      padding: var(--s4) var(--s3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--s4);
+      z-index: 4;
+    }
+    .mark {
+      width: var(--mark);
+      height: var(--mark);
+      border: 1px solid var(--navy-100);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: .05em;
+    }
+    .rail-label {
+      font-size: var(--type-xs);
+      line-height: 1.25;
+      text-align: center;
+      color: var(--navy-100);
+    }
+    .dots {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s2);
+      margin-block: auto;
+    }
+    .dot {
+      width: var(--dot);
+      height: var(--dot);
+      border: 1px solid var(--navy-700);
+      background: transparent;
+      color: var(--navy-100);
+      cursor: pointer;
+      font-size: var(--type-sm);
+      font-weight: 700;
+    }
+    .dot[aria-current="true"] {
+      background: var(--white);
+      border-color: var(--white);
+      color: var(--navy-900);
+    }
+
+    .stage { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+    .screen {
+      position: absolute;
+      inset: 0;
+      padding: clamp(24px, 4.2vw, 56px) clamp(24px, 5vw, 68px) 64px;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(16px, 2.5vw, 28px);
+      background: var(--white);
+      opacity: 0;
+      transform: translateX(14px);
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity var(--motion-fast) ease-out, transform var(--motion-fast) ease-out;
+      overflow: hidden;
+    }
+    .screen.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+      visibility: visible;
+    }
+    .screen::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--accent);
+      height: 100%;
+      background: var(--navy-900);
+    }
+    .screen.human::before { background: var(--red-700); }
+
+    header { min-width: 0; }
+    .eyebrow {
+      margin: 0 0 var(--s2);
+      color: var(--navy-700);
+      font-size: clamp(10px, 1.1vw, 13px);
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 920px;
+      color: var(--navy-900);
+      font-size: clamp(26px, 4.2vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -.025em;
+    }
+    .lead {
+      margin: var(--s3) 0 0;
+      max-width: 860px;
+      color: var(--muted);
+      font-size: clamp(13px, 1.5vw, 18px);
+      line-height: 1.45;
+    }
+    .content { min-height: 0; display: grid; align-content: start; gap: var(--s4); }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      border: 1px solid var(--warm-200);
+      background: var(--white);
+      padding: clamp(12px, 1.7vw, 20px);
+      min-width: 0;
+    }
+    .card.system { border-top: 4px solid var(--navy-900); }
+    .card.exception { border-top: 4px solid var(--red-700); background: var(--red-100); }
+    .metric { font-size: clamp(24px, 4.6vw, 52px); line-height: 1; color: var(--navy-900); font-weight: 800; }
+    .metric.red { color: var(--red-700); }
+    .label { margin-top: var(--s2); font-size: clamp(11px, 1.25vw, 15px); font-weight: 800; color: var(--ink); }
+    .note { margin: var(--s2) 0 0; color: var(--muted); font-size: clamp(10px, 1.1vw, 13px); line-height: 1.35; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid currentColor;
+      padding: var(--s1) var(--s2);
+      color: var(--navy-700);
+      background: var(--navy-100);
+      font-size: clamp(var(--type-xs), .9vw, var(--type-sm));
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    .tag.hold { color: var(--red-700); background: var(--red-100); }
+    .tag.neutral { color: var(--muted); background: var(--warm-50); }
+    .statement {
+      padding: var(--s4);
+      border-left: 4px solid var(--navy-900);
+      background: var(--warm-50);
+      font-size: clamp(13px, 1.55vw, 18px);
+      line-height: 1.4;
+      font-weight: 650;
+    }
+    .statement.hold { border-left-color: var(--red-700); background: var(--red-100); }
+    .list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s2); }
+    .list li {
+      position: relative;
+      padding-left: var(--s4);
+      color: var(--ink);
+      font-size: clamp(11px, 1.25vw, 15px);
+      line-height: 1.35;
+    }
+    .list li::before { content: ""; position: absolute; left: 0; top: .48em; width: 6px; height: 6px; background: var(--navy-700); }
+    .list.red li::before { background: var(--red-700); }
+    .chain { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s2); align-items: stretch; }
+    .step { position: relative; border: 1px solid var(--warm-200); padding: var(--s3); min-width: 0; }
+    .step:not(:last-child)::after { content: "›"; position: absolute; right: -8px; top: 50%; z-index: 2; color: var(--navy-700); background: var(--white); transform: translateY(-50%); font-weight: 900; }
+    .step.hold { border: 2px solid var(--red-700); background: var(--red-100); }
+    .step-name { margin: var(--s2) 0; color: var(--navy-900); font-size: clamp(11px, 1.25vw, 15px); line-height: 1.22; font-weight: 800; overflow-wrap: anywhere; }
+    .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; overflow-wrap: anywhere; }
+    .owner { color: var(--muted); font-size: clamp(var(--type-xs), 1vw, var(--type-base)); }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: clamp(10px, 1.1vw, 13px); }
+    th, td { border-bottom: 1px solid var(--warm-200); padding: clamp(7px, 1vw, 11px); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+    th { color: var(--navy-900); background: var(--warm-50); font-weight: 800; }
+    .checklist { display: grid; gap: var(--s2); }
+    .check {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--s3);
+      border-bottom: 1px solid var(--warm-200);
+      padding: var(--s2) 0;
+      font-size: clamp(11px, 1.25vw, 15px);
+    }
+    .level { font-weight: 900; color: var(--navy-900); }
+    .pass { color: var(--navy-700); font-weight: 800; }
+    .pending { color: var(--red-700); font-weight: 800; }
+    .footer {
+      position: absolute;
+      z-index: 5;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--footer);
+      border-top: 1px solid var(--warm-200);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--s4);
+      color: var(--muted);
+      font-size: var(--type-base);
+    }
+    .footer-actions { display: flex; gap: var(--s2); align-items: center; }
+    .nav-btn { border: 1px solid var(--warm-200); background: var(--white); color: var(--navy-900); min-width: var(--nav-width); height: var(--nav-height); cursor: pointer; font-weight: 800; }
+    .nav-btn:disabled { color: var(--warm-200); cursor: default; }
+    .counter { color: var(--navy-900); font-weight: 800; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 900px) {
+      .deck { grid-template-columns: var(--rail-tablet) minmax(0, 1fr); }
+      .rail { padding-inline: var(--s2); }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .chain { grid-template-columns: 1fr; gap: var(--s2); }
+      .step { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3); }
+      .step-name { margin: 0; }
+      .step:not(:last-child)::after { content: ""; display: block; right: auto; left: 50%; top: auto; bottom: calc(-1 * var(--s2)); width: 2px; height: var(--s2); transform: translateX(-50%); background: var(--navy-700); }
+    }
+
+    @media (max-width: 520px) {
+      .deck { grid-template-columns: 1fr; grid-template-rows: var(--rail-mobile) minmax(0, 1fr); }
+      .rail { padding: 0 var(--s2); flex-direction: row; justify-content: space-between; gap: var(--s2); }
+      .mark { width: var(--mark-mobile); height: var(--mark-mobile); font-size: var(--type-xs); flex: 0 0 auto; }
+      .rail-label { display: none; }
+      .dots { flex-direction: row; gap: var(--s1); margin: 0; }
+      .dot { width: var(--dot-mobile); height: var(--dot-mobile); font-size: var(--type-xs); }
+      .screen { padding: var(--s4) var(--s4) var(--s12) var(--s5); gap: var(--s3); }
+      .screen::before { width: var(--accent-mobile); }
+      .eyebrow { margin-bottom: var(--s1); font-size: var(--type-xs); }
+      h1 { font-size: clamp(21px, 7vw, 27px); line-height: 1.05; }
+      .lead { margin-top: var(--s2); font-size: 11px; line-height: 1.3; }
+      .content { gap: var(--s2); }
+      .grid, .grid.two, .grid.three { grid-template-columns: 1fr 1fr; gap: var(--s2); }
+      .card { padding: var(--s2); }
+      .metric { font-size: 24px; }
+      .label { margin-top: var(--s1); font-size: var(--type-xs); }
+      .note { margin-top: var(--s1); font-size: var(--type-xs); line-height: 1.24; }
+      .statement { padding: var(--s2) var(--s3); font-size: var(--type-sm); line-height: 1.27; }
+      .list { gap: var(--s1); }
+      .list li { padding-left: var(--s3); font-size: var(--type-xs); line-height: 1.22; }
+      .list li::before { width: var(--s1); height: var(--s1); }
+      .chain { gap: var(--s2); }
+      .step { grid-template-columns: 64px minmax(0,1fr) auto; gap: var(--s2); padding: var(--s1) var(--s2); }
+      .step-name { font-size: var(--type-xs); line-height: 1.1; }
+      .owner { font-size: var(--type-xs); }
+      .tag { padding: var(--s1); font-size: var(--type-xs); }
+      table, tbody, tr, th, td { display: block; }
+      thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+      tbody { display: grid; gap: var(--s1); }
+      tr { display: grid; grid-template-columns: 1.15fr .85fr; border: 1px solid var(--warm-200); }
+      td { border: 0; padding: var(--s1); font-size: var(--type-xs); line-height: 1.15; }
+      td:first-child { color: var(--navy-900); font-weight: 800; }
+      .checklist { gap: var(--s1); }
+      .check { grid-template-columns: var(--nav-mobile-width) minmax(0,1fr) auto; gap: var(--s2); padding: var(--s1) 0; font-size: var(--type-xs); line-height: 1.15; }
+      .footer { height: var(--footer-mobile); padding-inline: var(--s3); font-size: var(--type-xs); }
+      .nav-btn { min-width: var(--nav-mobile-width); height: var(--nav-mobile-height); font-size: var(--type-xs); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .screen { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Sourcing Operations Lab agent plan presentation">
+    <aside class="rail" aria-label="화면 탐색">
+      <div class="mark" aria-hidden="true">SOL</div>
+      <div class="rail-label">AGENT<br>PLAN v0</div>
+      <nav class="dots" aria-label="화면 목록">
+        <button class="dot" data-go="0" aria-label="1 화면" aria-current="true">01</button>
+        <button class="dot" data-go="1" aria-label="2 화면">02</button>
+        <button class="dot" data-go="2" aria-label="3 화면">03</button>
+        <button class="dot" data-go="3" aria-label="4 화면">04</button>
+        <button class="dot" data-go="4" aria-label="5 화면">05</button>
+        <button class="dot" data-go="5" aria-label="6 화면">06</button>
+        <button class="dot" data-go="6" aria-label="7 화면">07</button>
+        <button class="dot" data-go="7" aria-label="8 화면">08</button>
+        <button class="dot" data-go="8" aria-label="9 화면">09</button>
+      </nav>
+    </aside>
+
+    <section class="stage" id="stage">
+      <article class="screen active" aria-labelledby="s1-title">
+        <header><p class="eyebrow">01 · Package verdict</p><h1 id="s1-title">구매 판단은 사람에게,<br>비교 준비는 에이전트에게</h1><p class="lead">3개 독립 작업을 하나의 도달 가능한 체인으로 묶은 Sourcing Operations Lab v0.</p></header>
+        <div class="content">
+          <div class="grid">
+            <div class="card system"><div class="metric">3</div><div class="label">독립 AI 작업</div><p class="note">각각 고유 입력·출력·소유자·인수 조건</p></div>
+            <div class="card system"><div class="metric">4</div><div class="label">계약 데이터 파일</div><p class="note">입력 2, 중간 출력 2</p></div>
+            <div class="card system"><div class="metric">2</div><div class="label">단독 table writer</div><p class="note">정규화 표와 비교 표</p></div>
+            <div class="card exception"><div class="metric red">2</div><div class="label">사람 결정 hold</div><p class="note">예외 확인과 최종 공급업체 선택</p></div>
+          </div>
+          <div class="statement"><span class="tag">TEAM AGENT</span> L0–L4 계약·구조·문맥·일관성·합성 E2E를 통과한 판정. 실제 구매 실행 권한은 없다.</div>
+        </div>
+      </article>
+
+      <article class="screen" aria-labelledby="s2-title">
+        <header><p class="eyebrow">02 · Scope</p><h1 id="s2-title">비교를 준비하지만<br>결정을 대신하지 않는다</h1><p class="lead">Lv4 Strategic sourcing · Lv5 Supplier quote evaluation · 주간 및 수시 실행.</p></header>
+        <div class="content grid two">
+          <section class="card system"><span class="tag">IN SCOPE</span><h2 class="label">하는 일</h2><ul class="list"><li>모든 견적 행 읽기와 보존</li><li>지원 통화·필수 필드 정규화</li><li>정책 매칭과 편차 근거 작성</li><li>전체 견적 검토 브리프 렌더링</li></ul></section>
+          <section class="card exception"><span class="tag hold">OUT OF SCOPE</span><h2 class="label">하지 않는 일</h2><ul class="list red"><li>누락 가격 추론 또는 실패 행 삭제</li><li>정책 수정과 공급업체 승인·선택</li><li>공급업체 연락과 구매주문 전송</li><li>ERP 또는 외부 시스템 writeback</li></ul></section>
+        </div>
+      </article>
+
+      <article class="screen human" aria-labelledby="s3-title">
+        <header><p class="eyebrow">03 · Skill chain & ownership</p><h1 id="s3-title">하나의 체인,<br>두 번의 명시적 정지</h1><p class="lead">모든 스킬은 시작점에서 도달 가능하며 cycle과 orphan이 없다.</p></header>
+        <div class="content">
+          <div class="chain">
+            <div class="step"><span class="tag">SYSTEM</span><div class="step-name mono">quote-intake-normalizer</div><div class="owner">sourcing-analyst<br>quote_bundle → normalized_quotes</div></div>
+            <div class="step"><span class="tag">SYSTEM</span><div class="step-name mono">quote-variance-analyzer</div><div class="owner">sourcing-analyst<br>normalized_quotes → variance_flags</div></div>
+            <div class="step hold"><span class="tag hold">HUMAN HOLD</span><div class="step-name mono">buyer-variance-review-hold</div><div class="owner">buyer<br>예외·모호성 확인</div></div>
+            <div class="step"><span class="tag">SYSTEM</span><div class="step-name mono">sourcing-review-brief</div><div class="owner">buyer-owned<br>variance_flags → brief</div></div>
+            <div class="step hold"><span class="tag hold">HUMAN HOLD</span><div class="step-name mono">buyer-confirmation-hold</div><div class="owner">buyer<br>공급업체 선택</div></div>
+          </div>
+          <div class="statement hold">구매담당자가 hold를 해제해도 에이전트는 구매주문을 보내거나 ERP에 쓰지 않는다.</div>
+        </div>
+      </article>
+
+      <article class="screen" aria-labelledby="s4-title">
+        <header><p class="eyebrow">04 · Data contract</p><h1 id="s4-title">한 표에는 한 writer만</h1><p class="lead">읽기는 공유할 수 있지만 쓰기는 정본별로 단독 소유한다.</p></header>
+        <div class="content">
+          <table aria-label="데이터 정본과 writer">
+            <thead><tr><th>정본</th><th>핵심 열</th><th>writer</th><th>상태</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">incoming-quotes.csv</td><td>quote_id · supplier_code · item_code · unit_price · lead_days · currency</td><td>none</td><td><span class="tag neutral">READ ONLY</span></td></tr>
+              <tr><td class="mono">sourcing-policy.csv</td><td>(미확인)</td><td>none</td><td><span class="tag hold">SCHEMA HOLD</span></td></tr>
+              <tr><td class="mono">normalized-quotes.csv</td><td>quote_id · supplier_code · item_code · unit_price_krw · lead_days · parse_status</td><td class="mono">quote-intake-normalizer</td><td><span class="tag">ONE WRITER</span></td></tr>
+              <tr><td class="mono">comparison-table.csv</td><td>quote_id · price_variance_pct · lead_variance_days · policy_status · evidence</td><td class="mono">quote-variance-analyzer</td><td><span class="tag">ONE WRITER</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="screen human" aria-labelledby="s5-title">
+        <header><p class="eyebrow">05 · Rules & exceptions</p><h1 id="s5-title">임계값은 고정하고<br>모호성은 사람에게 보낸다</h1><p class="lead">승인된 규칙을 바꾸지 않고 모든 실패·누락 행을 보존한다.</p></header>
+        <div class="content grid two">
+          <section class="card system"><span class="tag">RULE</span><div class="metric">&gt;12%</div><div class="label">가격 편차</div><p class="note">12%와 같으면 초과가 아니다. 12%를 넘을 때 human review.</p></section>
+          <section class="card system"><span class="tag">RULE</span><div class="metric">&gt;7일</div><div class="label">납기 편차</div><p class="note">7일과 같으면 초과가 아니다. 7일을 넘을 때 human review.</p></section>
+          <section class="card exception"><span class="tag hold">EXCEPTION</span><div class="label">실패·누락은 삭제 금지</div><p class="note">failed parse는 `parse_status=review`; policy match 누락은 review와 evidence로 남긴다.</p></section>
+          <section class="card exception"><span class="tag hold">HUMAN</span><div class="label">모호성은 구매담당자에게</div><p class="note">정책 열·근거가 없으면 발명하거나 자동 통과시키지 않는다.</p></section>
+        </div>
+      </article>
+
+      <article class="screen human" aria-labelledby="s6-title">
+        <header><p class="eyebrow">06 · Human stop points</p><h1 id="s6-title">멈춤은 오류가 아니라<br>책임 설계다</h1><p class="lead">모든 정지점은 이유와 다음 행동을 함께 가진다.</p></header>
+        <div class="content grid two">
+          <section class="card exception"><span class="tag hold">01 · INTERMEDIATE</span><h2 class="label mono">buyer-variance-review-hold</h2><p class="note">조건: 임계값 초과, 파싱 실패, 정책 매칭 누락, 모호성. 다음 행동: 구매담당자가 예외와 근거를 확인한다.</p></section>
+          <section class="card exception"><span class="tag hold">02 · FINAL</span><h2 class="label mono">buyer-confirmation-hold</h2><p class="note">조건: 전체 브리프 완성. 다음 행동: 구매담당자가 예외와 공급업체 선택을 확인한다.</p></section>
+          <div class="statement hold" style="grid-column: 1 / -1;"><strong>항상 중지:</strong> 입력 누락, 외부 전송, 구매주문, ERP write 요청. 승인된 connector는 현재 없다.</div>
+        </div>
+      </article>
+
+      <article class="screen" aria-labelledby="s7-title">
+        <header><p class="eyebrow">07 · Validation evidence</p><h1 id="s7-title">L0–L4는 PASS,<br>시각 게이트는 별도 증거</h1><p class="lead">기계 검사는 시각 품질의 대체물이 아니다.</p></header>
+        <div class="content checklist">
+          <div class="check"><span class="level">L0</span><span>정본 계약 · 단독 writer · 임계값 · hold 일치</span><span class="pass">PASS</span></div>
+          <div class="check"><span class="level">L1</span><span>필수 구조 · frontmatter · 단일 agent-plan</span><span class="pass">PASS</span></div>
+          <div class="check"><span class="level">L2</span><span>3개 입력 스킬 · WFDATA 규칙·예외·소유자 보존</span><span class="pass">PASS</span></div>
+          <div class="check"><span class="level">L3</span><span>start 1 · reachable 3 · cycle 0 · payload 일치</span><span class="pass">PASS</span></div>
+          <div class="check"><span class="level">L4</span><span>ordinary + adversarial 합성 trace · 행 보존 · 외부 행동 0</span><span class="pass">PASS</span></div>
+          <div class="statement hold"><span class="tag hold">VISUAL QA</span> 375×667 · 768×720 · 1280×720의 27화면 상태는 `validation-report.md`를 정본으로 한다.</div>
+        </div>
+      </article>
+
+      <article class="screen" aria-labelledby="s8-title">
+        <header><p class="eyebrow">08 · Reversible verdict</p><h1 id="s8-title">지금은 team agent,<br>작업 수가 줄면 되돌린다</h1><p class="lead">파일 수가 아니라 독립 작업의 실질로 판정한다.</p></header>
+        <div class="content grid two">
+          <section class="card system"><span class="tag">AGENT CRITERIA</span><div class="metric">3/3</div><div class="label">독립성 기준 충족</div><p class="note">각 스킬마다 고유 input · output · owner · acceptance test가 있다. 하나의 reachable chain이며 L0–L4가 통과했다.</p></section>
+          <section class="card"><span class="tag neutral">REVERSIBLE RULE</span><div class="label">2개 이하이면 skillpack</div><p class="note">실제 독립 작업이 2개 이하가 되면 team skillpack으로 강등한다. 표·writer·hold·사람 책임은 바꾸지 않는다.</p></section>
+          <div class="statement"><strong>Counter-rationale:</strong> 운영에서 brief 작성이 단순 템플릿 렌더링으로 축소되거나 독립 인수 조건을 잃으면, 복잡한 agent보다 skillpack이 더 정직하고 유지비가 낮다.</div>
+        </div>
+      </article>
+
+      <article class="screen" aria-labelledby="s9-title">
+        <header><p class="eyebrow">09 · Source of truth</p><h1 id="s9-title">계획에서 재생성하고<br>계약에서 검증한다</h1><p class="lead">중복된 사실을 만들지 않고 각 정본의 책임을 분리한다.</p></header>
+        <div class="content grid two">
+          <section class="card system"><span class="tag">PURPOSE & STRUCTURE</span><h2 class="label mono">agent-plan.md</h2><p class="note">팀 목적, 데이터 사양, 시나리오, writeback, 통합, human hold, 실제 폴더 트리의 단일 정본.</p></section>
+          <section class="card system"><span class="tag">CANONICAL VALUES</span><h2 class="label mono">CONTRACT.md</h2><p class="note"><span class="mono">표 · writer · chain · payload<br>threshold · halt_at</span><br>재생성 계약.</p></section>
+          <section class="card"><span class="tag neutral">OPERATING ROLE</span><h2 class="label mono">AGENTS.md + skills/</h2><p class="note">실행 순서와 각 작업의 절차·예외·금지 행동.</p></section>
+          <section class="card exception"><span class="tag hold">EVIDENCE</span><h2 class="label mono">validation-report.md</h2><p class="note">L0–L4 결과, 시각 QA 상태, 미확인 정책 스키마, 사람의 다음 행동.</p></section>
+        </div>
+      </article>
+
+      <footer class="footer" aria-label="프레젠테이션 제어">
+        <span>Sourcing Operations Lab · fictional test package</span>
+        <div class="footer-actions"><button class="nav-btn" id="prev" aria-label="이전 화면">←</button><span class="counter" id="counter" aria-live="polite">01 / 09</span><button class="nav-btn" id="next" aria-label="다음 화면">→</button></div>
+      </footer>
+      <div id="announcement" class="sr-only" aria-live="polite"></div>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const screens = [...document.querySelectorAll('.screen')];
+      const dots = [...document.querySelectorAll('.dot')];
+      const counter = document.getElementById('counter');
+      const announcement = document.getElementById('announcement');
+      const prev = document.getElementById('prev');
+      const next = document.getElementById('next');
+      const stage = document.getElementById('stage');
+      const hashIndex = Number(location.hash.slice(1)) - 1;
+      let index = Number.isInteger(hashIndex) && hashIndex >= 0 && hashIndex < screens.length ? hashIndex : 0;
+
+      function show(target, announce = true) {
+        index = Math.max(0, Math.min(screens.length - 1, target));
+        screens.forEach((screen, i) => {
+          const active = i === index;
+          screen.classList.toggle('active', active);
+          screen.setAttribute('aria-hidden', String(!active));
+        });
+        dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === index)));
+        counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(screens.length).padStart(2, '0')}`;
+        prev.disabled = index === 0;
+        next.disabled = index === screens.length - 1;
+        if (announce) announcement.textContent = `${index + 1}번 화면: ${screens[index].querySelector('h1').textContent.trim()}`;
+      }
+
+      dots.forEach(dot => dot.addEventListener('click', () => show(Number(dot.dataset.go))));
+      prev.addEventListener('click', () => show(index - 1));
+      next.addEventListener('click', () => show(index + 1));
+      stage.addEventListener('click', event => {
+        if (event.target.closest('button, a')) return;
+        show(index + (event.clientX < stage.clientWidth / 2 ? -1 : 1));
+      });
+      document.addEventListener('keydown', event => {
+        if (['ArrowRight', 'PageDown'].includes(event.key) || (event.code === 'Space' && event.target.tagName !== 'BUTTON')) { event.preventDefault(); show(index + 1); }
+        if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); show(index - 1); }
+        if (event.key === 'Home') { event.preventDefault(); show(0); }
+        if (event.key === 'End') { event.preventDefault(); show(screens.length - 1); }
+      });
+      show(index, false);
+    })();
+  </script>
+</body>
+</html>

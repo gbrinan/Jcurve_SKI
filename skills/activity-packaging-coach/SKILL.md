@@ -1,6 +1,6 @@
 ---
 name: activity-packaging-coach
-description: Package approved WFDATA workflow files and one or more task SKILL.md files into a coherent, testable team skillpack or team agent. Use whenever a wireframe-coach handoff, WFDATA block, Lv5 packaging request, team-agent integration request, agent-plan, AGENTS.md, CONTRACT.md, or end-to-end packaging test is mentioned. Apply across HR, finance, procurement, operations, sales, strategy, and other domains. Do not use to select the workflow, redesign the approved wireframe, or merely turn a document into slides.
+description: Package approved WFDATA workflow files and task SKILL.md files into a coherent, testable team skillpack or team agent, a trace-driven execution mockup, and a presentation deck. Use whenever a wireframe-coach handoff, WFDATA block, Lv5 packaging request, team-agent integration request, executable package, Activity mockup, agent-plan, AGENTS.md, CONTRACT.md, or end-to-end packaging test is mentioned. Apply across HR, finance, procurement, operations, sales, strategy, and other domains. Do not use to select the workflow, redesign the approved wireframe, or merely turn a document into slides.
 ---
 
 # Activity Packaging Coach
@@ -18,6 +18,8 @@ Start only after the workflow has been selected and its To-Be wireframe approved
 - Do not invent missing business facts, scores, thresholds, owners, tables, or outcomes.
 - Do not perform irreversible actions, external sends, approvals, payments, hiring decisions, publishing, deletion, or production writes.
 - Do not classify a slide generator as the Activity Coach. Presentation is one output of packaging, not the package itself.
+- Treat Wireframe Coach `tobe.html` as the approved editing and confirmation surface. Activity Coach owns the later execution surface: recorded trace, run controls, step states, branches, human holds, and completion evidence.
+- Do not turn an unapproved wireframe into an execution mockup.
 
 ## Inputs
 
@@ -91,6 +93,8 @@ team-package/
 ├── AGENTS.md
 ├── CONTRACT.md
 ├── validation-report.md
+├── run.py | run.mjs
+├── agent-mockup.html
 ├── agent-plan-deck.html
 ├── skills/
 │   ├── depth/<skill>/SKILL.md
@@ -98,9 +102,11 @@ team-package/
 │   └── coil/<skill>/SKILL.md
 └── data/
     ├── input/
-    ├── output/
+    ├── output/trace.json
     └── reference/
 ```
+
+When confirmed schemas and rules support deterministic execution, include a local dry-run runner that regenerates the declared outputs and `trace.json`. When they do not, include a clearly labeled fictional fixture trace and mark production execution blocked; never disguise a playback-only mockup as a live integration.
 
 `README.md` contains only three usage lines and a link to `agent-plan.md`.
 
@@ -131,6 +137,22 @@ halt_at: every intermediate and final human stop
 ```
 
 Each packaged task `SKILL.md` uses frontmatter fields `name`, `owner`, `inputs`, `outputs`, `reads`, `writes`, and `next`. Its body includes trigger, inputs, procedure, decision rules, exceptions, output, completion conditions, prohibited actions, and a visual delivery clause. Preserve the upstream business contract while normalizing names.
+
+## Activity execution mockup
+
+Create `agent-mockup.html` as a self-contained semantic HTML/CSS/JavaScript execution surface. It is not the upstream wireframe editor and must not alter the approved WFDATA. Render its content from the same recorded `trace.json` produced by the local runner or fictional dry-run fixture.
+
+Show all of the following:
+
+1. Package verdict, independent AI task count, human stop count, review branches, and external-action count.
+2. Team hierarchy, reachable skill chain, ownership, package tree, and primary outputs.
+3. An execution rail and one observable card per workflow step with input, work, result, branch, and human responsibility.
+4. Distinct `rest`, `running`, intermediate hold, final hold, and completed states when completion is permitted.
+5. Play or pause, next step, speed, reset, rail jump, Space, ArrowRight, and R controls.
+
+Stop automatically at every human gate. Keep production actions disabled and label why. Never animate an approval, notification, transfer, hire, publish, deletion, or other external effect. Counts and outcomes must come from the trace rather than presentation copy.
+
+Use the same token system and responsive rules as the presentation, but let the document own vertical scrolling. At 375, 768, and 1280 widths, keep cards, execution rail, and fixed controls inside the viewport. Reserve bottom space so the control dock never covers the current step. Use real DOM elements, no screenshot background, no network request, and no visible emoji icons.
 
 ## Presentation output
 
@@ -190,7 +212,15 @@ Run these gates in order and record evidence in `validation-report.md`.
 - Preserve all input records, including unmatched, unclear, prior-only, failed-parse, and exception rows when applicable.
 - Stop at declared human gates and perform no external action.
 
-Machine checks are evidence, not proof of visual quality. Render all nine deck screens in a real browser at 375×667, 768×720, and 1280×720. Require each screen to fit within one pixel of the viewport in both directions. Inspect all 27 captures for CJK wrapping, contrast, table collisions, footer visibility, and complete compositing. If a browser is unavailable, mark the visual gate `미실행`; do not claim a pass.
+### Activity mockup surface
+
+- Regenerate or fixture `trace.json` before rendering; the embedded trace and file trace must be equivalent.
+- Exercise rest, running, every human hold, reset, next, and keyboard controls in a real browser.
+- Render at 375×667, 768×720, and 1280×900. Require the document, visible cards, and fixed controls to remain inside the viewport width.
+- Inspect all 12 minimum state captures: four states at each viewport. If the workflow has more distinct human holds or a permitted complete state, capture those too.
+- Confirm that every external-action control is disabled and that playback cannot pass a human hold without an explicit local confirmation.
+
+Machine checks are evidence, not proof of visual quality. In addition to the Activity mockup gate, render all nine deck screens in a real browser at 375×667, 768×720, and 1280×720. Require each screen to fit within one pixel of the viewport in both directions. Inspect all 27 captures for CJK wrapping, contrast, table collisions, footer visibility, and complete compositing. If a browser is unavailable, mark the visual gate `미실행`; do not claim a pass.
 
 During inspection, confirm that stacked chain connectors stay contained and continuous, no rendered metadata or table text is smaller than 10px, and long filenames or contract keys break cleanly without touching a card boundary.
 
@@ -200,7 +230,9 @@ Report:
 
 - package path and type;
 - independent AI task count and rationale;
-- L0–L4 and 27-screen visual status;
+- executable or playback-only status and trace source;
+- Activity mockup browser-state status;
+- L0–L4 and 27-screen presentation status;
 - every human stop and next action;
 - missing or unverified items;
 - a counter-rationale explaining when the package should remain a simpler skillpack.

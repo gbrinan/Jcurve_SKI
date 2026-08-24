@@ -1,0 +1,4 @@
+quote_id,supplier_code,item_code,unit_price_krw,lead_days,parse_status
+Q-NORMAL,SUP-A,ITEM-1,100000,5,ok
+Q-REVIEW,SUP-B,ITEM-2,112001,8,ok
+Q-FAILED,SUP-C,ITEM-3,,4,review

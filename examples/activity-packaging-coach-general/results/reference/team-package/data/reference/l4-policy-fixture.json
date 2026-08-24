@@ -1,0 +1,4 @@
+{
+  "Q-NORMAL": { "price_variance_pct": "0", "lead_variance_days": "0", "policy_status": "pass", "evidence": "L4 adapter item match; below both thresholds" },
+  "Q-REVIEW": { "price_variance_pct": "12.01", "lead_variance_days": "8", "policy_status": "review", "evidence": "Price above 12% and lead-time above 7 days" }
+}
