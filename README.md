@@ -16,15 +16,16 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 | ✅ **통합 점검기** | 상류 산출물을 팩으로 변환하고, 잘 묶였는지 판정하고, 실제로 돌려봄 | 패키징 전후 | [`check/`](check/) |
 | 📊 **slide-pack** | 문서를 HTML 슬라이드로 변환 | 팀에 공유하거나 발표할 때 | 저장소 루트 |
 
-### 단일 파일 포터빌리티 예시
+### 일반화 Activity Packaging Coach
 
-외부 공유를 가볍게 시작할 때 `SKILL.md` 하나만으로 HR 업무 구조화와 9면 발표 덱을 생성하는 예시를 추가했습니다.
+승인된 WFDATA와 업무별 `SKILL.md`를 도메인에 관계없이 하나의 검증 가능한 팀 스킬팩 또는 팀 에이전트로 묶는 자기완결 스킬을 추가했습니다.
 
-- [HR Activity Coach 단일 스킬 예시](examples/hr-activity-coach-standalone/)
-- [공유할 파일 하나](examples/hr-activity-coach-standalone/skill/SKILL.md)
-- [Luna 결과와 전체 패키지 비교](examples/hr-activity-coach-standalone/COMPARISON.md)
+- [일반화 Activity Packaging Coach](skills/activity-packaging-coach/SKILL.md)
+- [에이전트 정의](agents/activity-packaging-coach-agent.md)
+- [비식별 가상 구매 독립 실행 예시](examples/activity-packaging-coach-general/)
+- [기준 실행과 Luna 5 원본 비교](examples/activity-packaging-coach-general/COMPARISON.md)
 
-이 예시는 워크숍·발표 프로토타입용입니다. 실제 운영에서는 기존 `check/` 계약 게이트와 실행 패키지를 함께 사용하세요.
+정본 스킬은 HR 전용 필드나 외부 템플릿에 의존하지 않습니다. 예시는 같은 단일 스킬과 입력으로 기준 에이전트가 Edge 27/27을 통과하고 Luna 원본은 1280px 문서 overflow로 18/27이 된 차이까지 보존합니다. 워크숍·발표 프로토타입에는 단일 파일로 시작할 수 있지만, 실제 운영에서는 기존 `check/` 계약 게이트와 실행 패키지를 함께 사용하세요.
 
 > 처음이시라면 아래 "전체 흐름"만 읽으세요. 각 도구의 상세는 그 아래에 있습니다.
 
@@ -246,6 +247,8 @@ Activity Coach_SKI/
 ├── DESIGN.md            ← SK CI 색·폰트 규칙 (디자인의 원본)
 ├── prompts/             ← ① 인터뷰 프롬프트 v1·v2 (팀장이 붙여넣는 것)
 ├── check/               ← ② 통합 점검기 (판정 기준 + 어댑터 + 스크립트)
+├── skills/              ← 도메인 중립 Activity Packaging Coach 정본
+├── agents/              ← 정본 스킬을 실행하는 일반 에이전트 정의
 ├── personas/            ← SK 팀장·실무자 페르소나 인터뷰 (스킬 발굴 근거)
 ├── assets/              ← ③ 슬라이드 테마 뼈대 (다크 / SK CI)
 └── examples/            ← 완성 예시 모음
