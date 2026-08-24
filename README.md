@@ -16,6 +16,16 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 | ✅ **통합 점검기** | 상류 산출물을 팩으로 변환하고, 잘 묶였는지 판정하고, 실제로 돌려봄 | 패키징 전후 | [`check/`](check/) |
 | 📊 **slide-pack** | 문서를 HTML 슬라이드로 변환 | 팀에 공유하거나 발표할 때 | 저장소 루트 |
 
+### 단일 파일 포터빌리티 예시
+
+외부 공유를 가볍게 시작할 때 `SKILL.md` 하나만으로 HR 업무 구조화와 9면 발표 덱을 생성하는 예시를 추가했습니다.
+
+- [HR Activity Coach 단일 스킬 예시](examples/hr-activity-coach-standalone/)
+- [공유할 파일 하나](examples/hr-activity-coach-standalone/skill/SKILL.md)
+- [Luna 결과와 전체 패키지 비교](examples/hr-activity-coach-standalone/COMPARISON.md)
+
+이 예시는 워크숍·발표 프로토타입용입니다. 실제 운영에서는 기존 `check/` 계약 게이트와 실행 패키지를 함께 사용하세요.
+
 > 처음이시라면 아래 "전체 흐름"만 읽으세요. 각 도구의 상세는 그 아래에 있습니다.
 
 ---
