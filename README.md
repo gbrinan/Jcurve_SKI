@@ -200,7 +200,7 @@ agent-plan.md를 slide-pack으로 슬라이드 덱 만들어줘
 |---|---|---|
 | **생김새** | 어두운 배경, 차분한 톤 | 흰 배경 + SK 레드/오렌지 포인트 |
 | **언제** | 팀 내부에서 빠르게 훑을 때 | 발표·보고 등 남에게 보여줄 때 |
-| **예시** | [`examples/lv5-packaging-deck.html`](examples/lv5-packaging-deck.html) | [`examples/lv5-presentation-deck-sk.html`](examples/lv5-presentation-deck-sk.html) |
+| **예시** | [`examples/lv5-packaging-deck.html`](examples/lv5-packaging-deck.html) | 스켈레톤: [`assets/template-sk-ci.html`](assets/template-sk-ci.html) |
 | **호출** | 그냥 요청하면 기본 적용 | 아래 문장으로 요청 |
 
 SK CI 테마로 만들려면:
