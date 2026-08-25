@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>구매기획팀 Lv.5 에이전트</title>
+<style>
+  :root {
+    --bg: #0f1420;
+    --surface: #1a2233;
+    --line: #2c3a55;
+    --text: #e8edf7;
+    --muted: #93a1bd;
+    --accent: #ffb454;
+    --accent2: #5ec8f8;
+    --ok: #7dd486;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--bg); color: var(--text);
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif; }
+  .deck { height: 100%; display: flex; align-items: center; justify-content: center; }
+  .slide {
+    display: none; width: min(96vw, 177.6vh); aspect-ratio: 16/9;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: clamp(24px, 5vh, 56px) clamp(28px, 6vw, 72px);
+    flex-direction: column; justify-content: center; gap: clamp(12px, 2.5vh, 26px);
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+  .kicker { color: var(--accent); font-size: clamp(12px, 1.6vh, 17px); font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase; }
+  h1 { font-size: clamp(28px, 6vh, 56px); line-height: 1.2; }
+  h2 { font-size: clamp(20px, 4.2vh, 38px); line-height: 1.25; }
+  .sub { color: var(--muted); font-size: clamp(14px, 2.2vh, 21px); line-height: 1.5; }
+  ul { list-style: none; display: flex; flex-direction: column; gap: clamp(8px, 1.8vh, 16px); }
+  ul li { padding-left: 1.2em; position: relative; font-size: clamp(14px, 2.4vh, 22px); line-height: 1.45; }
+  ul li::before { content: "▸"; position: absolute; left: 0; color: var(--accent2); }
+  strong { color: var(--accent); font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: clamp(12px, 2vh, 18px); }
+  th { text-align: left; color: var(--accent2); border-bottom: 2px solid var(--line);
+    padding: .45em .6em; font-weight: 700; }
+  td { border-bottom: 1px solid var(--line); padding: .45em .6em; line-height: 1.4; }
+  .pill { display: inline-block; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 999px; padding: .2em .8em; color: var(--accent2);
+    font-size: clamp(11px, 1.7vh, 15px); }
+  .pager { position: fixed; right: 22px; bottom: 16px; color: var(--muted);
+    font-size: 14px; font-variant-numeric: tabular-nums; }
+  .hint { position: fixed; left: 22px; bottom: 16px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="deck">
+
+<section class="slide">
+  <div class="kicker">팀 에이전트 기획서</div>
+  <h1>구매기획팀<br>Lv.5 에이전트</h1>
+  <p class="sub">견적 취합 → 비교표 갱신 → 발주 품의 초안 자동화</p>
+  <div><span class="pill">팀장 1 + 팀원 2</span> <span class="pill">주 6시간 절감 목표</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">1 · 팀과 목적</div>
+  <h2>주간 견적 비교·품의 준비에 매주 6시간을 쓴다</h2>
+  <ul>
+    <li>반복 업무: 견적 메일 취합 → 비교표 작성 → 품의 초안</li>
+    <li>에이전트가 <strong>취합·작성</strong>을 맡고, 사람은 <strong>판단·승인</strong>만</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">2 · 역할 정의</div>
+  <h2>"견적 메일을 읽어 비교표를 갱신하고 품의 초안을 만든다"</h2>
+  <ul>
+    <li>하는 일: 견적 파싱 · 비교표 기록 · 품의 초안 작성</li>
+    <li>하지 않는 일: <strong>발주 승인</strong> · 공급사와의 직접 소통</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">3 · 데이터 명세</div>
+  <h2>원본은 공용드라이브 data 폴더 한 곳</h2>
+  <table>
+    <tr><th>표</th><th>주요 칸</th><th>읽기/쓰기</th></tr>
+    <tr><td>견적비교표.xlsx</td><td>공급사 · 품목 · 단가 · 납기 · 수신일</td><td>쓰기</td></tr>
+    <tr><td>승인공급사목록.xlsx</td><td>공급사 · 등급 · 담당자</td><td>읽기</td></tr>
+  </table>
+  <p class="sub">SSOT: 공용드라이브/구매기획/data — 다른 위치에 사본을 만들지 않는다</p>
+</section>
+
+<section class="slide">
+  <div class="kicker">4 · 대표 시나리오</div>
+  <h2>월요일 09:00, 폴더 지정 한 번이면 끝</h2>
+  <ul>
+    <li><strong>트리거</strong>: 팀원이 지난주 견적 메일 폴더 지정</li>
+    <li><strong>입력</strong>: 견적 메일(PDF 첨부 포함)</li>
+    <li><strong>처리</strong>: 파싱 → 승인공급사 대조 → 미승인 건 분리</li>
+    <li><strong>출력</strong>: 비교표 갱신 + 품의 초안(md)</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">5 · 반영과 검증</div>
+  <h2>돈이 걸린 문서는 사람이 마지막에 선다</h2>
+  <ul>
+    <li>결과는 견적비교표의 해당 품목 행에 기록, 미승인 공급사는 "검토 필요"로 분리</li>
+    <li><strong>휴먼인더루프</strong>: 품의 초안 발송 전 팀장 확인 필수</li>
+    <li>단가 <strong>±15% 이상 변동</strong> 시 에이전트가 멈추고 확인 요청</li>
+    <li>연동: 현재 독립 · 차기 결재 시스템 스킬로 초안 전달</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">원문 · SSOT</div>
+  <h2>이 슬라이드는 요약본입니다</h2>
+  <ul>
+    <li>원본 문서: <strong>examples/sample/agent-plan.md</strong> (Jcurve_SKI 저장소)</li>
+    <li>폴더 트리 배치(8절) 등 상세는 원문에서 확인</li>
+    <li>원문이 바뀌면 이 덱은 <strong>다시 생성</strong>합니다</li>
+  </ul>
+  <p class="sub">생성: slide-pack 스킬 · Codex 슬라이드 포맷 · 기본 다크 테마</p>
+</section>
+
+</div>
+<div class="pager"><span id="cur">1</span> / <span id="total">1</span></div>
+<div class="hint">← → · 스페이스 · 클릭으로 이동</div>
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  let i = 0;
+  document.getElementById('total').textContent = slides.length;
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    document.getElementById('cur').textContent = i + 1;
+  }
+  addEventListener('keydown', e => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+  });
+  addEventListener('click', e => show(e.clientX < innerWidth / 3 ? i - 1 : i + 1));
+  show(0);
+</script>
+</body>
+</html>
