@@ -119,7 +119,7 @@ python3 check/adapt_workflow.py <워크플로우.html> <출력 팩>             
 다시 돌려도 그 파일을 건드리지 않고, 새로 읽은 결과를 `DECISIONS.new.md`로 따로 씁니다.
 (재실행이 기록을 지운 적이 있어 막아 둔 것입니다 — 결정을 남기려는 도구가 결정을 지우면 안 됩니다.)
 
-**상류 코치 산출물에서 시작하기.** 세션 3(ATF 핏 코치)·세션 4(와이어프레임 코치)의 출력을
+**상류 코치 산출물에서 시작하기.** 세션 3(ATF 핏 코치)·세션 4(에이전트, 스킬 설계 코치)의 출력을
 그대로 팩으로 변환합니다 — 참가자가 스킬을 새로 쓸 필요가 없습니다.
 
 ```bash
@@ -200,7 +200,7 @@ agent-plan.md를 slide-pack으로 슬라이드 덱 만들어줘
 |---|---|---|
 | **생김새** | 어두운 배경, 차분한 톤 | 흰 배경 + SK 레드/오렌지 포인트 |
 | **언제** | 팀 내부에서 빠르게 훑을 때 | 발표·보고 등 남에게 보여줄 때 |
-| **예시** | [`examples/lv5-packaging-deck.html`](examples/lv5-packaging-deck.html) | [`examples/lv5-presentation-deck-sk.html`](examples/lv5-presentation-deck-sk.html) |
+| **예시** | [`examples/lv5-packaging-deck.html`](examples/lv5-packaging-deck.html) | 스켈레톤: [`assets/template-sk-ci.html`](assets/template-sk-ci.html) |
 | **호출** | 그냥 요청하면 기본 적용 | 아래 문장으로 요청 |
 
 SK CI 테마로 만들려면:

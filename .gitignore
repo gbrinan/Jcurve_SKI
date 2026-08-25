@@ -1,0 +1,6 @@
+# 실행 산출물 — run.py / simulate_run.py 가 만드는 결과물
+examples/sample/*/out/
+
+# 파이썬
+__pycache__/
+*.pyc
