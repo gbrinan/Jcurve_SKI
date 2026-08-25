@@ -1,12 +1,13 @@
-# Activity Coach_SKI — 팀 AI 에이전트 패키징 도구 모음
+# 스킬·에이전트 통합 코치 — 팀 AI 에이전트 패키징 도구 모음
 
 **개인이 만든 스킬들을 하나의 팀 에이전트로 묶고, 제대로 묶였는지 검증하고, 그 결과를 발표 자료로 만드는 것**까지를 한 저장소에서 지원합니다.
 SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어졌습니다.
 
 > **이름의 뜻** — 교육의 코치 계열을 잇는 이름입니다.
-> 세션 3 **핏 코치**(업무가 에이전트에 맞는가) → 세션 4 **Wireframe Coach**(태스크 하나를 어떻게 판단하는가)
-> → 세션 4 **Merge Coach**(팀 것을 하나로) → 세션 6 **Activity Coach**(액티비티=Lv5를 팀 에이전트로 패키징).
-> 각 코치가 한 계층을 맡고, Activity Coach가 마지막 통합 계층을 맡습니다.
+> 세션 3 **디자인 캠프 해설 코치**(결과를 확인하고 LV5를 고르는가)
+> → 세션 4 **에이전트 설계 코치**(LV5 전체 작업과 스킬 경계를 어떻게 설계하는가)
+> → 세션 6 **스킬·에이전트 통합 코치**(팀원이 만든 스킬을 실행 팩과 발표자료로 묶는가).
+> 각 코치가 한 계층을 맡고, 스킬·에이전트 통합 코치가 마지막 통합 계층을 맡습니다.
 
 이 저장소는 세 가지 도구로 이루어져 있습니다.
 
@@ -16,11 +17,11 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 | ✅ **통합 점검기** | 상류 산출물을 팩으로 변환하고, 잘 묶였는지 판정하고, 실제로 돌려봄 | 패키징 전후 | [`check/`](check/) |
 | 📊 **slide-pack** | 문서를 HTML 슬라이드로 변환 | 팀에 공유하거나 발표할 때 | 저장소 루트 |
 
-### 일반화 Activity Packaging Coach
+### 일반화 스킬·에이전트 통합 코치
 
 승인된 WFDATA와 업무별 `SKILL.md`를 도메인에 관계없이 하나의 검증 가능한 팀 스킬팩 또는 팀 에이전트로 묶고, 같은 trace로 Activity 실행 목업과 발표자료를 만드는 자기완결 스킬을 추가했습니다.
 
-- [일반화 Activity Packaging Coach](skills/activity-packaging-coach/SKILL.md)
+- [일반화 스킬·에이전트 통합 코치](skills/activity-packaging-coach/SKILL.md)
 - [에이전트 정의](agents/activity-packaging-coach-agent.md)
 - [비식별 가상 구매 독립 실행 예시](examples/activity-packaging-coach-general/)
 - [trace 기반 Activity 실행 목업](examples/activity-packaging-coach-general/results/reference/agent-mockup.html)
@@ -35,19 +36,19 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 
 ## 세 코치 전체 사용법
 
-**TL;DR:** [SKI-skills](https://github.com/gbrinan/SKI-skills)의 Moderator가 LV5를 확정하고, [wireframe-coach](https://github.com/gbrinan/wireframe-coach)가 승인된 `tobe.html`·`WFDATA`·업무별 `SKILL.md`를 만들면, 이 저장소의 **Activity Packaging Coach**가 실행 가능한 팀 스킬팩 또는 팀 에이전트, 실행 trace, Activity 목업과 9면 발표자료로 묶습니다.
+**TL;DR:** [SKI-skills](https://github.com/gbrinan/SKI-skills)의 **디자인 캠프 해설 코치**가 LV5를 확정하고, **에이전트 설계 코치**가 승인된 `tobe.html`·`WFDATA`·업무별 `SKILL.md`를 만들면, 이 저장소의 **스킬·에이전트 통합 코치**가 실행 가능한 팀 스킬팩 또는 팀 에이전트, 실행 기록, 직접 테스트하는 목업과 9면 발표자료로 묶습니다.
 
 ```mermaid
 flowchart TB
-  U["1. 비식별 업무 요청과 자료<br/>최대 5종"] --> M["2. Wireframe Moderator Coach<br/>LV5 후보와 적합성 판정"]
+  U["1. 비식별 업무 요청과 자료<br/>최대 5종"] --> M["2. 디자인 캠프 해설 코치<br/>결과 확인·LV5 선택"]
   M --> MS["선정 트리 HTML<br/>선정 상태 블록"]
   MS --> H1{"사람 확인<br/>대상 LV5 확정"}
 
-  H1 --> W["3. Wireframe Coach<br/>판단 기준·예외·책임 설계"]
+  H1 --> W["3. 에이전트 설계 코치<br/>전체 작업·예외·책임 설계"]
   W --> WF["tobe.html + WFDATA<br/>업무별 task SKILL.md"]
   WF --> H2{"사람 확인<br/>와이어프레임 승인"}
 
-  H2 --> A["4. Activity Packaging Coach<br/>계약·writer·payload·chain 통합"]
+  H2 --> A["4. 스킬·에이전트 통합 코치<br/>스킬·계약·실행 흐름 통합"]
   A --> C{"독립 AI 작업 수와<br/>L0-L4 결과"}
   C -->|"2개 이하"| SP["team skillpack"]
   C -->|"3개 이상 + 검증 통과"| TA["team agent"]
@@ -277,13 +278,13 @@ DESIGN.md의 토큰만 사용하고, template-sk-ci.html 스켈레톤을 써.
 ## 📁 저장소 구조
 
 ```
-Activity Coach_SKI/
+스킬·에이전트 통합 코치 저장소/
 ├── README.md            ← 지금 읽고 있는 문서
 ├── SKILL.md             ← AI가 읽는 slide-pack 스킬 정의
 ├── DESIGN.md            ← SK CI 색·폰트 규칙 (디자인의 원본)
 ├── prompts/             ← ① 인터뷰 프롬프트 v1·v2 (팀장이 붙여넣는 것)
 ├── check/               ← ② 통합 점검기 (판정 기준 + 어댑터 + 스크립트)
-├── skills/              ← 도메인 중립 Activity Packaging Coach 정본
+├── skills/              ← 도메인 중립 스킬·에이전트 통합 코치 정본
 ├── agents/              ← 정본 스킬을 실행하는 일반 에이전트 정의
 ├── personas/            ← SK 팀장·실무자 페르소나 인터뷰 (스킬 발굴 근거)
 ├── assets/              ← ③ 슬라이드 테마 뼈대 (다크 / SK CI)

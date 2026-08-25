@@ -1,4 +1,4 @@
-# Activity Packaging Coach 일반화 예시
+# 스킬·에이전트 통합 코치 일반화 예시
 
 ## TL;DR
 
@@ -15,6 +15,6 @@
 
 두 실행 모두 L0–L4와 사람 정지점은 보존했다. Luna 결과는 375·768에서 통과했지만 1280의 `body` 바깥 패딩 때문에 문서 높이가 viewport보다 14px 커졌다. 비교의 재현성을 위해 Luna HTML은 수정하지 않았다.
 
-Wireframe Coach의 `tobe.html`은 승인 전 편집·확정 화면이다. 실행 시작, trace 재생, 진행률, 분기 결과와 사람 정지는 승인 이후 Activity Packaging Coach가 만든 `agent-mockup.html`에서 담당한다.
+에이전트 설계 코치의 `tobe.html`은 선택한 LV5의 전체 작업 흐름을 확인하고 승인하는 화면이다. 팀원 개개인이 만든 스킬을 넣은 뒤, 실행 시작·기록 재생·진행률·분기 결과·사람 정지는 스킬·에이전트 통합 코치가 만든 `agent-mockup.html`에서 직접 테스트한다. `agent-plan-deck.html`은 같은 결과를 팀 발표용으로 설명한다.
 
 실제 업무에서는 `input/`을 복사하지 말고 비식별화한 승인 WFDATA와 해당 업무의 task skill로 교체한다. 이 예시는 외부 전송, 구매 승인, 결제 또는 운영 시스템 쓰기를 수행하지 않는다.
