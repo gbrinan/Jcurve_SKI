@@ -1,12 +1,25 @@
-# Activity Coach_SKI — 팀 AI 에이전트 패키징 도구 모음
+# 스킬 통합 코치 — 여러 스킬을 팀 에이전트 또는 스킬팩으로 만드는 도구 모음
 
-**개인이 만든 스킬들을 하나의 팀 에이전트로 묶고, 제대로 묶였는지 검증하고, 그 결과를 발표 자료로 만드는 것**까지를 한 저장소에서 지원합니다.
+**개인이 만든 여러 스킬을 필요에 따라 골라 쓰는 스킬팩 또는 순서대로 함께 실행하는 팀 에이전트로 묶고, 제대로 연결됐는지 확인한 뒤 발표자료까지 만드는 것**을 한 저장소에서 지원합니다.
 SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어졌습니다.
 
+### 처음 보는 용어를 쉽게 설명하면
+
+| 용어 | 쉬운 뜻 |
+|---|---|
+| 스킬 | AI가 한 가지 업무를 처리하는 방법을 적은 업무 지침 |
+| 스킬팩 | 여러 스킬을 묶어 필요할 때 골라 쓰는 구성 |
+| 팀 에이전트 | 여러 스킬을 순서와 갈림길로 연결해 함께 실행하는 구성 |
+| 업무 흐름 데이터(WFDATA) | 작업 순서, 예외, 사람 확인 지점을 적은 설계 정보 |
+| 실행 기록(trace) | 각 단계가 무엇을 받아 처리하고 남겼는지 보여주는 기록 |
+| L0–L4 점검 | 공통 규칙부터 파일 구조, 내용 보존, 연결 상태, 실제 실행까지 확인하는 5단계 검사 |
+| Manifest | 생성된 파일과 실행 방법을 한곳에 모은 안내문 |
+
 > **이름의 뜻** — 교육의 코치 계열을 잇는 이름입니다.
-> 세션 3 **핏 코치**(업무가 에이전트에 맞는가) → 세션 4 **Wireframe Coach**(태스크 하나를 어떻게 판단하는가)
-> → 세션 4 **Merge Coach**(팀 것을 하나로) → 세션 6 **Activity Coach**(액티비티=Lv5를 팀 에이전트로 패키징).
-> 각 코치가 한 계층을 맡고, Activity Coach가 마지막 통합 계층을 맡습니다.
+> 세션 3 **디자인 캠프 해설 코치**(결과를 확인하고 LV5를 고르는가)
+> → 세션 4 **에이전트 설계 코치**(LV5 전체 작업과 스킬 경계를 어떻게 설계하는가)
+> → 세션 6 **스킬 통합 코치**(팀원이 만든 여러 스킬을 팀 에이전트 또는 스킬팩으로 묶는가).
+> 각 코치가 한 계층을 맡고, 스킬 통합 코치가 마지막 통합 계층을 맡습니다.
 
 이 저장소는 세 가지 도구로 이루어져 있습니다.
 
@@ -14,28 +27,76 @@ SK이노베이션 AI Agent 제작 교육(세션 6·7)에서 쓰도록 만들어�
 |---|---|---|---|
 | 🎤 **인터뷰 프롬프트** | 질문에 답하면 팀 에이전트 기획서가 나옴 | 스킬들을 팀 단위로 묶기 시작할 때 | [`prompts/`](prompts/) |
 | ✅ **통합 점검기** | 상류 산출물을 팩으로 변환하고, 잘 묶였는지 판정하고, 실제로 돌려봄 | 패키징 전후 | [`check/`](check/) |
-| 📊 **slide-pack** | 문서를 HTML 슬라이드로 변환 | 팀에 공유하거나 발표할 때 | 저장소 루트 |
+| 📊 **발표자료 생성기(slide-pack)** | 문서를 웹브라우저에서 보는 발표 화면으로 변환 | 팀에 공유하거나 발표할 때 | 저장소 루트 |
 
-> 처음이시라면 아래 "전체 흐름"만 읽으세요. 각 도구의 상세는 그 아래에 있습니다.
+### 일반화 스킬 통합 코치
+
+승인된 업무 흐름 데이터와 업무별 스킬을 분야에 관계없이 하나의 점검 가능한 팀 스킬팩 또는 팀 에이전트로 묶고, 같은 실행 기록으로 직접 테스트하는 화면과 발표자료를 만드는 자기완결 스킬을 추가했습니다.
+
+- [일반화 스킬 통합 코치](skills/activity-packaging-coach/SKILL.md)
+- [에이전트 정의](agents/activity-packaging-coach-agent.md)
+- [비식별 가상 구매 독립 실행 예시](examples/activity-packaging-coach-general/)
+- [실행 기록 기반 테스트 화면](examples/activity-packaging-coach-general/results/reference/agent-mockup.html)
+- [실행 확인 화면 전용 생성기](scripts/render-activity-mockup.mjs) — 발표자료·업무 설계 화면과 템플릿을 공유하지 않고 기존 단계 목록·재생 제어·사람 정지 설계를 보존합니다.
+- [생성 에이전트·스킬·즉시 실행 Manifest](examples/activity-packaging-coach-general/results/reference/team-package/MANIFEST.md)
+- [기준 실행과 Luna 5 원본 비교](examples/activity-packaging-coach-general/COMPARISON.md)
+
+정본 스킬은 HR 전용 필드나 외부 템플릿에 의존하지 않습니다. 기준 예시는 `node run.mjs`로 실제 결과와 trace를 재생성하고, Activity 목업 12/12와 발표자료 27/27을 통과합니다. Luna 원본의 1280px 문서 overflow 18/27도 비교 대상으로 보존합니다. 워크숍·발표 프로토타입에는 단일 파일로 시작할 수 있지만, 실제 운영에서는 기존 `check/` 계약 게이트와 실행 패키지를 함께 사용하세요.
+
+> 처음이시라면 아래 "세 코치 전체 사용법"만 읽으세요. 빨간 노드가 이 저장소의 책임 범위이고, 각 도구의 상세는 그 아래에 있습니다.
 
 ---
 
-## 🧭 전체 흐름 — 세션 6에서 7까지
+## 세 코치 전체 사용법
 
-```
-들어오는 것 (둘 중 하나)
-  · 개인이 각자 쓴 SKILL.md                    → ① 인터뷰로 채운다
-  · 세션 3·4 코치 산출물 / 워크플로우 설계도 HTML → adapt_* 로 팩으로 변환
-      │
-      ├─① prompts/   확인표로 아는 것을 통째 확인, 빈 칸만 질문
-      │               →  agent-plan.md (기획서 = 원본/SSOT) + CONTRACT.md (이름 계약)
-      │
-      ├─② check/     readchk      → DECISIONS.md (이해한 바 + 미결 갈래 하나)
-      │               계약 게이트  → 🟢 통과 → 통합 점검기 → simulate_run 실제 실행
-      │                             🟡 표기 어긋남 → 교정안 → 재검사
-      │                             🔴 충돌 → 팀이 결정 → 재검사
-      │
-      └─③ slide-pack  발표 자료로 만든다        →  ...-deck.html (발표용 SK CI 테마)
+**TL;DR:** [SKI-skills](https://github.com/gbrinan/SKI-skills)의 **디자인 캠프 해설 코치**가 LV5를 확정하고, **에이전트 설계 코치**가 승인된 업무 설계 화면과 업무별 스킬을 만들면, 이 저장소의 **스킬 통합 코치**가 여러 스킬을 팀 스킬팩 또는 팀 에이전트로 묶고 실행 기록, 직접 테스트하는 화면과 9면 발표자료를 만듭니다.
+
+```mermaid
+flowchart TB
+  U["1. 비식별 업무 요청과 자료<br/>최대 5종"] --> M["2. 디자인 캠프 해설 코치<br/>결과 확인·LV5 선택"]
+  M --> MS["선정 트리 HTML<br/>선정 상태 블록"]
+  MS --> H1{"사람 확인<br/>대상 LV5 확정"}
+
+  H1 --> W["3. 에이전트 설계 코치<br/>전체 작업·예외·책임 설계"]
+  W --> WF["tobe.html + WFDATA<br/>업무별 task SKILL.md"]
+  WF --> H2{"사람 확인<br/>와이어프레임 승인"}
+
+  H2 --> A["4. 스킬 통합 코치<br/>여러 스킬을 에이전트 또는 스킬팩으로 통합"]
+  A --> C{"서로 구분되는 AI 작업 수와<br/>5단계 점검 결과"}
+  C -->|"2개 이하"| SP["팀 스킬팩<br/>필요한 스킬을 골라 사용"]
+  C -->|"3개 이상 + 점검 통과"| TA["팀 에이전트<br/>연결된 순서대로 함께 실행"]
+  SP -. "3개 이상 + 검증 통과" .-> TA
+  TA -. "2개 이하" .-> SP
+
+  SP --> PKG["5. team-package/MANIFEST.md<br/>생성 결과의 단일 진입점"]
+  TA --> PKG
+  PKG --> AS["AGENTS.md + task skills<br/>에이전트 정의와 실행 능력"]
+  PKG --> RT["run.mjs + trace.json<br/>로컬 실행과 기록"]
+  PKG --> MX["agent-mockup.html<br/>실행 상태·분기·사람 정지"]
+  PKG --> DK["agent-plan-deck.html<br/>9면 발표자료"]
+
+  RT --> CMD["6. Manifest의 명령 실행<br/>node run.mjs"]
+  CMD --> HH{"사람 책임 지점<br/>자동 진행 금지"}
+  HH --> OUT["결과 파일 확인<br/>근거·미해결 항목·다음 행동"]
+
+  AS --> V["7. 최종 검증<br/>skill validator · L0-L4 · E2E"]
+  MX --> V2["목업 QA<br/>375·768·1280 × 4상태"]
+  DK --> V3["발표 QA<br/>375·768·1280 × 9면"]
+  OUT --> V
+  V --> H3{"사람 최종 판단<br/>외부 행동은 별도 승인"}
+  V2 --> H3
+  V3 --> H3
+
+  classDef coach fill:#10233f,color:#ffffff,stroke:#10233f,stroke-width:2px;
+  classDef current fill:#EA002C,color:#ffffff,stroke:#9f001e,stroke-width:3px;
+  classDef artifact fill:#f7f5f2,color:#20242a,stroke:#6b7280,stroke-width:1px;
+  classDef human fill:#f7dddd,color:#7f1d1d,stroke:#a62a2a,stroke-width:2px;
+  classDef package fill:#e7f3eb,color:#14532d,stroke:#216e46,stroke-width:2px;
+  class M,W,A coach;
+  class A current;
+  class MS,WF,AS,RT,MX,DK,CMD,OUT,V,V2,V3 artifact;
+  class H1,H2,HH,H3 human;
+  class SP,TA,PKG package;
 ```
 
 각 단계는 앞 단계의 산출물을 그대로 입력으로 받습니다. 기획서 하나가 끝까지 따라갑니다.
@@ -230,12 +291,14 @@ DESIGN.md의 토큰만 사용하고, template-sk-ci.html 스켈레톤을 써.
 ## 📁 저장소 구조
 
 ```
-Activity Coach_SKI/
+스킬 통합 코치 저장소/
 ├── README.md            ← 지금 읽고 있는 문서
 ├── SKILL.md             ← AI가 읽는 slide-pack 스킬 정의
 ├── DESIGN.md            ← SK CI 색·폰트 규칙 (디자인의 원본)
 ├── prompts/             ← ① 인터뷰 프롬프트 v1·v2 (팀장이 붙여넣는 것)
 ├── check/               ← ② 통합 점검기 (판정 기준 + 어댑터 + 스크립트)
+├── skills/              ← 도메인 중립 스킬 통합 코치 정본
+├── agents/              ← 정본 스킬을 실행하는 일반 에이전트 정의
 ├── personas/            ← SK 팀장·실무자 페르소나 인터뷰 (스킬 발굴 근거)
 ├── assets/              ← ③ 슬라이드 테마 뼈대 (다크 / SK CI)
 └── examples/            ← 완성 예시 모음

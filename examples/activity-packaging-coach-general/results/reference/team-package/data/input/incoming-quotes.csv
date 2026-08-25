@@ -1,0 +1,4 @@
+quote_id,supplier_code,item_code,unit_price,lead_days,currency
+Q-NORMAL,SUP-A,ITEM-1,100000,5,KRW
+Q-REVIEW,SUP-B,ITEM-2,112001,8,KRW
+Q-FAILED,SUP-C,ITEM-3,not-a-number,4,KRW

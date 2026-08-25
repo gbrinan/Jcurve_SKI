@@ -1,0 +1,297 @@
+{
+  "summary": {
+    "checked": 12,
+    "passed": 12,
+    "failed": 0
+  },
+  "results": [
+    {
+      "viewport": {
+        "width": 375,
+        "height": 667
+      },
+      "state": "rest",
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "screenshot": "evidence\\mockup-visual\\375x667\\rest.png",
+      "metrics": {
+        "phase": "rest",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": false,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 375,
+        "height": 667
+      },
+      "state": "running",
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "screenshot": "evidence\\mockup-visual\\375x667\\running.png",
+      "metrics": {
+        "phase": "running",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 375,
+        "height": 667
+      },
+      "state": "hold-intermediate",
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "screenshot": "evidence\\mockup-visual\\375x667\\hold-intermediate.png",
+      "metrics": {
+        "phase": "hold-intermediate",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 375,
+        "height": 667
+      },
+      "state": "hold-final",
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "screenshot": "evidence\\mockup-visual\\375x667\\hold-final.png",
+      "metrics": {
+        "phase": "hold-final",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 720
+      },
+      "state": "rest",
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "screenshot": "evidence\\mockup-visual\\768x720\\rest.png",
+      "metrics": {
+        "phase": "rest",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": false,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 720
+      },
+      "state": "running",
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "screenshot": "evidence\\mockup-visual\\768x720\\running.png",
+      "metrics": {
+        "phase": "running",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 720
+      },
+      "state": "hold-intermediate",
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "screenshot": "evidence\\mockup-visual\\768x720\\hold-intermediate.png",
+      "metrics": {
+        "phase": "hold-intermediate",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 768,
+        "height": 720
+      },
+      "state": "hold-final",
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "screenshot": "evidence\\mockup-visual\\768x720\\hold-final.png",
+      "metrics": {
+        "phase": "hold-final",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "state": "rest",
+      "passed": true,
+      "png": {
+        "width": 1280,
+        "height": 900
+      },
+      "screenshot": "evidence\\mockup-visual\\1280x900\\rest.png",
+      "metrics": {
+        "phase": "rest",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": false,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "state": "running",
+      "passed": true,
+      "png": {
+        "width": 1280,
+        "height": 900
+      },
+      "screenshot": "evidence\\mockup-visual\\1280x900\\running.png",
+      "metrics": {
+        "phase": "running",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "state": "hold-intermediate",
+      "passed": true,
+      "png": {
+        "width": 1280,
+        "height": 900
+      },
+      "screenshot": "evidence\\mockup-visual\\1280x900\\hold-intermediate.png",
+      "metrics": {
+        "phase": "hold-intermediate",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "state": "hold-final",
+      "passed": true,
+      "png": {
+        "width": 1280,
+        "height": 900
+      },
+      "screenshot": "evidence\\mockup-visual\\1280x900\\hold-final.png",
+      "metrics": {
+        "phase": "hold-final",
+        "overflowX": 0,
+        "controlsInside": true,
+        "contextVisible": true,
+        "currentCardClear": true,
+        "currentRailVisible": true,
+        "cardsInside": true,
+        "externalActionsDisabled": true,
+        "traceMatches": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+quote_id,price_variance_pct,lead_variance_days,policy_status,evidence
+Q-NORMAL,0,0,pass,L4 adapter item match; below both thresholds
+Q-REVIEW,12.01,8,review,Price above 12% and lead-time above 7 days
+Q-FAILED,,,review,Upstream parse_status=review; source row preserved

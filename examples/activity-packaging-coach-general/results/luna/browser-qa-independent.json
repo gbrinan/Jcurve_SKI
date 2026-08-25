@@ -1,0 +1,577 @@
+{
+  "generatedAtUtc": "2026-08-24T10:42:04.413Z",
+  "summary": {
+    "checked": 27,
+    "passed": 18,
+    "failed": 9
+  },
+  "results": [
+    {
+      "viewport": "375x667",
+      "screen": 1,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "375x667",
+      "screen": 2,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "375x667",
+      "screen": 3,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "375x667",
+      "screen": 4,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "375x667",
+      "screen": 5,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "375x667",
+      "screen": 6,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "375x667",
+      "screen": 7,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "375x667",
+      "screen": 8,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "375x667",
+      "screen": 9,
+      "passed": true,
+      "png": {
+        "width": 375,
+        "height": 667
+      },
+      "metrics": {
+        "innerWidth": 375,
+        "innerHeight": 667,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 619,
+        "footerTop": 619,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 1,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 2,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 3,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 4,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 5,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 6,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 7,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 8,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "768x720",
+      "screen": 9,
+      "passed": true,
+      "png": {
+        "width": 768,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 768,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 0,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 518,
+        "footerTop": 518,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 1,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 2,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 3,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 4,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 5,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 6,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 7,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 8,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    },
+    {
+      "viewport": "1280x720",
+      "screen": 9,
+      "passed": false,
+      "png": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "innerWidth": 1280,
+        "innerHeight": 720,
+        "documentOverflowX": 0,
+        "documentOverflowY": 14,
+        "screenOverflowX": 0,
+        "screenOverflowY": 0,
+        "screenBottom": 661,
+        "footerTop": 661,
+        "footerVisible": true,
+        "activeCount": 1
+      }
+    }
+  ]
+}
