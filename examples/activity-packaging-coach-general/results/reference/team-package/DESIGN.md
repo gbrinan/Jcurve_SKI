@@ -56,6 +56,8 @@ System UI만 사용한다. 제목은 `clamp(1.5rem, 3vw, 2.75rem)` 700, 본문�
 - Data table: 의미 있는 `table`, 작은 화면에서 카드형 row로 변환.
 - Navigation button: 기본·hover·active·focus-visible·disabled 상태, 키보드 접근 가능.
 - Activity hero: 패키지 유형, 독립 AI 작업 수, 사람 정지점, 검토 분기를 trace에서 계산해 표시.
+- Coach introduction: 첫 화면의 가장 위에서 `스킬 통합 코치` 이름과 `여러 스킬을 묶어 팀 에이전트 또는 스킬팩을 만든다`는 역할을 일반 문장으로 먼저 설명한다.
+- Plain-language glossary: 첫 화면에서 스킬·스킬팩·팀 에이전트·실행 기록을 각각 한 문장으로 설명한다. 내부 데이터 키나 파일명은 유지해도 사람이 보는 레이블에는 영문 약어를 단독으로 노출하지 않는다.
 - Execution rail: 시작·AI 단계·사람 정지·종료를 텍스트, 형태, 색으로 함께 구분하며 현재 단계에 focus ring을 표시.
 - Run card: 입력, 실행 중, 결과, 분기, 사람 정지 variant. 모든 수치와 문구는 내장 trace에서 렌더링.
 - Control dock: 재생·일시정지, 다음, 속도, 초기화. 사람 정지에서는 자동 진행을 중단하고 명시적 확인만 허용.
