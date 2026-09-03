@@ -26,8 +26,8 @@ user-invocable: true
    - 원문의 문장을 복사하지 말고 키워드로 압축한다
 5. **SSOT 표시**: 마지막 슬라이드에 원문 문서의 위치(파일명·경로)를 명시한다. 슬라이드는 요약본이며 원본이 아니다 — 원문이 바뀌면 슬라이드를 다시 생성한다.
 6. **템플릿**: 색·폰트·네비게이션 JS를 재발명하지 않는다. 용도에 따라 선택:
-   - 팀 내부 공유(기본): `assets/template.html` (다크)
-   - 발표용(SK CI): `assets/template-sk-ci.html` — 디자인 토큰의 SSOT는 `DESIGN.md`이며, DESIGN.md에 없는 색·크기는 임의로 만들지 않는다
+   - 팀 내부 공유(기본): `skills/depth/slide-pack/assets/template.html` (다크)
+   - 발표용(SK CI): `skills/depth/slide-pack/assets/template-sk-ci.html` — 디자인 토큰의 SSOT는 `DESIGN.md`이며, DESIGN.md에 없는 색·크기는 임의로 만들지 않는다
 7. **발표용 추가 규칙** (SK CI 테마일 때):
    - 슬라이드 제목은 주제가 아니라 **주장(한 문장 메시지)**으로 쓴다
    - 파트가 3개 이상이면 섹션 구분 슬라이드(`slide divider`)를 넣는다
@@ -38,7 +38,7 @@ user-invocable: true
 1. 입력 문서를 읽고 섹션 구조를 파악한다.
 2. 슬라이드 개요를 먼저 뽑는다: 타이틀 1장 + 섹션당 1장 + 마무리(원문 위치) 1장. **10장을 넘기지 않는다** — 넘치면 섹션을 병합하거나 뺀다.
 3. 각 슬라이드를 밀도 제한에 맞게 압축한다. 뺀 내용은 마지막 슬라이드에 "원문에서 확인"으로 안내한다.
-4. `assets/template.html`을 읽어 `<!-- SLIDES -->` 위치에 슬라이드를 채우고, `<!-- TITLE -->`을 제목으로 치환해 저장한다.
+4. `skills/depth/slide-pack/assets/template.html`을 읽어 `<!-- SLIDES -->` 위치에 슬라이드를 채우고, `<!-- TITLE -->`을 제목으로 치환해 저장한다.
 5. 생성 후 자기 점검: 외부 URL 참조가 없는가, 페이지 표시가 전체 장수와 맞는가, 원문 위치 슬라이드가 있는가.
 
 ## 산출물 이름 규칙

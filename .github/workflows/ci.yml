@@ -1,0 +1,26 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate the skill catalog
+        run: bash scripts/validate-skills.sh
+      - name: README structure matches folders
+        run: python3 check/run_check.py --self
+      - name: Sample packs pass the contract gate and integration check
+        run: |
+          python3 check/check_contract.py examples/sample/team-agent --run-check
+          python3 check/check_contract.py examples/sample/ax-share-agent --run-check
+          python3 check/check_contract.py examples/sample/report-wording-pack --run-check
+      - name: Upstream coach outputs flow end to end
+        run: bash check/test_upstream_e2e.sh /tmp/upstream-e2e-pack

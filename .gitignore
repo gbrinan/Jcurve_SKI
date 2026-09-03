@@ -1,0 +1,5 @@
+.re0/
+*.local.md
+REMEDIATION.md
+DECISIONS.new.md
+__pycache__/

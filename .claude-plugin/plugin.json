@@ -1,0 +1,7 @@
+{
+  "name": "jcurve-ski",
+  "description": "팀 AI 에이전트 패키징 도구 모음의 SK이노베이션 프로필 — 인터뷰 프롬프트, 상류 어댑터, 통합 점검기, slide-pack. 범용 엔진은 skillmergeagent.",
+  "skills": [
+    "./skills/depth/slide-pack"
+  ]
+}

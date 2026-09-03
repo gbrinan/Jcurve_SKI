@@ -65,6 +65,6 @@
 
 ```
 DESIGN.md를 읽고, 그 토큰과 규칙만 사용해서
-assets/template-sk-ci.html 스켈레톤 위에 슬라이드를 생성하라.
+skills/depth/slide-pack/assets/template-sk-ci.html 스켈레톤 위에 슬라이드를 생성하라.
 DESIGN.md에 없는 색·크기가 필요하면 임의로 만들지 말고 나에게 물어라.
 ```
