@@ -28,6 +28,11 @@ SK이노베이션 AI 에이전트 제작 교육(세션 6·7)에서, 팀원들이
 - [x] `planning/` 세 파일
 - [x] README를 지도·색인·엔진 관계가 보이도록 다시 씀
 
+### Phase 3.5: paperthin 냉독(shower) 반영 ✅
+
+- [x] 컨텍스트 없는 세션이 README·CLAUDE.md를 냉독 → needs work (용어 미정의 · 실행 위치 없음 · 두 문서 불일치)
+- [x] "누가 어디서 무엇을 하나" 절, 용어표 13개, 저장소 이름·스킬 6개·SKILL.md/skill.md·점검 도구 소재 통일
+
 ### Phase 4: 실측 ⏸️
 
 - [ ] `examples/sample/report-wording-pack`에 `data/`가 없어 L1이 실패한다 (README는 통과 예시라고 설명). `data/`를 채우거나 README 설명을 고친다

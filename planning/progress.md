@@ -20,6 +20,14 @@
 - `planning/tasks.md`, `planning/findings.md`, `planning/progress.md` (신규)
 - `README.md`, `DESIGN.md` (수정)
 
+## Session 2026-09-03 (2)
+
+### Phase 3.5: 냉독 반영 ✅
+
+**작업 내역**: 냉독(shower) 결함 3묶음 반영. README에 "누가 어디서 무엇을 하나"·"용어" 절 추가, 저장소 이름·스킬 개수·파일명 대소문자·점검 도구 소재를 README와 CLAUDE.md에서 통일.
+
+**생성/수정 파일**: `README.md`, `CLAUDE.md`, `planning/*`
+
 ## Test Results
 
 | Test | Input | Expected | Actual | Status |

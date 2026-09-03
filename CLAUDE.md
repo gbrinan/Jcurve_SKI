@@ -1,6 +1,6 @@
 # Jcurve_SKI (Activity Coach_SKI)
 
-팀원들이 각자 만든 스킬을 하나의 팀 에이전트로 묶고, 잘 묶였는지 판정하고, 결과를 발표 자료로 만드는 도구 모음의 **SK이노베이션 프로필**이다. 회사에 묶이지 않는 범용 엔진은 [skillmergeagent](https://github.com/gbrinan/skillmergeagent)이고, 이 저장소는 그 엔진을 한 회사의 교육 흐름(세션 3 핏 코치 → 4 와이어프레임 코치 → 6·7 통합·패키징)에 맞춘 인스턴스다. 이 문서는 에이전트와 기여자가 따르는 규약이다. 사람이 읽는 정문은 [README](./README.md)다.
+팀원들이 각자 만든 스킬을 하나의 팀 에이전트로 묶고, 잘 묶였는지 판정하고, 결과를 발표 자료로 만드는 도구 모음의 **SK이노베이션 프로필**이다. 회사에 묶이지 않는 범용 엔진은 [skillmergeagent](https://github.com/gbrinan/skillmergeagent)이고, 이 저장소는 그 엔진을 한 회사의 교육 흐름(세션 3 핏 코치 → 세션 4 와이어프레임 코치·머지 코치 → 세션 6 액티비티 코치, 즉 통합·패키징 → 세션 7 팀 간 피드백)에 맞춘 인스턴스다. 이 문서는 에이전트와 기여자가 따르는 규약이다. 사람이 읽는 정문은 [README](./README.md)다.
 
 ## 철학 (paperthin)
 
@@ -14,9 +14,9 @@
 
 | 여기(프로필)에 두는 것 | 엔진(skillmergeagent)에 두는 것 |
 | --- | --- |
-| 교육 세션 번호·타임라인, 이노허브/Codex 전제 | 스킬 6개(intake · askflow · skillmerge · weave · mergechk · planfiles) |
-| SK CI 디자인 토큰(`DESIGN.md`), slide-pack 테마 | 팩 규격 서식(`templates/`), 점검 기준 |
-| 상류 도구 형식(ATF HTML, `WFDATA` 와이어프레임)과 어댑터(`check/adapt_*.py`) | 유사도 감사(`similarity.py`) |
+| 교육 세션 번호·타임라인, 이노허브(Codex 기반 사내 AI 코치) 전제 | 스킬 6개(intake · askflow · skillmerge · weave · mergechk · planfiles) |
+| SK CI 디자인 토큰(`DESIGN.md`), slide-pack 테마 | 팩 규격 서식(`templates/`) |
+| 상류 도구 형식(ATF HTML, `WFDATA` 와이어프레임)과 어댑터(`check/adapt_*.py`) · 점검 도구와 기준(`check/`, 이 저장소가 원형) | 유사도 감사(`similarity.py`) · 점검 도구의 회사 이름 뺀 사본 |
 | 페르소나 인터뷰, 교안용 예시 팩 | 범용 예시(before/after) |
 
 `check/`의 게이트·점검기·readchk는 엔진에 일반화된 사본이 있다. **팩 규격**(스킬 frontmatter `name·owner·quadrant·human·inputs·outputs·reads·writes·next`, 계약 블록 `tables·writers·chain·payloads·threshold·halt_at`)은 두 저장소가 같게 유지한다. 규격을 바꾸면 양쪽을 같이 바꾼다. 코드는 링크로 공유하지 않는다. 어느 쪽도 혼자 설치돼 돌아야 한다.
@@ -27,7 +27,7 @@
 skills/<사분면>/<이름>/SKILL.md     ← 이 저장소가 제공하는 스킬 (지금은 depth/slide-pack 하나)
 check/                              ← 점검기 · 게이트 · readchk · 상류 어댑터 · E2E
 prompts/                            ← 인터뷰 프롬프트 v1·v2 (팀장이 붙여넣는 것)
-examples/sample/<팀>/               ← 팩 규격의 실제 예시 (스킬은 skills/<사분면>/<이름>/skill.md)
+examples/sample/<팀>/               ← 팩 규격의 실제 예시 (스킬은 skills/<사분면>/<이름>/SKILL.md, 소문자 skill.md도 점검기가 읽는다)
 planning/                           ← 이 저장소 자신의 tasks · findings · progress
 ```
 

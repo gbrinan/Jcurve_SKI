@@ -31,6 +31,10 @@
 
 스킬 frontmatter `name · owner · quadrant · human · inputs · outputs · reads · writes · next`, 계약 블록 `tables · writers · chain · payloads · threshold · halt_at`. 이 규격이 두 저장소를 잇는다. 코드가 아니라.
 
+### paperthin 냉독 결과 (2026-09-03)
+
+컨텍스트 없는 별도 세션이 README와 CLAUDE.md만 읽고 보고한 결함: Lv5·ATF·WFDATA·이노허브·상류·팩·계약·게이트·L1~L4·자동/증강/사람고유·SSOT가 정의 없이 등장, 명령을 어디서 치는지 없음, 저장소 이름(Jcurve vs Activity Coach)·엔진 스킬 5 vs 6·`SKILL.md` vs `skill.md`·점검 도구 소재가 두 문서에서 어긋남. 모두 README 앞부분의 두 절(누가 어디서 무엇을 하나 · 용어)과 문장 통일로 고쳤다. 교육 자료는 "팀장이 첫 화면에서 멈추는 곳"이 곧 결함이라는 기준을 적용했다.
+
 ## Technical Decisions
 
 | Decision | Rationale |
