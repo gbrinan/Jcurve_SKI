@@ -30,6 +30,8 @@ SK이노베이션 AI 에이전트 제작 교육(세션 6·7)에서, 팀원들이
 
 ### Phase 4: 실측 ⏸️
 
+- [ ] `examples/sample/report-wording-pack`에 `data/`가 없어 L1이 실패한다 (README는 통과 예시라고 설명). `data/`를 채우거나 README 설명을 고친다
+
 - [ ] 세션 6에서 엔진의 `intake` → `askflow`를 실제 팀 폴더에 돌려보고 v2 프롬프트와 비교
 - [ ] 슬라이드 생성 후 검증 체크리스트 5항목 실측
 
@@ -52,6 +54,7 @@ SK이노베이션 AI 에이전트 제작 교육(세션 6·7)에서, 팀원들이
 | Error | Attempt | Resolution |
 | --- | --- | --- |
 | `run_check.py --self`가 `skills/`·`scripts/`·`planning/`을 구조도에서 못 찾음 | 1 | README 구조도 갱신 |
+| report-wording-pack L1 `data/ 존재` 실패 | 1 | 이 브랜치 이전부터의 상태. CI에서 제외, Phase 4 항목으로 남김 |
 
 ## Notes
 

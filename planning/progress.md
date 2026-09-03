@@ -28,7 +28,7 @@
 | run_check.py --self | README 구조도 | 최상위 폴더 전부 안내 | 통과 | ✅ |
 | check_contract.py --run-check | examples/sample/team-agent | 🟢 · 전체 통과 | 🟢 · 전체 통과 | ✅ |
 | check_contract.py --run-check | examples/sample/ax-share-agent | 🟢 · 전체 통과 | 🟢 · 전체 통과 | ✅ |
-| check_contract.py --run-check | examples/sample/report-wording-pack | 🟢 · 통과 (⚠️ 수용된 위험 1) | 🟢 · 통과 (⚠️ 1) | ✅ |
+| check_contract.py --run-check | examples/sample/report-wording-pack | 🟢 · 통과 (⚠️ 수용된 위험 1) | 🟢 · L1 `data/ 존재` 실패 1건 (main에서도 동일) | ❌ |
 | test_upstream_e2e.sh | examples/upstream | 전 구간 통과 | 전 구간 통과 | ✅ |
 
 ## Error Log
@@ -36,6 +36,7 @@
 | Timestamp | Error | Attempt | Resolution |
 | --- | --- | --- | --- |
 | 2026-09-03 | `--self`가 새 최상위 폴더를 구조도에서 못 찾음 | 1 | README 구조도 갱신 |
+| 2026-09-03 | report-wording-pack이 L1 `data/ 존재`에서 실패 (이 브랜치 이전부터) | 1 | CI에서 제외하고 tasks.md에 미결로 남김. 예시를 고칠지는 팀 결정 |
 
 ## 5-Question Reboot Check
 

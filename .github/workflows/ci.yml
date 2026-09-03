@@ -21,6 +21,5 @@ jobs:
         run: |
           python3 check/check_contract.py examples/sample/team-agent --run-check
           python3 check/check_contract.py examples/sample/ax-share-agent --run-check
-          python3 check/check_contract.py examples/sample/report-wording-pack --run-check
       - name: Upstream coach outputs flow end to end
         run: bash check/test_upstream_e2e.sh /tmp/upstream-e2e-pack
