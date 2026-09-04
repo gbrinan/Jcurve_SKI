@@ -37,7 +37,8 @@ SK이노베이션 AI 에이전트 제작 교육(세션 6·7)에서, 팀원들이
 
 - [ ] `examples/sample/report-wording-pack`에 `data/`가 없어 L1이 실패한다 (README는 통과 예시라고 설명). `data/`를 채우거나 README 설명을 고친다
 
-- [ ] 세션 6에서 엔진의 `intake` → `askflow`를 실제 팀 폴더에 돌려보고 v2 프롬프트와 비교
+- [x] 엔진의 `intake`를 `examples/upstream/`에 수행 → `examples/upstream/INTAKE.md`. v2 프롬프트의 0단계(재료 읽기)·1단계(확인표)와 같은 결과 형태가 나옴
+- [ ] 세션 6 실제 팀 폴더에서 `askflow`까지 돌려 v2 프롬프트와 비교
 - [ ] 슬라이드 생성 후 검증 체크리스트 5항목 실측
 
 ## Key Questions

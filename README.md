@@ -172,7 +172,7 @@ python3 check/adapt_upstream.py <와이어프레임 폴더> <ATF html> <출력 �
 
 어댑터는 `WFDATA`의 판단기준·예외·환경태그를 스킬 파일(`SKILL.md`)로 옮기고, `atf-data`의 판정·6기준을
 기획서로 옮깁니다. **상류에 없는 것은 지어내지 않고 `(미정)`으로 남깁니다** — 스킬 사이 순서,
-표·칸 이름, 임계값이 여기 해당합니다. 그 자리는 세션 6 인터뷰가 채웁니다. 예시는 [`examples/upstream/`](examples/upstream/).
+표·칸 이름, 임계값이 여기 해당합니다. 그 자리는 세션 6 인터뷰가 채웁니다. 예시는 [`examples/upstream/`](examples/upstream/). 엔진의 `intake` 스킬을 이 상류 산출물에 그대로 수행한 결과(스킬 카드·확인표·인터뷰 목록)는 [`examples/upstream/INTAKE.md`](examples/upstream/INTAKE.md)에 있습니다.
 
 게이트는 팀원들이 각자 만들어 온 스킬을 `CONTRACT.md`(표·기록자·체인·페이로드·임계값)와 대조해 세 갈래로 나눕니다:
 

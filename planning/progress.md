@@ -28,6 +28,14 @@
 
 **생성/수정 파일**: `README.md`, `CLAUDE.md`, `planning/*`
 
+## Session 2026-09-04
+
+### Phase 4 실측 (일부) 🔄
+
+**작업 내역**: 엔진의 `intake`를 `examples/upstream/`(와이어프레임 3 + ATF 1)에 지시문대로 수행. 결과를 `examples/upstream/INTAKE.md`로 남김. 통폐합 후보 0, 직선 체인 1, 정지 지점 1(팀장 확인), 인터뷰 항목 6(가장 무거운 것은 데이터 정의).
+
+**생성/수정 파일**: `examples/upstream/INTAKE.md` (신규), `README.md`, `planning/*`
+
 ## Test Results
 
 | Test | Input | Expected | Actual | Status |
